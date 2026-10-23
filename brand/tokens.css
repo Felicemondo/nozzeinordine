@@ -1,0 +1,13 @@
+:root {
+  --ground: #F1F0EC;      /* calce */
+  --ink: #1E1417;         /* inchiostro */
+  --muted: #4B4044;
+  --accent: #6E1B2F;      /* aglianico */
+  --accent-ink: #FFFFFF;
+  --tile: #F7F7F5;        /* tessera */
+  --tile-laid: #E7E6E2;   /* tessera già posata */
+  --grout: #D8D5CD;        /* fuga */
+  --verde: #5E8C3A;  --limone: #E7B72F;  --celeste: #7EA4D6;  --cotto: #C4694D;   /* smalti: solo stati */
+  --font: "Hanken Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --joint: 4px;   /* la fuga */
+}
