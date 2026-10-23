@@ -1,0 +1,7 @@
+{
+  "name": "nozzeinordine",
+  "private": true,
+  "scripts": {
+    "build": "echo 'sito statico: nessuna build'"
+  }
+}
