@@ -17,7 +17,7 @@ Il modulo scrive su Supabase (tabella `waitlist`) con la chiave publishable, che
 
 ## Crediti
 
-- Carattere: Hanken Grotesk, SIL Open Font License, ospitato in `site/fonts`.
-- Foto: Sailko, CC BY 3.0, da Wikimedia Commons (chiostro maiolicato di Santa Chiara, Napoli). Credito in fondo a ogni pagina; dettagli in `brand/credits.json`.
+- Caratteri: DM Serif Display (titoli) e DM Sans (interfaccia e dati), SIL Open Font License, ospitati in `site/fonts`.
+- Foto: Sailko (CC BY 3.0) per il chiostro maiolicato di Santa Chiara, Napoli; Leandro Neumann Ciuffo (CC BY 2.0) per Villa Rufolo, Ravello. Da Wikimedia Commons, con credito in fondo a ogni pagina.
 - I dati nei riquadri del sito sono di esempio.
 - Il nome "Nozze in Ordine" non ha un parere legale sul marchio: serve un consulente prima del deposito.

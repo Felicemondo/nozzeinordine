@@ -103,6 +103,7 @@ const IMG = {
   viale1: ["img/viale-1.jpg", 1500, 1000, "Il viale del chiostro maiolicato di Santa Chiara a Napoli: file di pilastri rivestiti di riggiole e panche decorate."],
   viale2: ["img/viale-2.jpg", 1500, 843, "Lo stesso viale del chiostro di Santa Chiara, visto con alcune persone che lo percorrono."],
   tenda: ["img/riggiole-tenda.jpg", 1500, 934, "Riggiole dipinte del chiostro di Santa Chiara: una scena di campagna con una tenda a strisce gialle e azzurre."],
+  ravello: ["img/ravello.jpg", 1500, 995, "Un pino marittimo e due torrette di Villa Rufolo, sopra il mare della Costiera Amalfitana."],
   paesaggio: ["img/riggiole-paesaggio.jpg", 1500, 540, "Pannello di riggiole dipinte: un paesaggio con un fiume, alberi e una torre, incorniciato di giallo."],
 };
 const img = (k, extra = "") => `<img src="${IMG[k][0]}" width="${IMG[k][1]}" height="${IMG[k][2]}" alt="${IMG[k][3]}" ${extra}>`;
@@ -110,7 +111,7 @@ const img = (k, extra = "") => `<img src="${IMG[k][0]}" width="${IMG[k][1]}" hei
 const LZ = 'loading="lazy" decoding="async"';
 const xf = (a, b, extra = "") => `<div class="frame-img xfade drift"${extra}>${img(a, LZ)}${img(b, LZ)}</div>`;
 const strip = (cap) => `<section class="section frame" aria-label="Riggiole"><figure class="pic strip" ${rv()}><div class="frame-img drift">${img("paesaggio", LZ)}</div><figcaption>${cap}</figcaption></figure></section>`;
-const CREDITS = `Foto: Sailko, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, da Wikimedia Commons: <a href="https://commons.wikimedia.org/wiki/File:Chiostro_maiolicato_delle_clarisse_di_s._chiara,_1739-42,_01.jpg">chiostro maiolicato 01</a>, <a href="https://commons.wikimedia.org/wiki/File:Santa_chiara,_chiostro_maiolicato_02.JPG">chiostro maiolicato 02</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=83108541">riggiole, la tenda</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=83108543">riggiole, il paesaggio</a>. Ritagliate e ridimensionate.`;
+const CREDITS = `Foto: Sailko, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, da Wikimedia Commons: <a href="https://commons.wikimedia.org/wiki/File:Chiostro_maiolicato_delle_clarisse_di_s._chiara,_1739-42,_01.jpg">chiostro maiolicato 01</a>, <a href="https://commons.wikimedia.org/wiki/File:Santa_chiara,_chiostro_maiolicato_02.JPG">chiostro maiolicato 02</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=83108541">riggiole, la tenda</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=83108543">riggiole, il paesaggio</a>. Villa Rufolo: Leandro Neumann Ciuffo, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>, da <a href="https://commons.wikimedia.org/wiki/File:Vista_da_Villa_Rufolo_-_1_(9704341704).jpg">Wikimedia Commons</a>. Ritagliate e ridimensionate.`;
 
 /* ---------- struttura comune ---------- */
 const NAV = [["coppie.html", "Per le coppie"], ["planner.html", "Per le planner"], ["prezzi.html", "Prezzi"]];
@@ -135,34 +136,45 @@ const FORM_PLANNER = `<form id="waitlist" data-profile="planner" novalidate>
 <label class="consent" for="chiamata"><input type="checkbox" id="chiamata" name="chiamata"><span>Mi farebbe piacere una chiamata di 25 minuti per raccontare come lavoro.</span></label>
 <label class="consent" for="consenso"><input type="checkbox" id="consenso" name="consenso"><span>Acconsento a ricevere un'email quando la prima versione è pronta. Uso l'indirizzo solo per questo e puoi chiedere di cancellarlo quando vuoi. <a href="privacy.html">Leggi l'informativa</a>.</span></label>
 <div><button class="btn" type="submit" id="invia">Iscrivimi alla lista <span class="arrow" aria-hidden="true">→</span></button><p id="status" role="status" aria-live="polite"></p></div></form>`;
-const formSection = (h, p, form, aside) => `<section class="field" id="lista" aria-labelledby="lst"><div class="frame"><div class="grid"><h2 id="lst" ${rv()}>${h}</h2><p class="lead after" ${rv(80)}>${p}</p></div>
+const formSection = (h, p, form, aside) => `<div class="rig" aria-hidden="true"></div>
+<section class="field" id="lista" aria-labelledby="lst"><div class="frame"><div class="grid"><h2 id="lst" ${rv()}>${h}</h2><p class="lead after" ${rv(80)}>${p}</p></div>
 <div class="form-wrap"><div class="form-card" style="grid-column:1 / span 7" ${rv(120)}>${form}</div><div class="form-aside" ${rv(200)}>${aside}</div></div></div></section>`;
 
 /* =========================================================== HOME */
-write("index.html", head("Nozze in Ordine | Il matrimonio, tutto in ordine", "Budget, fornitori, invitati e scadenze del matrimonio in un solo posto, per coppie e wedding planner. Partiamo dalla Campania.", "index") + top("", "#lista") + `
+write("index.html", head("Nozze in Ordine | Il tuo sì, un tassello alla volta", "Budget, fornitori, invitati e scadenze del matrimonio in un solo posto, per coppie e wedding planner. Partiamo dalla Campania.", "index") + top("", "#lista") + `
 <main>
-<section class="hero frame" aria-labelledby="h1"><div class="grid"><h1 id="h1">Il matrimonio, tutto in ordine.</h1>
-<div class="intro"><p>Budget, fornitori, invitati e scadenze in un solo posto, per coppie e wedding planner. Provalo subito: scrivi la data del sì.</p><div class="actions"><a class="btn" href="coppie.html#lista">Siamo una coppia <span class="arrow" aria-hidden="true">→</span></a><a class="link" href="planner.html#lista">Sono una wedding planner <span class="arrow" aria-hidden="true">→</span></a></div></div></div>
-<div class="stage-wrap" ${rv(200)}>${FLOOR}</div></section>
+<section class="hero frame" aria-labelledby="h1"><div class="grid"><h1 id="h1" class="t-long">Il tuo sì, un tassello alla volta.</h1>
+<div class="intro"><p class="sub">Tutto il matrimonio, finalmente in ordine.</p><p>Budget, fornitori, invitati e scadenze in uno spazio condiviso, per organizzare ogni dettaglio con maggiore tranquillità. Provalo subito: scrivi la data del sì.</p><div class="actions"><a class="btn" href="coppie.html#lista">Sono una coppia <span class="arrow" aria-hidden="true">→</span></a><a class="btn alt" href="planner.html#lista">Sono una wedding planner <span class="arrow" aria-hidden="true">→</span></a></div></div>
+<figure class="pic photo" ${rv(120)}><div class="frame-img xfade drift">${img("viale1", 'decoding="async"')}${img("viale2", LZ)}</div><figcaption>Il chiostro maiolicato di Santa Chiara, a Napoli: da qui viene l'idea delle tessere.</figcaption></figure>
+<div class="stage-wrap" id="scadenze" ${rv(200)}>${FLOOR}</div></div></section>
 
-<section class="section frame" aria-labelledby="cose"><div class="grid"><h2 class="sec-head" id="cose" ${rv()}>Ogni cosa al suo posto.</h2></div>
-<div class="grid mod"><div style="--span:7;grid-column:1 / span 7" ${rv()}>${BUDGET}</div><div class="words" ${rv(120)}><h3>Quanto hai speso, voce per voce</h3><p>Previsto, firmato, pagato e residuo per ogni voce. Il totale torna sempre, senza rifare i conti ogni sera.</p></div></div>
-<div class="grid mod"><div style="grid-column:1 / span 6" ${rv()}>${QUOTES}</div><div class="words" ${rv(120)}><h3>I preventivi, uno accanto all'altro</h3><p>PDF, email e messaggi finiscono nella scheda del fornitore. Confronti le offerte e segni quale hai scelto.</p></div></div>
-<div class="grid mod"><div style="grid-column:1 / span 6" ${rv()}>${RSVP}</div><div class="words" ${rv(120)}><h3>Chi viene e chi deve ancora rispondere</h3><p>Nuclei familiari, risposte e menù. Un invito, una riggiola: vedi subito quante ne mancano.</p></div></div>
-<div class="grid mod"><div style="grid-column:1 / span 7" ${rv()}>${EVENTS}</div><div class="words" ${rv(120)}><h3>Tutti i matrimoni, un solo sguardo</h3><p>Per le wedding planner: ogni evento con la sua data, i suoi fornitori e gli acconti da incassare.</p></div></div>
-<div class="grid mod"><div style="grid-column:1 / span 5" ${rv()}>${WEEK}</div><div class="words" ${rv(120)}><h3>La giornata, minuto per minuto</h3><p>Orari, luoghi e responsabili, da mandare a fornitori e collaboratori.</p></div></div>
-<p class="note" ${rv()}>Tutti i dati nei riquadri sono di esempio.</p></section>
+<section class="section frame" aria-labelledby="cose"><div class="grid"><p class="secno" aria-hidden="true">N° 01</p><h2 class="sec-head" id="cose" ${rv()}>Ogni cosa al suo posto.</h2>
+<div class="overview" ${rv()}>
+<a class="ov big" href="#budget"><h3>Budget</h3><p class="fig">26.000 €<small>previsto · 5.450 € già pagati</small></p><p>Previsto, firmato, pagato e residuo per ogni voce di spesa.</p><span class="go">Vedi un esempio →</span></a>
+<a class="ov a" href="#invitati"><h3>Invitati</h3><p class="fig">84 su 150<small>hanno confermato</small></p><span class="go">Vedi un esempio →</span></a>
+<a class="ov b" href="#scadenze"><h3>Scadenze</h3><p class="fig">6 fasi<small>sulla tua data</small></p><span class="go">Provale qui sopra ↑</span></a>
+<a class="ov c" href="#preventivi"><h3>Fornitori</h3><p class="fig">2 preventivi<small>a confronto, con il totale</small></p><p>Scheda, contatti e stato della decisione.</p><span class="go">Vedi un esempio →</span></a></div>
+<p class="note" style="grid-column:1 / -1" ${rv()}>Cifre di esempio: servono a mostrare come sarà, non sono dati reali.</p></div></section>
+
+<section class="section frame" aria-labelledby="caos"><div class="grid"><p class="secno" aria-hidden="true">N° 02</p><h2 class="sec-head" id="caos" ${rv()}>Meno caos. Più controllo.</h2>
+<p class="lead sec-lead" ${rv()}>Pianifica le scadenze, confronta i preventivi, coordina il giorno. Cinque schermate d'esempio, con dati finti dichiarati.</p>
+<div class="grid mod" style="grid-column:1 / -1" id="budget"><div style="--span:7;grid-column:1 / span 7" ${rv()}>${BUDGET}</div><div class="words" ${rv(120)}><h3>Quanto hai speso, voce per voce</h3><p>Previsto, firmato, pagato e residuo per ogni voce. Il totale torna sempre, senza rifare i conti ogni sera.</p></div></div>
+<div class="grid mod" style="grid-column:1 / -1" id="preventivi"><div style="grid-column:1 / span 6" ${rv()}>${QUOTES}</div><div class="words" ${rv(120)}><h3>I preventivi, uno accanto all'altro</h3><p>PDF, email e messaggi finiscono nella scheda del fornitore. Confronti le offerte e segni quale hai scelto.</p></div></div>
+<div class="grid mod" style="grid-column:1 / -1" id="invitati"><div style="grid-column:1 / span 6" ${rv()}>${RSVP}</div><div class="words" ${rv(120)}><h3>Chi viene e chi deve ancora rispondere</h3><p>Nuclei familiari, risposte e menù. Un invito, una riggiola: vedi subito quante ne mancano.</p></div></div>
+<div class="grid mod" style="grid-column:1 / -1" id="eventi"><div style="grid-column:1 / span 7" ${rv()}>${EVENTS}</div><div class="words" ${rv(120)}><h3>Tutti i matrimoni, un solo sguardo</h3><p>Per le wedding planner: ogni evento con la sua data, i suoi fornitori e gli acconti da incassare.</p></div></div>
+<div class="grid mod" style="grid-column:1 / -1" id="scaletta"><div style="grid-column:1 / span 5" ${rv()}>${WEEK}</div><div class="words" ${rv(120)}><h3>La giornata, minuto per minuto</h3><p>Orari, luoghi e responsabili, da mandare a fornitori e collaboratori.</p></div></div>
+<p class="note" style="grid-column:1 / -1" ${rv()}>Tutti i dati nei riquadri sono di esempio.</p></div></section>
 
 <section class="section frame why" aria-labelledby="qui"><div class="grid">
-<figure class="pic big" ${rv()}><div class="frame-img xfade">${img("viale1", 'loading="lazy" decoding="async"')}${img("viale2", 'loading="lazy" decoding="async"')}</div><figcaption>Il chiostro maiolicato di Santa Chiara, a Napoli. Riggiole di Giuseppe e Donato Massa, 1739-42: ogni tassello al suo posto.</figcaption></figure>
-<div class="col"><h2 id="qui" ${rv(80)}>Fatto per i matrimoni di qui.</h2>
+<figure class="pic big" ${rv()}><div class="frame-img drift">${img("ravello", LZ)}</div><figcaption>I giardini di Villa Rufolo, a Ravello, sulla Costiera Amalfitana: uno dei luoghi in cui si celebrano i matrimoni di qui.</figcaption></figure>
+<div class="col"><p class="secno" aria-hidden="true">N° 03</p><h2 id="qui" ${rv(80)}>Pensato per i matrimoni di qui.</h2>
 <p ${rv(140)}><b>Un solo posto.</b> Budget, fornitori, invitati e scadenze non stanno più tra fogli, email e messaggi.</p>
 <p ${rv(200)}><b>Lo stesso spazio per sposi e planner.</b> La planner lavora e condivide con gli sposi sugli stessi dati, senza PDF inoltrati.</p>
-<p ${rv(260)}><b>Pensato per l'Italia.</b> Riti civili e religiosi, voci di spesa e scadenze come le conosciamo. Partiamo dalla Campania.</p>
-<figure class="pic small" ${rv(320)}><div class="frame-img">${img("tenda", 'loading="lazy" decoding="async"')}</div><figcaption>Riggiole dipinte del chiostro: una scena di campagna, tassello dopo tassello.</figcaption></figure></div></div>
-<figure class="pic strip" ${rv()}><div class="frame-img">${img("paesaggio", 'loading="lazy" decoding="async"')}</div><figcaption>Un pannello di riggiole: nessuna è uguale alle altre, tutte sono nel posto giusto.</figcaption></figure></section>
+<p ${rv(260)}><b>Pensato per l'Italia.</b> Riti civili e religiosi, voci di spesa e scadenze come le conosciamo. Il nome viene dalle riggiole del chiostro di Santa Chiara: tanti tasselli, ognuno al suo posto, che insieme fanno un disegno. Partiamo dalla Campania.</p>
+</div></div>
+<figure class="pic strip" ${rv()}><div class="frame-img drift">${img("paesaggio", LZ)}</div><figcaption>Un pannello di riggiole: nessuna è uguale alle altre, tutte sono nel posto giusto.</figcaption></figure></section>
 
-<section class="section frame how" aria-labelledby="come"><div class="grid"><h2 id="come" ${rv()}>Come lo stiamo costruendo</h2>
+<section class="section frame how" aria-labelledby="come"><div class="grid"><p class="secno" aria-hidden="true">N° 04</p><h2 id="come" ${rv()}>Come lo stiamo costruendo</h2>
 <div class="steps">
 <div class="step" data-i="0"><h3>Ascoltiamo.</h3><p>Parliamo con coppie e wedding planner campane, 25 minuti a testa e niente da vendere, per capire cosa fa perdere tempo e denaro.</p></div>
 <div class="step" data-i="1"><h3>Proviamo.</h3><p>Un prototipo cliccabile con dati finti, e uno spazio gestito a mano con le prime persone che vorranno provarlo.</p></div>
@@ -174,14 +186,15 @@ write("index.html", head("Nozze in Ordine | Il matrimonio, tutto in ordine", "Bu
 <div class="state" data-s="2"><h4>Cosa entra nella prima versione</h4><ul class="qs"><li>Budget e pagamenti</li><li>Fornitori e preventivi</li><li>Checklist con scadenze</li><li>Invitati e RSVP</li><li>Scaletta del giorno</li><li class="out">Per ora no: marketplace di fornitori, app per telefono, chat interna, piantina dei tavoli, pagamenti ai fornitori.</li></ul></div>
 </div></div></div></section>
 
-<section class="field" id="lista" aria-labelledby="lst"><div class="frame"><div class="grid"><h2 id="lst" ${rv()}>Una lista per le coppie, una per le planner.</h2><p class="lead after" ${rv(100)}>Non chiediamo pagamenti. Ti scriviamo solo quando la prima versione è pronta.</p>
+<div class="rig" aria-hidden="true"></div>
+<section class="field" id="lista" aria-labelledby="lst"><div class="frame"><div class="grid"><h2 id="lst" ${rv()}>Comincia a mettere tutto in ordine.</h2><p class="lead after" ${rv(100)}>Una lista d'attesa per le coppie, una per le planner. Non chiediamo pagamenti: ti scriviamo solo quando la prima versione è pronta.</p>
 <div class="actions" ${rv(180)}><a class="btn on-field" href="coppie.html#lista">Sono una coppia <span class="arrow" aria-hidden="true">→</span></a><a class="btn on-field" href="planner.html#lista">Sono una wedding planner <span class="arrow" aria-hidden="true">→</span></a></div></div></div></section>
 </main>` + foot(true));
 
 /* =========================================================== COPPIE */
 write("coppie.html", head("Per le coppie | Nozze in Ordine", "Budget, preventivi, invitati e scadenze nello stesso posto, da condividere con il partner e con chi vi aiuta.", "coppie") + top("coppie.html", "#lista") + `
 <main>
-<section class="hero frame page-hero" aria-labelledby="h1"><div class="grid"><h1 id="h1">Il vostro matrimonio, sotto controllo.</h1>
+<section class="hero frame page-hero" aria-labelledby="h1"><div class="grid"><h1 id="h1" class="t-long">Il matrimonio, sotto controllo.</h1>
 <div class="intro"><p>Budget, preventivi, invitati e scadenze nello stesso posto, da condividere con il partner e con chi vi aiuta.</p><div class="actions"><a class="btn" href="#lista">Iscrivetevi alla lista <span class="arrow" aria-hidden="true">→</span></a><a class="link" href="#funzioni">Cosa include <span class="arrow" aria-hidden="true">→</span></a></div></div>
 <div style="grid-column:1 / -1" ${rv(200)}>${FLOOR}</div></div></section>
 
@@ -215,7 +228,7 @@ ${formSection("Entrate in lista d'attesa.", "Stiamo parlando con coppie e planne
 /* =========================================================== PLANNER */
 write("planner.html", head("Per le wedding planner | Nozze in Ordine", "Tutti i matrimoni che segui, ciascuno con budget, fornitori, scadenze e documenti, e un portale condiviso con gli sposi.", "planner") + top("planner.html", "#lista") + `
 <main>
-<section class="hero frame page-hero" aria-labelledby="h1"><div class="grid"><h1 id="h1">Tutti i tuoi matrimoni, in un solo posto.</h1>
+<section class="hero frame page-hero" aria-labelledby="h1"><div class="grid"><h1 id="h1" class="t-long">Tutti i matrimoni, in un posto.</h1>
 <div class="intro"><p>Ogni evento con budget, fornitori, scadenze e documenti, e un portale condiviso con gli sposi. Cerchiamo le prime planner in Campania.</p><div class="actions"><a class="btn" href="#lista">Racconta come lavori <span class="arrow" aria-hidden="true">→</span></a><a class="link" href="#risparmio">Cosa cambia <span class="arrow" aria-hidden="true">→</span></a></div></div>
 <div style="grid-column:1 / span 8;margin-top:clamp(32px,4vw,64px)" ${rv(200)}>${EVENTS}<p class="note">Dati di esempio.</p></div>
 <div style="grid-column:9 / span 4;margin-top:clamp(32px,4vw,64px)" ${rv(280)}>${WEEK}</div></div></section>
@@ -288,7 +301,7 @@ write("prezzi.html", head("Prezzi | Nozze in Ordine", "Prezzi indicativi per cop
 <figure class="pic beside" style="grid-row:2" ${rv(160)}><div class="frame-img drift" style="aspect-ratio:4/3">${img("tenda", LZ)}</div><figcaption>Riggiole del chiostro: una scena di campagna, tassello dopo tassello.</figcaption></figure></div></section>
 
 ${strip("Un pannello di riggiole del chiostro di Santa Chiara: nessuna è uguale alle altre, tutte sono nel posto giusto.")}
-</main>` + foot(true));
+<div class="rig" aria-hidden="true"></div></main>` + foot(true));
 
 /* =========================================================== PRIVACY */
 write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati della lista d'attesa di Nozze in Ordine.", "privacy") + top("", "index.html#lista") + `
@@ -316,6 +329,6 @@ write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati d
 </div><figure class="pic beside" style="grid-row:1" ${rv(160)}><div class="frame-img drift" style="aspect-ratio:4/3">${img("tenda", LZ)}</div><figcaption>Riggiole del chiostro: una scena di campagna, tassello dopo tassello.</figcaption></figure></div></section>
 
 ${strip("Un pannello di riggiole del chiostro di Santa Chiara: nessuna è uguale alle altre, tutte sono nel posto giusto.")}
-</main>` + foot(true));
+<div class="rig" aria-hidden="true"></div></main>` + foot(true));
 
 console.log("pagine scritte in", OUT);

@@ -14,37 +14,46 @@ const lum = (hex) => {
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return ((x + 0.05) / (y + 0.05)).toFixed(1).replace(".", ","); };
 
 const C = {
-  calce: "#F1F0EC", inchiostro: "#1E1417", muted: "#4B4044", aglianico: "#6E1B2F", bianco: "#FFFFFF",
-  tessera: "#F7F7F5", posata: "#E7E6E2", fuga: "#D8D5CD",
-  verde: "#5E8C3A", limone: "#E7B72F", celeste: "#7EA4D6", cotto: "#C4694D",
+  avorio: "#F5F0E7", inchiostro: "#25241F", muted: "#514C45", bordeaux: "#702F43", bianco: "#FFFFFF",
+  tessera: "#FBF8F2", posata: "#EBE4D6", fuga: "#DCD2BF",
+  blu: "#5F8794", bluInk: "#386070", terra: "#B75F45", terraInk: "#9B4A32", olive: "#465044", oliveSoft: "#6F7F52",
 };
 
 const TOKENS = `:root {
-  --ground: ${C.calce};      /* calce */
-  --ink: ${C.inchiostro};         /* inchiostro */
+  --ground: ${C.avorio};      /* avorio caldo */
+  --ink: ${C.inchiostro};
   --muted: ${C.muted};
-  --accent: ${C.aglianico};      /* aglianico */
+  --accent: ${C.bordeaux};      /* bordeaux: azione e campo pieno */
   --accent-ink: ${C.bianco};
-  --tile: ${C.tessera};        /* tessera */
-  --tile-laid: ${C.posata};   /* tessera già posata */
-  --grout: ${C.fuga};        /* fuga */
-  --verde: ${C.verde};  --limone: ${C.limone};  --celeste: ${C.celeste};  --cotto: ${C.cotto};   /* smalti: solo stati */
-  --font: "Hanken Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --blu: ${C.blu};         /* blu ceramica: solo elementi grafici */
+  --blu-ink: ${C.bluInk};     /* blu ceramica per testo, link e selezioni */
+  --terra: ${C.terra};        /* terracotta: dettagli grafici */
+  --terra-ink: ${C.terraInk};    /* terracotta per testo */
+  --olive: ${C.olive};        /* verde oliva: titoli secondari */
+  --olive-soft: ${C.oliveSoft};   /* stato confermato */
+  --tile: ${C.tessera};       /* tessera */
+  --tile-laid: ${C.posata};  /* tessera già posata */
+  --grout: ${C.fuga};       /* fuga */
+  --serif: "DM Serif Display", Georgia, serif;   /* titoli */
+  --font: "DM Sans", "Helvetica Neue", Arial, sans-serif;   /* interfaccia, dati, prezzi */
   --joint: 4px;   /* la fuga */
 }
 `;
 writeFileSync(join(OUT, "tokens.css"), TOKENS);
 
-const sw = (name, hex, role, ink = "#1E1417") => `<li class="sw" style="--c:${hex};--i:${ink}"><b>${name}</b><span>${hex}</span><em>${role}</em></li>`;
+const sw = (name, hex, role, ink = "#25241F") => `<li class="sw" style="--c:${hex};--i:${ink}"><b>${name}</b><span>${hex}</span><em>${role}</em></li>`;
 
 const pairs = [
-  ["Inchiostro su calce", C.inchiostro, C.calce, "testo"],
-  ["Testo secondario su calce", C.muted, C.calce, "note, didascalie"],
-  ["Aglianico su calce", C.aglianico, C.calce, "numeri, link, stato attivo"],
-  ["Bianco su aglianico", C.bianco, C.aglianico, "pulsanti, sezioni a campo pieno"],
-  ["Inchiostro su limone", C.inchiostro, C.limone, "solo se serve testo sullo smalto"],
-  ["Inchiostro su celeste", C.inchiostro, C.celeste, "solo se serve testo sullo smalto"],
-  ["Bianco su inchiostro", C.bianco, C.inchiostro, "totali, tessera selezionata"],
+  ["Inchiostro su avorio", C.inchiostro, C.avorio, "testo"],
+  ["Testo secondario su avorio", C.muted, C.avorio, "note, didascalie"],
+  ["Bordeaux su avorio", C.bordeaux, C.avorio, "titoli di accento, numeri"],
+  ["Bianco su bordeaux", C.bianco, C.bordeaux, "pulsanti, sezioni a campo pieno"],
+  ["Blu ceramica scuro su avorio", C.bluInk, C.avorio, "link e selezioni"],
+  ["Bianco su blu ceramica scuro", C.bianco, C.bluInk, "opzione scelta nei moduli"],
+  ["Terracotta scura su avorio", C.terraInk, C.avorio, "numeri di sezione"],
+  ["Verde oliva su avorio", C.olive, C.avorio, "titoli secondari"],
+  ["Blu ceramica su avorio", C.blu, C.avorio, "solo grafica: mai testo"],
+  ["Terracotta su avorio", C.terra, C.avorio, "solo grafica: mai testo"],
 ];
 
 const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Identità visiva | Nozze in Ordine</title><meta name="description" content="Guida al marchio di Nozze in Ordine: idea, logo, colori, carattere, immagini, movimento e voce."><link rel="icon" href="logo/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../site/styles.css"><style>
@@ -126,27 +135,28 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta n
 
 <section class="section frame" id="idea" aria-labelledby="idea-h"><div class="grid"><h2 data-rv class="g-head" id="idea-h">Le riggiole, posate in ordine.</h2>
 <div class="g-text"><p class="lead">Nel chiostro maiolicato di Santa Chiara, a Napoli, ogni tassello dipinto sta al suo posto. In napoletano si chiamano riggiole. Un matrimonio si organizza allo stesso modo: budget, fornitori, invitati, scadenze, tante tessere piccole che devono stare insieme.</p>
-<p>Il marchio e il prodotto lavorano su questa immagine: tessere quadrate, una fuga stretta tra l'una e l'altra, un solo colore forte, un solo carattere. Niente corsivi, fiori, oro o sigilli: è il linguaggio di quasi tutti i servizi per matrimoni, e non dice nulla di noi.</p>
+<p>Il marchio e il prodotto lavorano su questa immagine: tessere modulari, una fuga stretta tra l'una e l'altra, un solo colore per l'azione, una serif editoriale per i titoli. Niente rose, calligrafie o oro: è il linguaggio di quasi tutti i servizi per matrimoni, e non dice nulla di noi. Il brief creativo (mediterraneo, editoriale, rassicurante) guida ogni scelta.</p>
 <h3>Cosa abbiamo guardato</h3>
-<p>Le riggiole del chiostro di Santa Chiara (1739-42) sono descritte dalle fonti con celeste, giallo e verde, in linea con cielo, vite e limoni del giardino; la ceramica di Vietri sul Mare con blu, giallo, verde e rosso. Da qui i quattro smalti del prodotto. Le tendenze 2026 della cartoleria nuziale spostano l'attenzione su tipografia, date in grande e sistemi coerenti: ci siamo mossi in quella direzione, senza ornamenti.</p>
-<p class="small soft">Fonti: <a href="https://fondoambiente.it/luoghi/complesso-monumentale-di-santa-chiara-napoli">FAI, Complesso monumentale di Santa Chiara</a> · <a href="https://www.comune.napoli.it/flex/cm/pages/ServeBLOB.php/L/EN/IDPagina/2227">Comune di Napoli</a> · <a href="https://www.italia.it/it/campania/salerno/vietri-sul-mare-cosa-vedere">italia.it, Vietri sul Mare</a> · <a href="https://www.stationeryhq.com/pages/wedding-stationery-trends-2026-what-designers-need-to-know">StationeryHQ, tendenze 2026</a> (fonte di un fornitore di stampa: da leggere con cautela). Le date del chiostro non coincidono del tutto tra le fonti.</p></div>
+<p>Le riggiole del chiostro di Santa Chiara (1739-42) sono descritte dalle fonti con celeste, giallo e verde, in linea con cielo, vite e limoni del giardino; la ceramica di Vietri sul Mare con blu, giallo, verde e rosso. Da qui il blu ceramica, la terracotta e l'oliva. Il rapporto Pinterest sul 2026 cita merlot, fico e oliva e la tipografia con personalità; le guide di stampa parlano di serif a contrasto e di date in grande. Le reference del brief (studi italiani di wedding planning e fotografia) confermano numerazioni di sezione, titoli in minuscolo e foto di luoghi veri.</p>
+<p class="small soft">Fonti: <a href="https://newsroom.pinterest.com/news/wedding-trend-report-2026/">Pinterest, Wedding trend report 2026</a> · <a href="https://www.photobox.co.uk/blog/special-occasions/2026-wedding-trends-design">Photobox, tendenze 2026</a> · <a href="https://fondoambiente.it/luoghi/complesso-monumentale-di-santa-chiara-napoli">FAI, Complesso monumentale di Santa Chiara</a> · <a href="https://www.comune.napoli.it/flex/cm/pages/ServeBLOB.php/L/EN/IDPagina/2227">Comune di Napoli</a> · <a href="https://www.italia.it/it/campania/salerno/vietri-sul-mare-cosa-vedere">italia.it, Vietri sul Mare</a> · <a href="https://www.stationeryhq.com/pages/wedding-stationery-trends-2026-what-designers-need-to-know">StationeryHQ, tendenze 2026</a> (fonte di un fornitore di stampa: da leggere con cautela). Le date del chiostro non coincidono del tutto tra le fonti.</p></div>
 <div class="g-side"><h3>Prima e dopo</h3>
 <table class="tbl"><thead><tr><th>Prima</th><th>Ora</th></tr></thead><tbody>
-<tr><td>Corsivo Pinyon Script</td><td>Un solo carattere, Hanken Grotesk</td></tr>
-<tr><td>Bodoni Moda per i titoli</td><td>Titoli in semibold stretto</td></tr>
+<tr><td>Corsivo Pinyon Script</td><td>Titoli in DM Serif Display</td></tr>
+<tr><td>Bodoni Moda per i titoli</td><td>Interfaccia e dati in DM Sans</td></tr>
 <tr><td>Filetti oro e sigillo</td><td>La fuga di 4px, niente linee</td></tr>
 <tr><td>Icone in cerchio</td><td>Frammenti reali del prodotto</td></tr>
 <tr><td>Scheda cruscotto con ombra</td><td>Pavimento di tessere, senza ombre</td></tr>
-<tr><td>Bordeaux e avorio</td><td>Aglianico e calce</td></tr></tbody></table></div></div></section>
+<tr><td>Bordeaux e avorio</td><td>Bordeaux, avorio caldo e ceramica</td></tr>
+<tr><td>Hero su cruscotto</td><td>Hero con foto, titolo e tessere</td></tr></tbody></table></div></div></section>
 
 <section class="section frame" id="marchio" aria-labelledby="mk-h"><div class="grid"><h2 data-rv class="g-head" id="mk-h">Quattro riggiole e un anello.</h2>
 <div class="g-text"><p>Il marchio è un quadrato di quattro tessere, separate da una fuga di due unità, con un anello tagliato al centro e un sasso pieno dentro. Si legge come una tessera posata, come un anello, come un'<em>O</em> di ordine. Quando il sito si apre, le quattro tessere ruotano e si mettono al loro posto: è l'unico movimento del marchio.</p>
-<p><b>Spazio di rispetto:</b> metà dell'altezza del marchio su ogni lato.<br><b>Misure minime:</b> marchio 20 px, lockup 120 px di larghezza.<br><b>Colori:</b> aglianico su calce o su bianco; bianco su aglianico o su inchiostro; inchiostro solo per stampa monocromatica.</p></div>
+<p><b>Spazio di rispetto:</b> metà dell'altezza del marchio su ogni lato.<br><b>Misure minime:</b> marchio 20 px, lockup 120 px di larghezza.<br><b>Colori:</b> bordeaux su avorio o su bianco; bianco su bordeaux o su inchiostro; inchiostro solo per stampa monocromatica. Il nome si scrive in DM Serif Display.</p></div>
 <div class="g-side"><h3>File</h3><ul class="small"><li><a href="logo/lockup.svg">lockup.svg</a>, <a href="logo/lockup-ink.svg">ink</a>, <a href="logo/lockup-white.svg">bianco</a></li><li><a href="logo/mark.svg">mark.svg</a>, <a href="logo/mark-ink.svg">ink</a>, <a href="logo/mark-white.svg">bianco</a></li><li><a href="logo/wordmark.svg">wordmark.svg</a>, <a href="logo/wordmark-ink.svg">ink</a>, <a href="logo/wordmark-white.svg">bianco</a></li><li><a href="logo/mark-scrambled.svg">mark-scrambled.svg</a> (solo per l'animazione)</li><li><a href="logo/favicon.svg">favicon.svg</a>, <a href="avatar.png">avatar.png</a>, <a href="og.png">og.png</a></li></ul></div>
 <div class="fields">
-<div class="field-tile t-ground s7"><div><img src="logo/lockup.svg" alt="Lockup di Nozze in Ordine in aglianico" width="460"><small class="soft">Lockup, su calce</small></div></div>
-<div class="field-tile t-accent s5"><div><img src="logo/lockup-white.svg" alt="Lockup di Nozze in Ordine in bianco" width="360"><small>Lockup, su aglianico</small></div></div>
-<div class="field-tile t-laid s4"><div><img src="logo/mark.svg" alt="Il marchio in aglianico" width="170"><small class="soft">Marchio</small></div></div>
+<div class="field-tile t-ground s7"><div><img src="logo/lockup.svg" alt="Lockup di Nozze in Ordine in bordeaux" width="460"><small class="soft">Lockup, su avorio</small></div></div>
+<div class="field-tile t-accent s5"><div><img src="logo/lockup-white.svg" alt="Lockup di Nozze in Ordine in bianco" width="360"><small>Lockup, su bordeaux</small></div></div>
+<div class="field-tile t-laid s4"><div><img src="logo/mark.svg" alt="Il marchio in bordeaux" width="170"><small class="soft">Marchio</small></div></div>
 <div class="field-tile t-ink s4"><div><img src="logo/mark-white.svg" alt="Il marchio in bianco" width="170"><small>Su inchiostro</small></div></div>
 <div class="field-tile t-ground s4"><div class="motion-demo" aria-hidden="true"><i></i><i></i><i></i><i></i></div><small class="soft">Le tessere si posano</small></div>
 </div>
@@ -160,53 +170,56 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta n
 <div><b style="font-size:1.6rem;font-style:italic;font-family:Georgia,serif;color:var(--accent)">Nozze in Ordine</b><span><span class="chip no">Niente corsivi o serif</span></span></div>
 </div></div></section>
 
-<section class="section frame" id="colore" aria-labelledby="co-h"><div class="grid"><h2 data-rv class="g-head" id="co-h">Un fondo, un inchiostro, un colore forte.</h2>
-<div class="g-text"><p class="lead">L'aglianico è il vino rosso scuro della Campania, e il bordeaux che il progetto aveva già scelto. Lo teniamo come unico colore d'accento: pulsanti, numeri importanti, la tessera "in corso" e le sezioni a campo pieno. Il fondo non è più avorio ma una calce neutra, perché l'avorio con il bordeaux è la coppia più usata del settore.</p></div>
+<section class="section frame" id="colore" aria-labelledby="co-h"><div class="grid"><h2 class="g-head" id="co-h">Avorio, bordeaux e ceramica.</h2>
+<div class="g-text"><p class="lead">La palette viene dal brief creativo e dalla ceramica del chiostro: fondo caldo e neutro, un solo colore per l'azione, il blu per ciò che si può seguire o scegliere, terracotta e oliva per i dettagli. Il bordeaux resta quello del marchio e dei pulsanti.</p></div>
 <ul class="swatches">
-${sw("Calce", C.calce, "Fondo della pagina")}
-${sw("Inchiostro", C.inchiostro, "Testo e totali", "#fff")}
-<li class="sw dark" style="--c:${C.aglianico}"><b>Aglianico</b><span>${C.aglianico}</span><em>Accento: azione e campo pieno</em></li>
+${sw("Avorio caldo", C.avorio, "Fondo della pagina")}
+${sw("Inchiostro", C.inchiostro, "Testo", "#fff")}
+<li class="sw dark" style="--c:${C.bordeaux}"><b>Bordeaux</b><span>${C.bordeaux}</span><em>Azione, marchio, tessera in corso</em></li>
+<li class="sw dark" style="--c:${C.bluInk}"><b>Blu ceramica scuro</b><span>${C.bluInk}</span><em>Link e opzioni scelte</em></li>
 ${sw("Tessera", C.tessera, "Tessere non ancora posate")}
-${sw("Tessera posata", C.posata, "Tessere già passate, righe")}
-${sw("Fuga", C.fuga, "La fuga tra le tessere")}
+${sw("Tessera posata", C.posata, "Tessere passate, righe")}
+${sw("Fuga", C.fuga, "La malta tra le tessere")}
 ${sw("Testo secondario", C.muted, "Note e didascalie", "#fff")}
-${sw("Bianco", C.bianco, "Testo su aglianico e inchiostro")}
 </ul>
-<h3 style="grid-column:1 / -1;margin-top:clamp(32px,4vw,56px)">Gli smalti: solo stati del prodotto</h3>
+<h3 style="grid-column:1 / -1;margin-top:clamp(32px,4vw,56px)">Ceramica: dettagli e stati, mai testo</h3>
 <ul class="swatches">
-${sw("Verde vite", C.verde, "Confermato, pagato")}
-${sw("Limone", C.limone, "In corso")}
-${sw("Celeste", C.celeste, "Da venire")}
-${sw("Cotto", C.cotto, "Rifiutato, in ritardo")}
+<li class="sw" style="--c:${C.blu}"><b>Blu ceramica</b><span>${C.blu}</span><em>Da venire, motivi grafici</em></li>
+<li class="sw" style="--c:${C.terra}"><b>Terracotta</b><span>${C.terra}</span><em>Rifiutato, motivi grafici</em></li>
+<li class="sw dark" style="--c:${C.olive}"><b>Verde oliva</b><span>${C.olive}</span><em>Titoli secondari, struttura</em></li>
+<li class="sw dark" style="--c:${C.oliveSoft}"><b>Oliva chiaro</b><span>${C.oliveSoft}</span><em>Confermato, pagato</em></li>
 </ul>
-<div class="prop" role="img" aria-label="Proporzioni: calce e tessere 70 per cento, inchiostro 18, aglianico 10, smalti 2"><i style="flex:70;background:${C.calce};outline:var(--joint) solid ${C.fuga};outline-offset:calc(var(--joint) * -1)"></i><i style="flex:18;background:${C.inchiostro}"></i><i style="flex:10;background:${C.aglianico}"></i><i style="flex:2;background:${C.limone}"></i></div>
-<p class="prop-cap"><span>70% calce e tessere</span><span>18% inchiostro</span><span>10% aglianico</span><span>2% smalti</span></p>
+<div class="prop" role="img" aria-label="Proporzioni: avorio e tessere 72 per cento, inchiostro 16, bordeaux 9, ceramica 3"><i style="flex:72;background:${C.avorio};outline:var(--joint) solid ${C.fuga};outline-offset:calc(var(--joint) * -1)"></i><i style="flex:16;background:${C.inchiostro}"></i><i style="flex:9;background:${C.bordeaux}"></i><i style="flex:3;background:${C.blu}"></i></div>
+<p class="prop-cap"><span>72% avorio e tessere</span><span>16% inchiostro</span><span>9% bordeaux</span><span>3% ceramica</span></p>
 <h3 style="grid-column:1 / -1;margin-top:clamp(32px,4vw,56px)">Contrasto (WCAG 2)</h3>
 <div style="grid-column:1 / -1" class="tscroll"><table class="tbl"><thead><tr><th>Coppia</th><th>Rapporto</th><th>Uso</th></tr></thead><tbody>
 ${pairs.map(([n, a, b, u]) => `<tr><td class="y">${n}</td><td class="n">${ratio(a, b)} : 1</td><td>${u}</td></tr>`).join("")}</tbody></table></div>
-<p class="small soft" style="grid-column:1 / -1;margin-top:12px">Gli smalti non sono mai colore del testo e non si usano per decorare: ogni colore ha un solo significato, sempre accompagnato da una parola.</p></div></section>
+<p class="small soft" style="grid-column:1 / -1;margin-top:12px">Soglia 4,5 : 1 per il testo, 3 : 1 per la grafica. Gli stati si leggono anche dalle parole ("In corso", "Confermato"): il colore non basta mai da solo.</p></div></section>
 
-<section class="section frame" id="carattere" aria-labelledby="ca-h"><div class="grid"><h2 data-rv class="g-head" id="ca-h">Un solo carattere, preciso come un registro.</h2>
-<div class="spec"><span class="aa" aria-hidden="true">Aa</span><div><p><b>Hanken Grotesk</b></p><p class="small soft">400, 500, 600, 700. Licenza SIL Open Font License, quindi ospitabile sul nostro sito. Caratteri senza grazie, cifre lining e tabulari per budget e date: 26.000 €.</p></div></div>
+<section class="section frame" id="carattere" aria-labelledby="ca-h"><div class="grid"><h2 class="g-head" id="ca-h">Una serif, una sans.</h2>
+<div class="spec"><span class="aa" aria-hidden="true" style="font-family:var(--serif);font-weight:400">Aa</span><div><p><b>DM Serif Display</b> per titoli e messaggi · <b>DM Sans</b> per interfaccia</p><p class="small soft">DM Serif Display ha un solo peso, più il corsivo; DM Sans 400, 500, 600, 700. Entrambi sotto SIL Open Font License, ospitati sul nostro sito: nessun servizio esterno. Nelle tabelle, nei prezzi e nelle date si usa solo DM Sans, con cifre tabulari: 26.000 €.</p></div></div>
 <div class="scale">
-<div><span style="font-size:clamp(2.2rem,5vw,4.4rem);font-weight:600;letter-spacing:-0.04em;line-height:.98">Il matrimonio, tutto in ordine.</span><small>Display · 600 · -0,04em · interlinea 0,98 · una sola volta per pagina</small></div>
-<div><span style="font-size:2.4rem;font-weight:600;letter-spacing:-0.035em;line-height:1">Ogni cosa al suo posto.</span><small>Titolo di sezione · 600 · -0,035em · interlinea 1</small></div>
-<div><span style="font-size:1.5rem;font-weight:600;letter-spacing:-0.025em">Quanto hai speso, voce per voce</span><small>Sottotitolo · 600 · -0,025em</small></div>
-<div><span>Previsto, firmato, pagato e residuo per ogni voce. Il totale torna sempre.</span><small>Testo · 400 · 17-19 px · interlinea 1,5</small></div>
-<div><span class="small">Dati di esempio. Le date sono calcolate sul tuo giorno.</span><small>Nota · 14 px · mai sotto i 13 px</small></div></div>
-<p class="small soft g-text" style="grid-column:1 / -1;margin-top:24px">Regole: maiuscola solo a inizio frase e nei nomi; mai tutto maiuscolo con spaziatura; mai corsivi decorativi; mai più di due pesi nella stessa schermata. Il carattere predefinito era Switzer: l'abbiamo sostituito perché la licenza Fontshare sull'ospitare i file sul proprio sito non è chiara.</p></div></section>
+<div><span style="font:400 clamp(2.2rem,5vw,4.4rem)/1.02 var(--serif);letter-spacing:-0.015em">Il tuo sì, un tassello alla volta.</span><small>Titolo · DM Serif Display · interlinea 1,02 · una volta per pagina</small></div>
+<div><span style="font:400 2.4rem/1.05 var(--serif)">Ogni cosa al suo posto.</span><small>Titolo di sezione · DM Serif Display</small></div>
+<div><span style="font:italic 400 1.5rem/1.25 var(--serif);color:var(--olive)">Tutto il matrimonio, finalmente in ordine.</span><small>Sottotitolo · corsivo in verde oliva · solo nell'hero</small></div>
+<div><span>Previsto, firmato, pagato e residuo per ogni voce. Il totale torna sempre.</span><small>Testo · DM Sans 400 · 17-19 px · interlinea 1,55</small></div>
+<div><span class="small" style="font-weight:600">95 € a persona · 30 novembre 2026</span><small>Dati, prezzi, date · DM Sans 500-600 · cifre tabulari</small></div></div>
+<p class="small soft g-text" style="grid-column:1 / -1;margin-top:24px">Regole: titoli in minuscolo con il punto finale, come nelle riviste; mai tutto maiuscolo con spaziatura; il corsivo serve solo al sottotitolo dell'hero; la serif non entra mai nelle tabelle, nei moduli e nei dati. Il numero di sezione ("N° 01") è in DM Sans, terracotta scura.</p></div></section>
 
-<section class="section frame" id="fuga" aria-labelledby="fu-h"><div class="grid"><h2 data-rv class="g-head" id="fu-h">La fuga: quattro pixel tra una tessera e l'altra.</h2>
-<div class="g-text"><p class="lead">Ogni modulo del sito e del prodotto è una tessera quadrata. Tra due tessere c'è sempre la stessa fuga di 4 px, del colore della malta. Le tessere si distinguono per tono, non per bordi né ombre.</p>
-<p>Gli angoli sono vivi, come quelli di una riggiola. Niente gradienti, niente vetro, niente linee sottili. Chi ha già posato (le scadenze passate) usa la tessera posata, più scura; chi deve ancora arrivare usa la tessera chiara; l'unica a campo pieno in aglianico è quella in corso.</p></div>
+<section class="section frame" id="fuga" aria-labelledby="fu-h"><div class="grid"><h2 class="g-head" id="fu-h">La fuga: quattro pixel tra una tessera e l'altra.</h2>
+<div class="g-text"><p class="lead">Ogni modulo del sito e del prodotto è una tessera. Tra due tessere c'è sempre la stessa fuga di 4 px, del colore della malta. Le tessere si distinguono per tono e per dimensione: una grande, due medie, una larga, mai una parete di riquadri uguali.</p>
+<p>Gli angoli sono vivi. Ombre solo se servono a separare due livelli, e finora non servono. La tessera già posata (la scadenza passata) è più scura, quella da venire è chiara, quella in corso è bordeaux a campo pieno.</p></div>
 <div class="g-side"><div class="stage" data-ui aria-hidden="true"><div class="floor" style="grid-template-columns:repeat(3,1fr)"><div class="tile laid" style="min-height:110px"></div><div class="tile laid" style="min-height:110px"></div><div class="tile now" style="min-height:110px"></div><div class="tile" style="min-height:110px"></div><div class="tile" style="min-height:110px"></div><div class="tile" style="min-height:110px"></div></div></div><p class="small soft">Tessere già posate, tessera in corso, tessere da venire.</p></div>
+<h3 style="grid-column:1 / -1;margin-top:clamp(32px,4vw,56px)">Il bordo ceramico</h3>
+<div class="g-text" style="grid-column:1 / span 7"><p>Il motivo delle riggiole compare in pochi punti scelti, mai come sfondo: il bordo sopra le sezioni a campo pieno e a fine pagina, il marchio, gli stati. È una fascia di 14 px con quarti di cerchio in blu ceramica e terracotta su tessere sabbia e avorio.</p></div>
+<div class="rig" style="grid-column:1 / -1;margin-top:20px" aria-hidden="true"></div>
 <h3 style="grid-column:1 / -1;margin-top:clamp(32px,4vw,56px)">Stati nel prodotto</h3>
 <div class="states">
-<div><span class="chip">Da venire</span><span class="soft">Celeste. Una scadenza non ancora iniziata.</span></div>
-<div><span class="chip on">In corso</span><span class="soft">Limone. La fase di questo momento. La sua tessera è aglianico.</span></div>
-<div><span class="chip ok">Confermato</span><span class="soft">Verde vite. Fatto, pagato, risposto sì.</span></div>
-<div><span class="chip no">Rifiutato</span><span class="soft">Cotto. Risposto no o in ritardo.</span></div>
-<div><span class="chip wait">In attesa</span><span class="soft">Fuga. Nessuna risposta ancora.</span></div></div></div></section>
+<div><span class="chip">Da venire</span><span class="soft">Blu ceramica. Una scadenza non ancora iniziata.</span></div>
+<div><span class="chip on">In corso</span><span class="soft">Bordeaux. La fase di questo momento: la sua tessera è a campo pieno.</span></div>
+<div><span class="chip ok">Confermato</span><span class="soft">Oliva chiaro. Fatto, pagato, risposto sì.</span></div>
+<div><span class="chip no">Rifiutato</span><span class="soft">Terracotta. Risposto no.</span></div>
+<div><span class="chip wait">In attesa</span><span class="soft">Sabbia. Nessuna risposta ancora.</span></div></div></div></section>
 
 <section class="section frame" id="immagini" aria-labelledby="im-h"><div class="grid"><h2 data-rv class="g-head" id="im-h">Riggiole vere, non coppie in posa.</h2>
 <div class="g-text"><p class="lead">Le immagini mostrano il mondo in cui lavoriamo: le riggiole di Napoli e della Campania, i chiostri, la luce naturale. Mai foto di coppie, mani con anelli, bokeh o corone di fiori. Un'immagine trovata non è mai presentata come nostra, né come un nostro cliente.</p>
@@ -224,15 +237,15 @@ ${pairs.map(([n, a, b, u]) => `<tr><td class="y">${n}</td><td class="n">${ratio(
 <section class="section frame" id="voce" aria-labelledby="vo-h"><div class="grid"><h2 data-rv class="g-head" id="vo-h">Preciso, caldo, senza promesse.</h2>
 <div class="g-text"><p class="lead">Scriviamo come una persona che mette a posto le cose: frasi corte, parole concrete, nessuna promessa su funzioni o prezzi che non esistono ancora. Alle coppie si dà del voi, alle wedding planner e nei moduli del tu.</p></div>
 <div class="voice" style="margin-top:clamp(32px,4vw,56px)">
-<div class="si"><b>Sì</b><span>Il matrimonio, tutto in ordine.</span></div><div class="no"><b>No</b><span>Il giorno più bello della tua vita, finalmente sotto controllo!</span></div>
+<div class="si"><b>Sì</b><span>Il tuo sì, un tassello alla volta.</span></div><div class="no"><b>No</b><span>Il giorno più bello della tua vita, finalmente sotto controllo!</span></div>
 <div class="si"><b>Sì</b><span>Previsto, firmato, pagato e residuo per ogni voce.</span></div><div class="no"><b>No</b><span>Gestisci il budget in modo smart e intuitivo.</span></div>
 <div class="si"><b>Sì</b><span>Non chiediamo pagamenti. Ti scriviamo solo quando la prima versione è pronta.</span></div><div class="no"><b>No</b><span>Offerta esclusiva per i primi iscritti.</span></div>
 <div class="si"><b>Sì</b><span>25 minuti, niente da vendere: voglio capire come lavori.</span></div><div class="no"><b>No</b><span>Scopri la soluzione che rivoluzionerà il tuo lavoro.</span></div></div>
-<p class="small soft g-text" style="grid-column:1 / -1;margin-top:24px">Parole da evitare: magico, sogno, perfetto, rivoluzionario, esclusivo. Niente punti esclamativi. Slogan: "Il matrimonio, tutto in ordine." Secondario: "Ogni cosa al suo posto."</p></div></section>
+<p class="small soft g-text" style="grid-column:1 / -1;margin-top:24px">Parole da evitare: magico, sogno, perfetto, rivoluzionario, esclusivo. Niente punti esclamativi. Slogan: "Il tuo sì, un tassello alla volta." Sottotitolo: "Tutto il matrimonio, finalmente in ordine." Titoli di sezione: "Ogni cosa al suo posto.", "Meno caos. Più controllo.", "Pensato per i matrimoni di qui.", "Comincia a mettere tutto in ordine."</p></div></section>
 
 <section class="section frame" id="applicazioni" aria-labelledby="ap-h"><div class="grid"><h2 data-rv class="g-head" id="ap-h">Dove si usa.</h2>
 <div class="fields" style="margin-top:0">
-<div class="field-tile t-accent s4"><div><img src="avatar.png" alt="Avatar quadrato: marchio bianco su aglianico" width="200" height="200"><small>Avatar, 1024 px (profilo Instagram e WhatsApp)</small></div></div>
+<div class="field-tile t-accent s4"><div><img src="avatar.png" alt="Avatar quadrato: marchio bianco su bordeaux" width="200" height="200"><small>Avatar, 1024 px (profilo Instagram e WhatsApp)</small></div></div>
 <div class="field-tile t-ground s8"><div><img src="og.png" alt="Anteprima per i social: titolo e pavimento di tessere" width="520" height="273"><small class="soft">Anteprima social, 1200 × 630 (og.png)</small></div></div></div>
 <div class="g-text" style="margin-top:28px"><p><b>Firma email:</b> Felice Mondo · Nozze in Ordine · info@nozzeinordine.com · nozzeinordine.com. Solo testo, in inchiostro; il marchio non si inserisce nelle email dei primi contatti, per non farle sembrare una newsletter.</p><p><b>Messaggi di primo contatto:</b> restano scritti a nome di Felice, dal suo profilo, senza grafica.</p></div></div></section>
 
@@ -242,9 +255,11 @@ ${pairs.map(([n, a, b, u]) => `<tr><td class="y">${n}</td><td class="n">${ratio(
 <section class="section frame" aria-labelledby="no-h"><div class="grid"><h2 data-rv class="g-head" id="no-h">Note e limiti.</h2>
 <ul class="notes">
 <li>Questa guida definisce l'aspetto, non il nome. La ricerca su UIBM e TMview non ha trovato risultati, ma non è un parere legale: prima del deposito serve un consulente in proprietà industriale, anche perché il nome è descrittivo.</li>
-<li>La palette cambia rispetto alla decisione "bordeaux e avorio": il bordeaux resta, l'avorio cede a una calce neutra.</li>
-<li>Le foto sono di Sailko, CC BY 3.0, da Wikimedia Commons: il credito è obbligatorio e compare in fondo alle pagine. Non sono immagini di Nozze in Ordine né di suoi clienti.</li>
-<li>Hanken Grotesk è sotto SIL OFL e ospitato sul sito; non serve nessun servizio esterno.</li>
+<li>La palette e i caratteri seguono il brief creativo (avorio caldo, blu ceramica, terracotta, verde oliva, bordeaux per l'azione; DM Serif Display e DM Sans). I valori sono proposte: i contrasti sono verificati qui sopra.</li>
+<li>Le reference del brief sono state aperte e lette solo per principi (numerazioni, tipografia, fotografia di luoghi veri): nessun asset, testo o layout è stato copiato.</li>
+<li>Non c'è un'area editoriale su ispirazioni e tradizioni: il brief la valuta solo se utile agli obiettivi, e per ora distrarrebbe dallo strumento.</li>
+<li>Le foto sono di Sailko (CC BY 3.0) e, per Villa Rufolo, Leandro Neumann Ciuffo (CC BY 2.0), da Wikimedia Commons: il credito è obbligatorio e compare in fondo alle pagine. Non sono immagini di Nozze in Ordine né di suoi clienti.</li>
+<li>DM Serif Display e DM Sans sono sotto SIL OFL e ospitati sul sito (cartella fonts): non serve nessun servizio esterno e non si invia nulla a Google.</li>
 <li>I dati nei riquadri del sito (budget, preventivi, invitati, eventi, scaletta) sono di esempio e vanno sostituiti o dichiarati tali.</li>
 <li>La riga "Prova a mano: 3 planner e 5 coppie" sul sito riprende gli obiettivi del Piano operativo. Se non vuoi renderli pubblici, si toglie in un punto solo.</li></ul></div></section>
 </main>

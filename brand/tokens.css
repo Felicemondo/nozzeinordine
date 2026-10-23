@@ -1,13 +1,19 @@
 :root {
-  --ground: #F1F0EC;      /* calce */
-  --ink: #1E1417;         /* inchiostro */
-  --muted: #4B4044;
-  --accent: #6E1B2F;      /* aglianico */
+  --ground: #F5F0E7;      /* avorio caldo */
+  --ink: #25241F;
+  --muted: #514C45;
+  --accent: #702F43;      /* bordeaux: azione e campo pieno */
   --accent-ink: #FFFFFF;
-  --tile: #F7F7F5;        /* tessera */
-  --tile-laid: #E7E6E2;   /* tessera già posata */
-  --grout: #D8D5CD;        /* fuga */
-  --verde: #5E8C3A;  --limone: #E7B72F;  --celeste: #7EA4D6;  --cotto: #C4694D;   /* smalti: solo stati */
-  --font: "Hanken Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --blu: #5F8794;         /* blu ceramica: solo elementi grafici */
+  --blu-ink: #386070;     /* blu ceramica per testo, link e selezioni */
+  --terra: #B75F45;        /* terracotta: dettagli grafici */
+  --terra-ink: #9B4A32;    /* terracotta per testo */
+  --olive: #465044;        /* verde oliva: titoli secondari */
+  --olive-soft: #6F7F52;   /* stato confermato */
+  --tile: #FBF8F2;       /* tessera */
+  --tile-laid: #EBE4D6;  /* tessera già posata */
+  --grout: #DCD2BF;       /* fuga */
+  --serif: "DM Serif Display", Georgia, serif;   /* titoli */
+  --font: "DM Sans", "Helvetica Neue", Arial, sans-serif;   /* interfaccia, dati, prezzi */
   --joint: 4px;   /* la fuga */
 }
