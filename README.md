@@ -18,9 +18,11 @@ Serve solo Node 18 o successivo. Gli stili e lo script stanno in `site/styles.cs
 - `site/app/ui.js` disegna tutto; `api.js` parla con Supabase, `mock-api.js` fa lo stesso per la demo. `vendor/supabase.js` è supabase-js 2.117.3 (UMD), salvato in locale per rispettare la CSP.
 
 Ruoli:
-- **coppia**: crea il proprio matrimonio, gestisce budget, fornitori e preventivi, invitati, scadenze e scaletta; invita il partner o la planner.
+- **coppia**: crea il proprio matrimonio, gestisce budget (spesa totale, pagato, voci, viaggio di nozze), fornitori e preventivi, invitati per gruppo (famiglia e amici di ciascuno, amici comuni), tavoli e sala in pianta 2D (8-12 posti, nome del tavolo, nome su ogni posto), scadenze e scaletta; invita il partner o la planner.
 - **planner**: segue più matrimoni, invita gli sposi nel loro portale, ha le note interne che gli sposi non vedono.
 - **admin**: vede utenti, matrimoni e lista d'attesa, cambia i ruoli. Si assegna solo dal database (vedi sotto).
+
+Avvisi: scadenze e pagamenti in arrivo compaiono nella dashboard (con il numero accanto ad "Avvisi") e, se la persona lo consente, come notifiche del dispositivo quando apre l'app. `sw.js` e `manifest.webmanifest` permettono di aggiungerla alla schermata Home. Le notifiche ad app chiusa richiedono un servizio di invio email o web push lato server, non ancora attivo.
 
 Il database è in `supabase/migrations/`: tabelle, ruoli, scadenze generate dalla data, inviti e regole RLS. Le prove sono in `supabase/tests/rls.sql` (si lancia nell'editor SQL e annulla tutto) e in `tests/e2e-api.mjs` (prova `api.js` dal vivo con due account di prova confermati).
 

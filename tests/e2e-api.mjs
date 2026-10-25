@@ -54,6 +54,25 @@ try {
   await A.insert("timeline_items", { wedding_id: wid, start_time: "16:00", title: "Cerimonia" });
   assert.equal((await A.list("quotes", wid)).length, 1); log("budget, fornitore, preventivo, invitato e scaletta salvati");
 
+  // gruppi, tavoli e posti
+  await A.updateWedding(wid, { partner_a: "Anna", partner_b: "Marco" });
+  await A.insert("guests", { wedding_id: wid, name: "Zia Rosa", guest_group: "famiglia_a", rsvp: "si" });
+  await A.insert("seating_tables", { wedding_id: wid, name: "Capri", seats: 8, shape: "rotondo", pos_x: 20, pos_y: 30 });
+  const [tbl] = await A.list("seating_tables", wid);
+  const gs = await A.list("guests", wid);
+  const rosa = gs.find((x) => x.name === "Zia Rosa"), other = gs.find((x) => x.name !== "Zia Rosa");
+  assert.equal(rosa.guest_group, "famiglia_a"); log("gruppo dell'invitato salvato");
+  await A.update("guests", rosa.id, { table_id: tbl.id, seat_number: 8 });
+  await assert.rejects(() => A.update("guests", other.id, { table_id: tbl.id, seat_number: 8 }), /già occupato/); log("due persone sullo stesso posto: negato con messaggio chiaro");
+  await assert.rejects(() => A.update("guests", other.id, { table_id: tbl.id, seat_number: 9 }), /solo 8 posti/); log("posto 9 su tavolo da 8: negato");
+  await assert.rejects(() => A.insert("seating_tables", { wedding_id: wid, name: "Troppo", seats: 14 }), /non è valido/); log("tavolo da 14: negato");
+  await A.update("seating_tables", tbl.id, { pos_x: 55.5, pos_y: 70 });
+  await A.remove("seating_tables", tbl.id);
+  assert.equal((await A.list("guests", wid)).find((x) => x.id === rosa.id).table_id, null); log("tavolo eliminato: la persona torna da sistemare");
+  await A.updateMyProfile(meA.id, { phone: "333 1234567", city: "Caserta", notify_days: 7, role: "admin" });
+  const meA2 = await A.me();
+  assert.equal(meA2.notify_days, 7); assert.equal(meA2.role, "coppia"); log("profilo e preferenza avvisi salvati, ruolo invariato");
+
   await A.updateWedding(wid, { wedding_date: "2027-09-12" });
   const moved = (await A.list("tasks", wid)).find((t) => t.title === "Inviare le partecipazioni");
   assert.equal(moved.due_date, "2027-04-12"); log("cambio data: le scadenze aperte si spostano");

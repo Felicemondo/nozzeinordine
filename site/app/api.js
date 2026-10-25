@@ -5,11 +5,11 @@
   var SUPABASE_URL = "https://msokhiezfsmkqsvzgmmi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_kBqdAb3VA2lb4YJ45aA_2Q_0c0EQ85Q";
 
-  var MODULES = ["budget_items", "vendors", "quotes", "guests", "tasks", "timeline_items", "internal_notes"];
+  var MODULES = ["budget_items", "vendors", "quotes", "guests", "tasks", "timeline_items", "internal_notes", "seating_tables"];
   var ORDER = {
     budget_items: ["category", true], vendors: ["category", true], quotes: ["created_at", true],
     guests: ["household", true], tasks: ["due_date", true], timeline_items: ["start_time", true],
-    internal_notes: ["created_at", false]
+    internal_notes: ["created_at", false], seating_tables: ["created_at", true]
   };
 
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -25,8 +25,9 @@
       [/User already registered/i, "Esiste già un account con questa email. Prova ad accedere."],
       [/Password should be at least/i, "La password deve avere almeno 8 caratteri."],
       [/rate limit/i, "Troppi tentativi ravvicinati. Riprova tra qualche minuto."],
-      [/duplicate key/i, "Esiste già."],
       [/violates check constraint/i, "Uno dei valori non è valido."],
+      [/guests_one_per_seat/i, "Quel posto è già occupato."],
+      [/duplicate key/i, "Esiste già."],
       [/row-level security|permission denied/i, "Non hai i permessi per questa operazione."],
       [/Failed to fetch|NetworkError/i, "Connessione assente. Controlla la rete e riprova."]
     ];
@@ -59,10 +60,13 @@
     me: async function () {
       var u = ok(await sb.auth.getUser()).user;
       if (!u) return null;
-      var p = ok(await sb.from("profiles").select("id, role, full_name, email").eq("id", u.id).maybeSingle());
-      return p || { id: u.id, role: "coppia", full_name: "", email: u.email };
+      var p = ok(await sb.from("profiles").select("id, role, full_name, email, phone, business_name, city, notify_days, created_at").eq("id", u.id).maybeSingle());
+      return p || { id: u.id, role: "coppia", full_name: "", email: u.email, phone: "", business_name: "", city: "", notify_days: 3 };
     },
-    updateMyName: async function (id, name) { ok(await sb.from("profiles").update({ full_name: name }).eq("id", id)); },
+    updateMyProfile: async function (id, patch) {
+      var allowed = {}; ["full_name", "phone", "business_name", "city", "notify_days"].forEach(function (k) { if (k in patch) allowed[k] = patch[k]; });
+      ok(await sb.from("profiles").update(allowed).eq("id", id));
+    },
 
     /* ---- matrimoni ---- */
     listWeddings: async function (me) {

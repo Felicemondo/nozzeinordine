@@ -14,14 +14,24 @@
     ceremony: { civile: "Civile", religioso: "Religioso", simbolico: "Simbolico", da_decidere: "Da decidere" },
     vendor: { da_scegliere: "Da scegliere", in_trattativa: "In trattativa", confermato: "Confermato", scartato: "Scartato" },
     rsvp: { in_attesa: "In attesa", si: "Viene", no: "Non viene" },
-    side: { sposa: "Sposa", sposo: "Sposo", entrambi: "Entrambi" },
     menu: { standard: "Standard", vegetariano: "Vegetariano", vegano: "Vegano", bambini: "Bambini", altro: "Altro" },
     assignee: { sposi: "Sposi", planner: "Planner" }
   };
   var store = {
     get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
-    set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+    set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} },
+    local: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    setLocal: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   };
+  // Gruppi degli invitati: "a" è lei (o la prima persona), "b" è lui (o la seconda).
+  var GROUPS = ["famiglia_a", "famiglia_b", "amici_a", "amici_b", "amici_comuni"];
+  function groupLabel(w, g) {
+    var a = (w && w.partner_a) || "lei", b = (w && w.partner_b) || "lui";
+    return { famiglia_a: "Famiglia di " + a, famiglia_b: "Famiglia di " + b, amici_a: "Amici di " + a, amici_b: "Amici di " + b, amici_comuni: "Amici comuni" }[g] || "Amici comuni";
+  }
+  var CATS = ["Location e ricevimento", "Catering", "Fotografo e video", "Abiti e accessori", "Fiori e allestimenti", "Musica e intrattenimento", "Partecipazioni e stampa", "Bomboniere", "Trasporti", "Rito e documenti", "Viaggio di nozze", "Altre spese"];
+  // Quanto costa una voce: l'importo del contratto se c'è, altrimenti la stima.
+  function cost(b) { return Number(b.contracted) > 0 ? Number(b.contracted) : Number(b.planned) || 0; }
   var opts = function (map) { return Object.keys(map).map(function (k) { return [k, map[k]]; }); };
 
   /* ------------------------------------------------------------ utilità */
@@ -81,8 +91,10 @@
   }
   async function attempt(fn, okMsg) {
     try { var r = await fn(); if (okMsg) toast(okMsg); return r; }
-    catch (e) { toast(e.message || String(e), true); throw e; }
+    catch (e) { toast(e.message || String(e), true); if (e && typeof e === "object") e.shown = true; throw e; }
   }
+  // l'errore è già stato mostrato: non serve altro rumore in console
+  window.addEventListener("unhandledrejection", function (ev) { if (ev.reason && ev.reason.shown) ev.preventDefault(); });
 
   function dialog(title, body, actions) {
     return new Promise(function (resolve) {
@@ -122,7 +134,9 @@
     var id = "f-" + f.name;
     var input;
     if (f.type === "select") {
-      input = h("select", { id: id, name: f.name, required: f.required }, f.options.map(function (o) { return h("option", { value: o[0], selected: String(v) === String(o[0]) }, o[1]); }));
+      var os = f.options.slice();
+      if (v != null && v !== "" && !os.some(function (o) { return String(o[0]) === String(v); })) os.unshift([v, v]);
+      input = h("select", { id: id, name: f.name, required: f.required }, os.map(function (o) { return h("option", { value: o[0], selected: String(v) === String(o[0]) }, o[1]); }));
     } else if (f.type === "textarea") {
       input = h("textarea", { id: id, name: f.name, rows: 4, maxlength: f.max || 2000, required: f.required, placeholder: f.placeholder });
       input.value = v == null ? "" : v;
@@ -138,7 +152,7 @@
         autocomplete: f.autocomplete || "off", value: v == null ? "" : (f.type === "time" ? String(v).slice(0, 5) : f.type === "number" ? String(num(v)).replace(".", ",") : String(v))
       });
     }
-    return h("div", { class: "fld" + (f.wide ? " wide" : "") }, h("label", { for: id }, f.label + (f.required ? "" : " (facoltativo)")), input,
+    return h("div", { class: "fld" + (f.wide ? " wide" : "") }, h("label", { for: id }, f.label + (f.required || f.type === "select" ? "" : " (facoltativo)")), input,
       f.list ? h("datalist", { id: id + "-l" }, f.list.map(function (o) { return h("option", { value: o }); })) : null,
       f.help ? h("small", null, f.help) : null);
   }
@@ -167,6 +181,8 @@
   var F = {
     wedding: [
       { name: "title", label: "Nome del matrimonio", required: true, max: 120, placeholder: "Es. Anna e Marco", wide: true },
+      { name: "partner_a", label: "Nome di lei", max: 60, placeholder: "Es. Anna", help: "Serve per i gruppi degli invitati: famiglia e amici di ciascuno." },
+      { name: "partner_b", label: "Nome di lui", max: 60, placeholder: "Es. Marco", help: "Per due spose o due sposi scrivete semplicemente i due nomi." },
       { name: "wedding_date", label: "Data del matrimonio", type: "date", help: "Le scadenze si calcolano su questa data." },
       { name: "city", label: "Città o zona", max: 80, placeholder: "Es. Caserta" },
       { name: "ceremony", label: "Rito", type: "select", options: opts(LABEL.ceremony) },
@@ -174,12 +190,17 @@
       { name: "guests_expected", label: "Invitati previsti", type: "number", min: 0, step: "1" }
     ],
     budget_items: [
-      { name: "category", label: "Voce", required: true, max: 80, list: ["Location e ricevimento", "Catering", "Fotografo e video", "Abiti", "Musica", "Fiori e allestimenti", "Partecipazioni", "Bomboniere", "Trasporti", "Viaggio di nozze", "Altre voci"] },
-      { name: "description", label: "Dettaglio", max: 200 },
-      { name: "planned", label: "Previsto (€)", type: "number", min: 0, step: "0.01" },
-      { name: "contracted", label: "Firmato (€)", type: "number", min: 0, step: "0.01" },
+      { name: "category", label: "Voce", type: "select", required: true, options: CATS.map(function (c) { return [c, c]; }) },
+      { name: "description", label: "Dettaglio", max: 200, placeholder: "Es. Villa con giardino" },
+      { name: "planned", label: "Costo stimato (€)", type: "number", min: 0, step: "0.01", help: "Quanto pensate di spendere per questa voce." },
+      { name: "contracted", label: "Importo del contratto, se firmato (€)", type: "number", min: 0, step: "0.01", help: "Quando c'è, prende il posto della stima." },
       { name: "paid", label: "Già pagato (€)", type: "number", min: 0, step: "0.01" },
       { name: "due_date", label: "Prossimo pagamento", type: "date" }
+    ],
+    tables: [
+      { name: "name", label: "Nome del tavolo", required: true, max: 60, placeholder: "Es. Capri", wide: true },
+      { name: "seats", label: "Posti", type: "select", options: [["8", "8 posti"], ["9", "9 posti"], ["10", "10 posti"], ["11", "11 posti"], ["12", "12 posti"]] },
+      { name: "shape", label: "Forma", type: "select", options: [["rotondo", "Rotondo"], ["rettangolare", "Rettangolare"]] }
     ],
     vendors: [
       { name: "category", label: "Categoria", required: true, max: 80, list: ["Location", "Catering", "Fotografo", "Video", "Musica", "Fiori", "Abiti", "Trucco e capelli", "Partecipazioni", "Trasporti", "Altro"] },
@@ -196,14 +217,6 @@
       { name: "expires_on", label: "Valido fino al", type: "date" },
       { name: "chosen", label: "È il preventivo scelto", type: "checkbox" }
     ],
-    guests: [
-      { name: "name", label: "Nome e cognome", required: true, max: 120 },
-      { name: "household", label: "Nucleo familiare", max: 120, placeholder: "Es. Famiglia Russo" },
-      { name: "side", label: "Invitato da", type: "select", options: opts(LABEL.side) },
-      { name: "rsvp", label: "Risposta", type: "select", options: opts(LABEL.rsvp) },
-      { name: "menu", label: "Menù", type: "select", options: opts(LABEL.menu) },
-      { name: "notes", label: "Note", max: 500 }
-    ],
     tasks: [
       { name: "title", label: "Attività", required: true, max: 200, wide: true },
       { name: "due_date", label: "Scadenza", type: "date" },
@@ -219,6 +232,17 @@
     ],
     internal_notes: [{ name: "body", label: "Nota", type: "textarea", required: true, max: 4000, wide: true }]
   };
+
+  function guestFields(w) {
+    return [
+      { name: "name", label: "Nome e cognome", required: true, max: 120 },
+      { name: "guest_group", label: "Gruppo", type: "select", options: GROUPS.map(function (g) { return [g, groupLabel(w, g)]; }) },
+      { name: "household", label: "Nucleo familiare", max: 120, placeholder: "Es. Famiglia Russo" },
+      { name: "rsvp", label: "Risposta", type: "select", options: opts(LABEL.rsvp) },
+      { name: "menu", label: "Menù", type: "select", options: opts(LABEL.menu) },
+      { name: "notes", label: "Note", max: 500, placeholder: "Es. intolleranze, seggiolone" }
+    ];
+  }
 
   /* ------------------------------------------------------------ routing */
   function route() {
@@ -243,7 +267,7 @@
     });
     return s;
   }
-  function brand() { return h("a", { class: "brand", href: "../index.html" }, markSvg(), h("span", null, "Nozze in Ordine")); }
+  function brand(home) { return h("a", { class: "brand", href: home ? "#/" : "../index.html", "aria-label": home ? "Nozze in Ordine, torna alla dashboard" : "Nozze in Ordine, sito" }, markSvg(), h("span", null, "Nozze in Ordine")); }
 
   function navLink(href, label, active) { return h("a", { href: "#/" + href, class: active ? "on" : null, "aria-current": active ? "page" : null }, label); }
 
@@ -260,12 +284,14 @@
     }
     if (w) {
       var sec = p[2] || "panoramica";
-      var items = [["panoramica", "Panoramica"], ["scadenze", "Scadenze"], ["budget", "Budget"], ["fornitori", "Fornitori e preventivi"], ["invitati", "Invitati"], ["scaletta", "Scaletta del giorno"]];
+      var items = [["panoramica", "Panoramica"], ["scadenze", "Scadenze"], ["budget", "Budget"], ["fornitori", "Fornitori e preventivi"], ["invitati", "Invitati"], ["tavoli", "Tavoli e sala"], ["scaletta", "Scaletta del giorno"]];
       if (isPlannerHere(w)) items.push(["note", "Note interne"]);
       items.push(["persone", "Persone e inviti"], ["impostazioni", "Dati del matrimonio"]);
       add(nav, [h("p", { class: "nav-title" }, w.title), items.map(function (it) { return navLink("m/" + w.id + "/" + it[0], it[1], sec === it[0]); })]);
     }
-    nav.append(h("div", { class: "nav-foot" }, navLink("profilo", "Profilo", p[0] === "profilo"),
+    var nAlerts = computeAlerts().length;
+    nav.append(h("div", { class: "nav-foot" }, h("a", { href: "#/avvisi", class: p[0] === "avvisi" ? "on" : null, "aria-current": p[0] === "avvisi" ? "page" : null }, "Avvisi", nAlerts ? h("span", { class: "badge", "aria-label": nAlerts + " avvisi" }, String(nAlerts)) : null),
+      navLink("profilo", "Profilo", p[0] === "profilo"),
       h("button", { class: "linkish", type: "button", onclick: async function () { await attempt(api.signOut); } }, "Esci")));
 
     function setNav(open) {
@@ -278,7 +304,7 @@
       onclick: function () { setNav(!state.navOpen); } }, "Menu");
     document.onkeydown = function (e) { if (e.key === "Escape" && state.navOpen) setNav(false); };
     var side = h("aside", { class: "side" + (state.navOpen ? " open" : ""), id: "side" },
-      h("div", { class: "side-top" }, h("button", { class: "close-nav", type: "button", onclick: function () { setNav(false); } }, "Chiudi"), brand(), h("p", { class: "who" }, h("b", null, me.full_name || me.email), h("span", null, LABEL.role[me.role]))), nav);
+      h("div", { class: "side-top" }, h("button", { class: "close-nav", type: "button", onclick: function () { setNav(false); } }, "Chiudi"), brand(true), h("p", { class: "who" }, h("b", null, me.full_name || me.email), h("span", null, LABEL.role[me.role]))), nav);
     var banner = api.mode === "demo" ? h("p", { class: "demo-band" }, "Demo con dati finti: ogni modifica resta solo in questa pagina. ", h("a", { href: "demo.html" }, "Cambia profilo")) : null;
     var invites = state.invites.length ? h("section", { class: "invites", "aria-label": "Inviti ricevuti" }, state.invites.map(function (i) {
       return h("div", { class: "invite-row" }, h("span", null, "Sei invitato a ", h("b", null, i.wedding_title), " come " + LABEL.member[i.member_role].toLowerCase() + "."),
@@ -287,7 +313,8 @@
           await loadBase(); go("m/" + id + "/panoramica");
         } }, "Accetta"));
     })) : null;
-    return h("div", { class: "shell" }, h("header", { class: "topbar" }, brand(), toggle), side,
+    var bell = h("a", { class: "bell", href: "#/avvisi", "aria-label": nAlerts ? nAlerts + " avvisi" : "Avvisi" }, "Avvisi", nAlerts ? h("span", { class: "badge" }, String(nAlerts)) : null);
+    return h("div", { class: "shell" }, h("header", { class: "topbar" }, brand(true), h("div", { class: "top-actions" }, bell, toggle)), side,
       h("main", { class: "main", id: "main", tabindex: "-1", onclick: function () { if (state.navOpen) setNav(false); } }, banner, invites, content));
   }
 
@@ -400,7 +427,7 @@
 
   /* ------------------------------------------------------------ panoramica del matrimonio */
   function budgetTotals(items) {
-    return items.reduce(function (a, b) { a.planned += num(b.planned); a.contracted += num(b.contracted); a.paid += num(b.paid); return a; }, { planned: 0, contracted: 0, paid: 0 });
+    return items.reduce(function (a, b) { a.total += cost(b); a.paid += num(b.paid); return a; }, { total: 0, paid: 0 });
   }
   function bar(parts, total, label) {
     total = total || 1;
@@ -424,9 +451,8 @@
     var late = open.filter(function (x) { return x.due_date && x.due_date < todayIso(); });
     var next = open.filter(function (x) { return x.due_date; }).slice(0, 6);
     var g = { si: 0, no: 0, in_attesa: 0 }; guests.forEach(function (x) { g[x.rsvp]++; });
-    var pays = bud.filter(function (b) { return b.due_date && num(b.contracted) > num(b.paid) && b.due_date >= todayIso(); }).sort(function (a, b) { return a.due_date < b.due_date ? -1 : 1; }).slice(0, 4);
+    var pays = bud.filter(function (b) { return b.due_date && cost(b) > num(b.paid) && b.due_date >= todayIso(); }).sort(function (a, b) { return a.due_date < b.due_date ? -1 : 1; }).slice(0, 4);
     var vs = {}; vendors.forEach(function (v) { vs[v.status] = (vs[v.status] || 0) + 1; });
-    var budgetRef = num(w.budget_total) || t.planned;
 
     var countdown = h("div", { class: "tile t-count" },
       h("p", { class: "lbl" }, "Mancano al sì"),
@@ -437,11 +463,11 @@
 
     var budget = h("a", { class: "tile t-budget", href: "#/m/" + w.id + "/budget" },
       h("p", { class: "lbl" }, "Budget"),
-      h("p", { class: "fig" }, eur(t.paid), h("small", null, " pagati su " + eur(budgetRef))),
-      bar([[t.paid, "p"], [t.contracted - t.paid, "c"]], Math.max(budgetRef, t.contracted), "Pagato " + eur(t.paid) + ", firmato " + eur(t.contracted) + ", budget " + eur(budgetRef)),
-      h("dl", { class: "kv" }, h("div", null, h("dt", null, "Firmato"), h("dd", null, eur(t.contracted))), h("div", null, h("dt", null, "Da pagare"), h("dd", null, eur(t.contracted - t.paid))),
-        h("div", null, h("dt", null, "Previsto per voce"), h("dd", null, eur(t.planned))),
-        num(w.budget_total) ? h("div", null, h("dt", null, "Margine sul budget"), h("dd", { class: t.planned > num(w.budget_total) ? "warn" : null }, eur(num(w.budget_total) - t.planned))) : null));
+      h("p", { class: "fig" }, eur(t.total), h("small", null, " in tutto")),
+      bar([[t.paid, "p"]], t.total || 1, "Pagato " + eur(t.paid) + " su " + eur(t.total)),
+      h("dl", { class: "kv" }, h("div", null, h("dt", null, "Già pagato"), h("dd", null, eur(t.paid))), h("div", null, h("dt", null, "Da pagare"), h("dd", null, eur(t.total - t.paid))),
+        num(w.budget_total) ? h("div", null, h("dt", null, "Tetto di spesa"), h("dd", null, eur(w.budget_total))) : null,
+        num(w.budget_total) ? h("div", null, h("dt", null, t.total > num(w.budget_total) ? "Sopra il tetto" : "Margine"), h("dd", { class: t.total > num(w.budget_total) ? "warn" : null }, eur(Math.abs(num(w.budget_total) - t.total)))) : null));
 
     var guestTile = h("a", { class: "tile t-guests", href: "#/m/" + w.id + "/invitati" },
       h("p", { class: "lbl" }, "Invitati"),
@@ -459,7 +485,7 @@
       h("p", { class: "soft small" }, (tasks.length - open.length) + " fatte su " + tasks.length));
 
     var payTile = h("div", { class: "tile" }, h("p", { class: "lbl" }, "Prossimi pagamenti"),
-      pays.length ? h("ul", { class: "rows" }, pays.map(function (b) { return h("li", null, h("span", null, b.category), h("span", null, eur(num(b.contracted) - num(b.paid)) + " · " + whenText(b.due_date))); }))
+      pays.length ? h("ul", { class: "rows" }, pays.map(function (b) { return h("li", null, h("span", null, b.category), h("span", null, eur(cost(b) - num(b.paid)) + " · " + whenText(b.due_date))); }))
         : h("p", { class: "soft" }, "Nessun pagamento con una data. Aggiungila nelle voci del budget."));
 
     var vendTile = h("a", { class: "tile", href: "#/m/" + w.id + "/fornitori" }, h("p", { class: "lbl" }, "Fornitori"),
@@ -512,31 +538,57 @@
 
   /* ------------------------------------------------------------ budget */
   async function budgetView(w) {
-    var items = await api.list("budget_items", w.id), t = budgetTotals(items), ref = num(w.budget_total);
+    var items = await api.list("budget_items", w.id), t = budgetTotals(items), cap = num(w.budget_total);
     var add = btn("Aggiungi voce", async function () {
-      var d = await formDialog("Nuova voce di spesa", F.budget_items);
+      var d = await formDialog("Nuova voce di spesa", F.budget_items, { category: CATS[0] });
       if (!d) return; d.wedding_id = w.id;
       await attempt(function () { return api.insert("budget_items", d); }, "Voce aggiunta."); render();
     });
-    var summary = h("div", { class: "board sum4" },
-      h("div", { class: "tile t-count" }, h("p", { class: "lbl" }, "Budget complessivo"), h("p", { class: "fig" }, ref ? eur(ref) : "—"), h("p", { class: "meta" }, ref ? "Margine: " + eur(ref - t.planned) : h("a", { href: "#/m/" + w.id + "/impostazioni" }, "Imposta il budget"))),
-      h("div", { class: "tile" }, h("p", { class: "lbl" }, "Previsto per voce"), h("p", { class: "fig" }, eur(t.planned))),
-      h("div", { class: "tile" }, h("p", { class: "lbl" }, "Contratti firmati"), h("p", { class: "fig" }, eur(t.contracted))),
-      h("div", { class: "tile" }, h("p", { class: "lbl" }, "Già pagato"), h("p", { class: "fig" }, eur(t.paid)), h("p", { class: "meta" }, "Da pagare: " + eur(t.contracted - t.paid))));
-    var table = items.length ? h("div", { class: "tscroll" }, h("table", { class: "tbl data" },
+    if (!items.length) {
+      return [pageHead("Budget", "Quanto spenderete in tutto, quanto avete già pagato e come si divide la spesa.", add),
+        empty("Ancora nessuna voce di spesa. Potete partire dalle voci tipiche di un matrimonio, viaggio di nozze compreso, e poi scrivere le cifre.",
+          btn("Parti dalle voci tipiche", async function () {
+            await attempt(async function () { for (var i = 0; i < CATS.length; i++) await api.insert("budget_items", { wedding_id: w.id, category: CATS[i] }); }, "Voci aggiunte: ora scrivete i costi.");
+            render();
+          }))];
+    }
+    var left = t.total - t.paid;
+    var hero = h("div", { class: "tile t-count t-total" },
+      h("p", { class: "lbl" }, "Spenderete in tutto"),
+      h("p", { class: "fig huge" }, eur(t.total)),
+      bar([[t.paid, "on-dark"]], t.total || 1, "Pagato " + eur(t.paid) + " su " + eur(t.total)),
+      h("div", { class: "kv on-dark" }, h("div", null, h("dt", null, "Già pagato"), h("dd", null, eur(t.paid))), h("div", null, h("dt", null, "Ancora da pagare"), h("dd", null, eur(left)))));
+    var capTile = h("div", { class: "tile" }, h("p", { class: "lbl" }, "Il tetto che vi siete dati"),
+      cap ? [h("p", { class: "fig" }, eur(cap)),
+        h("p", { class: t.total > cap ? "warn" : "good" }, t.total > cap ? "Siete sopra di " + eur(t.total - cap) + "." : "Restano " + eur(cap - t.total) + " di margine.")]
+        : [h("p", { class: "soft" }, "Non l'avete ancora indicato."), h("a", { href: "#/m/" + w.id + "/impostazioni" }, "Imposta il tetto di spesa")]);
+    var sorted = items.slice().sort(function (a, b) { return cost(b) - cost(a); });
+    var split = h("section", { class: "tile split", "aria-labelledby": "split-h" }, h("h2", { id: "split-h" }, "Come si divide la spesa"),
+      h("ul", { class: "split-list" }, sorted.map(function (b) {
+        var c = cost(b), pct = t.total ? Math.round(c / t.total * 100) : 0;
+        return h("li", null, h("div", { class: "split-top" }, h("span", null, h("b", null, b.category), b.description ? h("small", null, " · " + b.description) : null),
+            h("span", { class: "n" }, eur(c) + " · " + pct + "%")),
+          bar([[num(b.paid), "p"], [Math.max(0, c - num(b.paid)), "c"]], t.total || 1, b.category + ": " + eur(c) + ", pagati " + eur(b.paid)),
+          h("p", { class: "soft small" }, num(b.contracted) > 0 ? "Da contratto" : c ? "Stima" : "Costo da scrivere", num(b.paid) ? " · pagati " + eur(b.paid) : null, b.due_date ? " · prossimo pagamento " + fmtDate(b.due_date) : null));
+      })),
+      h("p", { class: "legend-line" }, chip("Già pagato", "on"), chip("Da pagare", "tint")));
+    var table = h("div", { class: "tscroll" }, h("table", { class: "tbl data" },
       h("caption", { class: "sr" }, "Voci di spesa"),
-      h("thead", null, h("tr", null, ["Voce", "Previsto", "Firmato", "Pagato", "Da pagare", "Prossimo pagamento", ""].map(function (x, i) { return h("th", { scope: "col", class: i >= 1 && i <= 4 ? "n" : null }, x); }))),
-      h("tbody", null, items.map(function (b) {
+      h("thead", null, h("tr", null, ["Voce", "Costo", "Già pagato", "Da pagare", "Prossimo pagamento", ""].map(function (x, i) { return h("th", { scope: "col", class: i >= 1 && i <= 3 ? "n" : null }, x); }))),
+      h("tbody", null, sorted.map(function (b) {
+        var c = cost(b);
         return h("tr", null, h("th", { scope: "row" }, h("b", null, b.category), b.description ? h("small", null, b.description) : null),
-          h("td", { class: "n" }, eur(b.planned)), h("td", { class: "n" }, eur(b.contracted)), h("td", { class: "n" }, eur(b.paid)),
-          h("td", { class: "n" }, eur(num(b.contracted) - num(b.paid))), h("td", null, b.due_date ? fmtDate(b.due_date) : "—"),
+          h("td", { class: "n" }, eur(c), h("small", null, num(b.contracted) > 0 ? "da contratto" : "stima")), h("td", { class: "n" }, eur(b.paid)),
+          h("td", { class: "n" }, eur(Math.max(0, c - num(b.paid)))), h("td", null, b.due_date ? fmtDate(b.due_date) : "—"),
           h("td", { class: "row-actions" },
             iconBtn("Modifica", async function () { var d = await formDialog("Modifica voce", F.budget_items, b); if (!d) return; await attempt(function () { return api.update("budget_items", b.id, d); }, "Salvato."); render(); }),
             iconBtn("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger")));
       })),
-      h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.planned)), h("td", { class: "n" }, eur(t.contracted)), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(t.contracted - t.paid)), h("td", null), h("td", null))))) :
-      empty("Ancora nessuna voce. Cominciate dalla location: è di solito la spesa più grande.");
-    return [pageHead("Budget", "Previsto, firmato, pagato e residuo per ogni voce.", add), summary, table];
+      h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), h("td", null), h("td", null)))));
+    return [pageHead("Budget", "Quanto spenderete in tutto, quanto avete già pagato e come si divide la spesa.", add),
+      h("div", { class: "board budget-board" }, hero, capTile, split),
+      h("p", { class: "soft small explain" }, "Per ogni voce scrivete una stima. Quando firmate il contratto, inserite l'importo firmato: da quel momento conta quello. Il totale in alto è la somma di tutte le voci."),
+      h("h2", { class: "sec" }, "Tutte le voci"), table];
   }
 
   /* ------------------------------------------------------------ fornitori e preventivi */
@@ -591,49 +643,271 @@
 
   /* ------------------------------------------------------------ invitati */
   async function guestsView(w) {
-    var guests = await api.list("guests", w.id);
-    var filter = store.get("nio-rsvp") || "";
+    var res = await Promise.all([api.list("guests", w.id), api.list("seating_tables", w.id)]);
+    var guests = res[0], tables = res[1];
+    var tname = function (id) { var t = tables.filter(function (x) { return x.id === id; })[0]; return t ? t.name : ""; };
+    var filter = store.get("nio-rsvp") || "", gfilter = store.get("nio-group") || "";
     var q = (store.get("nio-q") || "").toLowerCase();
-    var g = { si: 0, no: 0, in_attesa: 0 }, menus = {}; guests.forEach(function (x) { g[x.rsvp]++; if (x.rsvp === "si") menus[x.menu] = (menus[x.menu] || 0) + 1; });
+    var g = { si: 0, no: 0, in_attesa: 0 }, menus = {}, byGroup = {};
+    guests.forEach(function (x) { g[x.rsvp]++; if (x.rsvp === "si") menus[x.menu] = (menus[x.menu] || 0) + 1; byGroup[x.guest_group] = (byGroup[x.guest_group] || 0) + 1; });
     var add = btn("Aggiungi invitato", async function () {
-      var d = await formDialog("Nuovo invitato", F.guests, { side: "entrambi", rsvp: "in_attesa", menu: "standard" }, "Aggiungi");
+      var d = await formDialog("Nuovo invitato", guestFields(w), { guest_group: gfilter || "amici_comuni", rsvp: "in_attesa", menu: "standard" }, "Aggiungi");
       if (!d) return; d.wedding_id = w.id;
       await attempt(function () { return api.insert("guests", d); }, "Invitato aggiunto."); render();
     });
-    var shown = guests.filter(function (x) { return (!filter || x.rsvp === filter) && (!q || (x.name + " " + x.household).toLowerCase().indexOf(q) >= 0); });
-    var households = {}; shown.forEach(function (x) { var k = x.household || "Senza nucleo"; (households[k] = households[k] || []).push(x); });
+    var shown = guests.filter(function (x) {
+      return (!filter || x.rsvp === filter) && (!gfilter || x.guest_group === gfilter) && (!q || (x.name + " " + x.household).toLowerCase().indexOf(q) >= 0);
+    });
+    var groupsBoard = h("div", { class: "groups" }, GROUPS.map(function (k) {
+      var on = gfilter === k;
+      return h("button", { type: "button", class: "group-tile gt-" + k + (on ? " on" : ""), "aria-pressed": String(on), onclick: function () { store.set("nio-group", on ? "" : k); render(); } },
+        h("span", { class: "swatch", "aria-hidden": "true" }), h("b", null, groupLabel(w, k)), h("span", { class: "n" }, String(byGroup[k] || 0)));
+    }));
     var tools = h("div", { class: "tools" },
       h("label", { class: "sr", for: "q" }, "Cerca"),
       h("input", { id: "q", type: "search", placeholder: "Cerca per nome o nucleo", value: store.get("nio-q") || "", oninput: function (e) { store.set("nio-q", e.target.value); clearTimeout(window.__nioQ); window.__nioQ = setTimeout(render, 250); } }),
-      h("div", { class: "seg small", role: "group", "aria-label": "Filtra per risposta" }, [["", "Tutti " + guests.length], ["si", "Vengono " + g.si], ["in_attesa", "In attesa " + g.in_attesa], ["no", "Non vengono " + g.no]].map(function (o) {
+      h("div", { class: "seg small", role: "group", "aria-label": "Filtra per risposta" }, [["", "Tutte le risposte"], ["si", "Vengono " + g.si], ["in_attesa", "In attesa " + g.in_attesa], ["no", "Non vengono " + g.no]].map(function (o) {
         return h("button", { type: "button", class: filter === o[0] ? "on" : null, "aria-pressed": String(filter === o[0]), onclick: function () { store.set("nio-rsvp", o[0]); render(); } }, o[1]);
       })));
-    var mosaic = guests.length ? h("div", { class: "mosaic", role: "img", "aria-label": g.si + " vengono, " + g.no + " non vengono, " + g.in_attesa + " in attesa" },
-      guests.slice().sort(function (a, b) { var o = { si: 0, no: 1, in_attesa: 2 }; return o[a.rsvp] - o[b.rsvp]; }).map(function (x) { return h("i", { class: x.rsvp === "si" ? "ok" : x.rsvp === "no" ? "no" : "wait" }); })) : null;
     var menuLine = Object.keys(menus).length ? h("p", { class: "soft" }, "Menù di chi viene: " + Object.keys(menus).map(function (k) { return LABEL.menu[k].toLowerCase() + " " + menus[k]; }).join(", ") + ".") : null;
-    var lists = Object.keys(households).sort().map(function (k) {
-      return h("section", { class: "group" }, h("h2", null, k, h("span", { class: "count" }, households[k].length)),
-        h("ul", { class: "guest-list" }, households[k].map(function (x) {
-          return h("li", null, h("span", null, h("b", null, x.name), h("small", null, LABEL.side[x.side] + " · menù " + LABEL.menu[x.menu].toLowerCase() + (x.notes ? " · " + x.notes : ""))),
+    var lists = GROUPS.map(function (k) {
+      var rows = shown.filter(function (x) { return x.guest_group === k; }).sort(function (a, b) { return (a.household + a.name).localeCompare(b.household + b.name); });
+      if (!rows.length) return null;
+      return h("section", { class: "group" }, h("h2", null, h("span", { class: "swatch gt-" + k, "aria-hidden": "true" }), groupLabel(w, k), h("span", { class: "count" }, rows.length)),
+        h("ul", { class: "guest-list" }, rows.map(function (x) {
+          var seatTxt = x.table_id ? tname(x.table_id) + ", posto " + x.seat_number : (x.rsvp === "no" ? null : "senza tavolo");
+          return h("li", null, h("span", null, h("b", null, x.name),
+              h("small", null, [x.household, "menù " + LABEL.menu[x.menu].toLowerCase(), seatTxt, x.notes].filter(Boolean).join(" · "))),
             h("label", { class: "sr", for: "r-" + x.id }, "Risposta di " + x.name),
-            h("select", { id: "r-" + x.id, class: "rsvp " + x.rsvp, onchange: async function (e) { await attempt(function () { return api.update("guests", x.id, { rsvp: e.target.value }); }, "Risposta aggiornata."); render(); } },
-              opts(LABEL.rsvp).map(function (o) { return h("option", { value: o[0], selected: x.rsvp === o[0] }, o[1]); })),
+            h("select", { id: "r-" + x.id, class: "rsvp " + x.rsvp, onchange: async function (e) {
+              var v = e.target.value, patch = { rsvp: v };
+              if (v === "no" && x.table_id) patch = { rsvp: v, table_id: null, seat_number: null };
+              await attempt(function () { return api.update("guests", x.id, patch); }, v === "no" && x.table_id ? "Risposta aggiornata: il suo posto al tavolo è di nuovo libero." : "Risposta aggiornata."); render();
+            } }, opts(LABEL.rsvp).map(function (o) { return h("option", { value: o[0], selected: x.rsvp === o[0] }, o[1]); })),
             h("span", { class: "row-actions" },
-              iconBtn("Modifica", async function () { var d = await formDialog("Modifica invitato", F.guests, x); if (!d) return; await attempt(function () { return api.update("guests", x.id, d); }, "Salvato."); render(); }),
-              iconBtn("Elimina", async function () { if (!await confirmBox("Eliminare l'invitato?", x.name + " verrà tolto dalla lista.", "Elimina")) return; await attempt(function () { return api.remove("guests", x.id); }, "Eliminato."); render(); }, "danger")));
+              iconBtn("Modifica", async function () { var d = await formDialog("Modifica invitato", guestFields(w), x); if (!d) return; await attempt(function () { return api.update("guests", x.id, d); }, "Salvato."); render(); }),
+              iconBtn("Elimina", async function () { if (!await confirmBox("Eliminare l'invitato?", x.name + " verrà tolto dalla lista e dal suo tavolo.", "Elimina")) return; await attempt(function () { return api.remove("guests", x.id); }, "Eliminato."); render(); }, "danger")));
         })));
-    });
+    }).filter(Boolean);
     function csv() {
-      var rows = [["Nome", "Nucleo", "Invitato da", "Risposta", "Menù", "Note"]].concat(guests.map(function (x) { return [x.name, x.household, LABEL.side[x.side], LABEL.rsvp[x.rsvp], LABEL.menu[x.menu], x.notes]; }));
+      var rows = [["Nome", "Gruppo", "Nucleo", "Risposta", "Menù", "Tavolo", "Posto", "Note"]].concat(guests.map(function (x) { return [x.name, groupLabel(w, x.guest_group), x.household, LABEL.rsvp[x.rsvp], LABEL.menu[x.menu], tname(x.table_id), x.seat_number || "", x.notes]; }));
       download("invitati-" + w.title.replace(/\W+/g, "-").toLowerCase() + ".csv", rows);
     }
-    return [pageHead("Invitati", g.si + " vengono, " + g.in_attesa + " in attesa, " + g.no + " non vengono" + (w.guests_expected ? " · previsti " + w.guests_expected : "") + ".", [guests.length ? btn("Esporta CSV", csv, "alt") : null, add]),
-      mosaic, menuLine, guests.length ? tools : null, lists.length ? lists : empty(guests.length ? "Nessun invitato con questi filtri." : "La lista è vuota. Aggiungete gli invitati per nucleo familiare: la risposta si aggiorna da qui.")];
+    return [pageHead("Invitati", g.si + " vengono, " + g.in_attesa + " in attesa, " + g.no + " non vengono" + (w.guests_expected ? " · previsti " + w.guests_expected : "") + ".",
+        [guests.length ? btn("Esporta CSV", csv, "alt") : null, h("a", { class: "btn alt", href: "#/m/" + w.id + "/tavoli" }, "Tavoli e sala"), add]),
+      guests.length ? groupsBoard : null, menuLine, guests.length ? tools : null,
+      lists.length ? lists : empty(guests.length ? "Nessun invitato con questi filtri." : "La lista è vuota. Aggiungete gli invitati scegliendo il gruppo: famiglia o amici di ciascuno, oppure amici comuni.")];
   }
   function download(name, rows) {
     var text = "﻿" + rows.map(function (r) { return r.map(function (c) { c = c == null ? "" : String(c); return /[";\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(";"); }).join("\n");
     var a = h("a", { href: URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" })), download: name });
     document.body.append(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  /* ------------------------------------------------------------ tavoli e sala */
+  var HALL_W = 1600, HALL_H = 1050;
+  function shortName(x) { var p = x.name.trim().split(/\s+/); return p.length > 1 ? p[0] + " " + p[p.length - 1].charAt(0) + "." : p[0]; }
+  function tableGeometry(t) {
+    // posti e didascalie attorno al tavolo, in pixel rispetto al centro
+    var n = t.seats, seats = [];
+    if (t.shape === "rettangolare") {
+      var top = Math.ceil(n / 2), bottom = n - top, W = 40 + top * 44, H = 74;
+      for (var i = 0; i < top; i++) seats.push({ x: -W / 2 + 42 + i * 44, y: -H / 2 - 22, lx: 0, ly: -26, align: "top" });
+      for (var j = 0; j < bottom; j++) seats.push({ x: -W / 2 + 42 + j * 44, y: H / 2 + 22, lx: 0, ly: 26, align: "bottom" });
+      return { w: W, h: H, seats: seats };
+    }
+    var D = 112 + (n - 8) * 10, R = D / 2 + 24;
+    for (var k = 0; k < n; k++) {
+      var a = (k / n) * Math.PI * 2 - Math.PI / 2, c = Math.cos(a), s = Math.sin(a);
+      seats.push({ x: Math.round(c * R), y: Math.round(s * R), lx: Math.round(c * 26), ly: Math.round(s * 26), align: c > 0.35 ? "right" : c < -0.35 ? "left" : s < 0 ? "top" : "bottom" });
+    }
+    return { w: D, h: D, seats: seats };
+  }
+  function freeSpot(tables) {
+    for (var i = 0; i < 40; i++) {
+      var x = 14 + (i % 4) * 24, y = 16 + Math.floor(i / 4) * 30;
+      if (y > 92) break;
+      if (!tables.some(function (t) { return Math.abs(t.pos_x - x) < 12 && Math.abs(t.pos_y - y) < 14; })) return [x, y];
+    }
+    return [50, 50];
+  }
+
+  async function seatDialog(w, t, n, guests, tables) {
+    var cur = guests.filter(function (x) { return x.table_id === t.id && x.seat_number === n; })[0];
+    var tname = function (id) { var x = tables.filter(function (y) { return y.id === id; })[0]; return x ? x.name : ""; };
+    var free = guests.filter(function (x) { return !x.table_id && x.rsvp !== "no"; });
+    var elsewhere = guests.filter(function (x) { return x.table_id && !(x.table_id === t.id && x.seat_number === n); });
+    var sel = h("select", { id: "f-guest", name: "guest" },
+      h("option", { value: "" }, "Posto libero"),
+      cur ? h("option", { value: cur.id, selected: true }, cur.name + " (ora qui)") : null,
+      GROUPS.map(function (k) {
+        var rows = free.filter(function (x) { return x.guest_group === k; });
+        return rows.length ? h("optgroup", { label: groupLabel(w, k) + " · da sistemare" }, rows.map(function (x) { return h("option", { value: x.id }, x.name + (x.rsvp === "in_attesa" ? " (in attesa)" : "")); })) : null;
+      }),
+      elsewhere.length ? h("optgroup", { label: "Sposta da un altro posto" }, elsewhere.map(function (x) { return h("option", { value: x.id }, x.name + " · " + tname(x.table_id) + ", posto " + x.seat_number); })) : null);
+    var r = await dialog(t.name + " · posto " + n, h("div", { class: "fld" }, h("label", { for: "f-guest" }, "Chi siede qui"), sel,
+      h("small", null, "Chi ha risposto che non viene non compare. Scegliendo una persona già seduta altrove, il suo vecchio posto si libera.")), [
+      h("button", { class: "btn", value: "ok" }, "Salva"), h("button", { class: "btn alt", value: "no", formnovalidate: true }, "Annulla")]);
+    if (r.value !== "ok") return;
+    var chosen = r.form.elements.guest.value;
+    if (cur && chosen === cur.id) return;
+    await attempt(async function () {
+      if (cur) await api.update("guests", cur.id, { table_id: null, seat_number: null });
+      if (chosen) await api.update("guests", chosen, { table_id: t.id, seat_number: n });
+    }, chosen ? "Posto assegnato." : "Posto liberato.");
+    render();
+  }
+
+  async function placeGuestDialog(w, x, tables, guests) {
+    var options = [];
+    tables.forEach(function (t) {
+      for (var n = 1; n <= t.seats; n++) if (!guests.some(function (g) { return g.table_id === t.id && g.seat_number === n; })) options.push([t.id + "|" + n, t.name + " · posto " + n]);
+    });
+    if (!options.length) { toast("Non ci sono posti liberi: aggiungete un tavolo.", true); return; }
+    var r = await dialog("Dove siede " + x.name + "?", h("div", { class: "fld" }, h("label", { for: "f-seat" }, "Posto libero"),
+      h("select", { id: "f-seat", name: "seat" }, options.map(function (o) { return h("option", { value: o[0] }, o[1]); }))), [
+      h("button", { class: "btn", value: "ok" }, "Assegna"), h("button", { class: "btn alt", value: "no", formnovalidate: true }, "Annulla")]);
+    if (r.value !== "ok") return;
+    var v = r.form.elements.seat.value.split("|");
+    await attempt(function () { return api.update("guests", x.id, { table_id: v[0], seat_number: Number(v[1]) }); }, "Posto assegnato.");
+    render();
+  }
+
+  async function tableEditDialog(w, t) {
+    var d = await formDialog(t ? "Modifica " + t.name : "Nuovo tavolo", F.tables, t ? Object.assign({}, t, { seats: String(t.seats) }) : null, t ? "Salva" : "Aggiungi");
+    if (!d) return null;
+    d.seats = Number(d.seats);
+    return d;
+  }
+
+  async function tablesView(w) {
+    var res = await Promise.all([api.list("seating_tables", w.id), api.list("guests", w.id)]);
+    var tables = res[0], guests = res[1];
+    var coming = guests.filter(function (x) { return x.rsvp !== "no"; });
+    var waiting = coming.filter(function (x) { return !x.table_id; });
+    var seated = guests.filter(function (x) { return x.table_id; });
+    var seatsTotal = tables.reduce(function (a, t) { return a + t.seats; }, 0);
+    var byId = {}; tables.forEach(function (t) { byId[t.id] = t; });
+    var at = function (t, n) { return guests.filter(function (x) { return x.table_id === t.id && x.seat_number === n; })[0]; };
+
+    var add = btn("Aggiungi tavolo", async function () {
+      var d = await tableEditDialog(w, null);
+      if (!d) return;
+      var pos = freeSpot(tables); d.pos_x = pos[0]; d.pos_y = pos[1]; d.wedding_id = w.id;
+      await attempt(function () { return api.insert("seating_tables", d); }, "Tavolo aggiunto alla sala."); render();
+    });
+    var stats = h("div", { class: "board sum4" },
+      h("div", { class: "tile t-count" }, h("p", { class: "lbl" }, "Ai tavoli"), h("p", { class: "fig" }, seated.length + " su " + coming.length), h("p", { class: "meta" }, "invitati che vengono o non hanno ancora risposto")),
+      h("div", { class: "tile" }, h("p", { class: "lbl" }, "Tavoli"), h("p", { class: "fig" }, String(tables.length)), h("p", { class: "meta" }, seatsTotal + " posti in tutto")),
+      h("div", { class: "tile" }, h("p", { class: "lbl" }, "Posti liberi"), h("p", { class: "fig" }, String(seatsTotal - seated.length))),
+      h("div", { class: "tile" }, h("p", { class: "lbl" }, "Da sistemare"), h("p", { class: waiting.length ? "fig warn-fig" : "fig" }, String(waiting.length)),
+        waiting.length > seatsTotal - seated.length ? h("p", { class: "warn small" }, "Mancano " + (waiting.length - (seatsTotal - seated.length)) + " posti: aggiungete un tavolo.") : null));
+    var legend = h("p", { class: "legend-line" }, GROUPS.map(function (k) { return h("span", { class: "leg" }, h("span", { class: "swatch gt-" + k, "aria-hidden": "true" }), groupLabel(w, k)); }),
+      h("span", { class: "leg" }, h("span", { class: "swatch free", "aria-hidden": "true" }), "Posto libero"));
+
+    /* la pianta: si trascinano i tavoli, si tocca un posto per assegnarlo */
+    var zoom = Number(store.get("nio-zoom")) || 0;
+    var wrap = h("div", { class: "hall-wrap", role: "region", "aria-label": "Pianta della sala" });
+    var hall = h("div", { class: "hall", style: "width:" + HALL_W + "px;height:" + HALL_H + "px" });
+    tables.forEach(function (t) {
+      var geo = tableGeometry(t);
+      var el = h("div", { class: "table-el", style: "left:" + (t.pos_x / 100 * HALL_W) + "px;top:" + (t.pos_y / 100 * HALL_H) + "px" });
+      var core = h("button", { type: "button", class: "table-core " + (t.shape === "rettangolare" ? "rect" : "round"), style: "width:" + geo.w + "px;height:" + geo.h + "px",
+        "aria-label": t.name + ", " + guests.filter(function (x) { return x.table_id === t.id; }).length + " su " + t.seats + " posti. Trascina per spostare, invio per modificare." },
+        h("b", null, t.name), h("span", null, guests.filter(function (x) { return x.table_id === t.id; }).length + "/" + t.seats));
+      el.append(core);
+      geo.seats.forEach(function (s, i) {
+        var n = i + 1, x = at(t, n);
+        el.append(h("button", { type: "button", class: "seat " + (x ? "gt-" + x.guest_group : "free"), style: "left:" + s.x + "px;top:" + s.y + "px",
+          "aria-label": "Posto " + n + ": " + (x ? x.name : "libero"), onclick: function () { seatDialog(w, t, n, guests, tables); } }, String(n)));
+        if (x) el.append(h("span", { class: "seat-name a-" + s.align, style: "left:" + (s.x + s.lx) + "px;top:" + (s.y + s.ly) + "px" }, shortName(x)));
+      });
+      // trascinamento con mouse o dito; un tocco senza movimento apre la modifica del tavolo
+      var start = null;
+      core.addEventListener("pointerdown", function (e) {
+        start = { x: e.clientX, y: e.clientY, left: t.pos_x / 100 * HALL_W, top: t.pos_y / 100 * HALL_H, moved: false, z: currentZoom() };
+        core.setPointerCapture(e.pointerId);
+      });
+      core.addEventListener("pointermove", function (e) {
+        if (!start) return;
+        var dx = (e.clientX - start.x) / start.z, dy = (e.clientY - start.y) / start.z;
+        if (Math.abs(dx) + Math.abs(dy) > 4) start.moved = true;
+        if (start.moved) { el.style.left = Math.max(0, Math.min(HALL_W, start.left + dx)) + "px"; el.style.top = Math.max(0, Math.min(HALL_H, start.top + dy)) + "px"; }
+      });
+      core.addEventListener("pointerup", async function () {
+        if (!start) return;
+        var s0 = start; start = null;
+        if (!s0.moved) { editTable(t); return; }
+        var px = Math.round(parseFloat(el.style.left) / HALL_W * 1000) / 10, py = Math.round(parseFloat(el.style.top) / HALL_H * 1000) / 10;
+        t.pos_x = px; t.pos_y = py;
+        await attempt(function () { return api.update("seating_tables", t.id, { pos_x: px, pos_y: py }); });
+      });
+      core.addEventListener("keydown", async function (e) {
+        var step = e.shiftKey ? 5 : 1, k = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+        if (!k) return;
+        e.preventDefault();
+        t.pos_x = Math.max(0, Math.min(100, t.pos_x + k[0])); t.pos_y = Math.max(0, Math.min(100, t.pos_y + k[1]));
+        el.style.left = (t.pos_x / 100 * HALL_W) + "px"; el.style.top = (t.pos_y / 100 * HALL_H) + "px";
+        clearTimeout(core._save); core._save = setTimeout(function () { attempt(function () { return api.update("seating_tables", t.id, { pos_x: t.pos_x, pos_y: t.pos_y }); }); }, 500);
+      });
+      hall.append(el);
+    });
+    if (!tables.length) hall.append(h("p", { class: "hall-empty" }, "La sala è vuota. Aggiungete il primo tavolo: lo potrete trascinare dove volete."));
+    var sizer = h("div", { class: "hall-sizer" }, hall);
+    wrap.append(sizer);
+    function currentZoom() { return Number(wrap.dataset.z) || 1; }
+    function applyZoom(z) {
+      var fit = Math.max(0.6, Math.min(1, (wrap.clientWidth - 2) / HALL_W));
+      var v = z || fit;
+      wrap.dataset.z = v;
+      hall.style.transform = "scale(" + v + ")";
+      sizer.style.width = HALL_W * v + "px"; sizer.style.height = HALL_H * v + "px";
+      zl.textContent = Math.round(v * 100) + "%";
+    }
+    var zl = h("span", { class: "zoom-level", "aria-live": "polite" });
+    var zoomBar = h("div", { class: "zoom" },
+      iconBtn("−", function () { zoom = Math.max(0.35, (zoom || currentZoom()) - 0.15); store.set("nio-zoom", zoom); applyZoom(zoom); }),
+      zl,
+      iconBtn("+", function () { zoom = Math.min(1.4, (zoom || currentZoom()) + 0.15); store.set("nio-zoom", zoom); applyZoom(zoom); }),
+      iconBtn("Adatta", function () { zoom = 0; store.set("nio-zoom", ""); applyZoom(0); }));
+    requestAnimationFrame(function () { applyZoom(zoom); });
+    window.onresize = function () { if (!zoom && document.body.contains(wrap)) applyZoom(0); };
+
+    async function editTable(t) {
+      var d = await tableEditDialog(w, t);
+      if (!d) return;
+      await attempt(function () { return api.update("seating_tables", t.id, d); }, "Tavolo aggiornato."); render();
+    }
+
+    /* elenco per tavolo: lo stesso contenuto della pianta, leggibile anche da telefono */
+    var cards = h("div", { class: "table-cards" }, tables.map(function (t) {
+      var list = [];
+      for (var n = 1; n <= t.seats; n++) (function (n) {
+        var x = at(t, n);
+        list.push(h("li", null, h("button", { type: "button", class: "seat-row", onclick: function () { seatDialog(w, t, n, guests, tables); } },
+          h("span", { class: "seat-no " + (x ? "gt-" + x.guest_group : "free") }, String(n)),
+          x ? h("span", null, x.name, h("small", null, groupLabel(w, x.guest_group))) : h("span", { class: "soft" }, "Posto libero"))));
+      })(n);
+      var filled = guests.filter(function (x) { return x.table_id === t.id; }).length;
+      return h("article", { class: "table-card" },
+        h("header", null, h("h3", null, t.name), h("p", { class: "soft small" }, (t.shape === "rettangolare" ? "Rettangolare" : "Rotondo") + " · " + filled + " su " + t.seats + " posti"),
+          h("span", { class: "row-actions" }, iconBtn("Modifica", function () { editTable(t); }),
+            iconBtn("Elimina", async function () {
+              if (!await confirmBox("Eliminare " + t.name + "?", filled ? "Le " + filled + " persone sedute torneranno tra quelle da sistemare." : "Il tavolo verrà tolto dalla sala.", "Elimina")) return;
+              await attempt(function () { return api.remove("seating_tables", t.id); }, "Tavolo eliminato."); render();
+            }, "danger"))),
+        h("ol", { class: "seat-list" }, list));
+    }));
+
+    var waitingPanel = waiting.length ? h("section", { class: "group waiting" }, h("h2", null, "Da sistemare", h("span", { class: "count" }, waiting.length)),
+      GROUPS.map(function (k) {
+        var rows = waiting.filter(function (x) { return x.guest_group === k; });
+        return rows.length ? h("div", { class: "wait-group" }, h("p", { class: "lbl" }, h("span", { class: "swatch gt-" + k, "aria-hidden": "true" }), groupLabel(w, k) + " · " + rows.length),
+          h("div", { class: "chips-btn" }, rows.map(function (x) { return h("button", { type: "button", class: "guest-chip", onclick: function () { placeGuestDialog(w, x, tables, guests); } }, x.name + (x.rsvp === "in_attesa" ? " ?" : "")); }))) : null;
+      })) : null;
+
+    return [pageHead("Tavoli e sala", tables.length ? "Trascinate i tavoli per disporre la sala. Toccate un posto per scegliere chi ci siede." : "Disegnate la sala: tavoli da 8 a 12 posti, con il loro nome.", [h("a", { class: "btn alt", href: "#/m/" + w.id + "/invitati" }, "Invitati"), add]),
+      stats, legend, tables.length ? zoomBar : null, wrap, waitingPanel, tables.length ? h("h2", { class: "sec" }, "Tavolo per tavolo") : null, cards];
   }
 
   /* ------------------------------------------------------------ scaletta */
@@ -725,25 +999,124 @@
   }
 
   /* ------------------------------------------------------------ profilo */
+  /* ------------------------------------------------------------ avvisi */
+  // Scadenze e pagamenti vicini, sui matrimoni di cui sono membro.
+  function computeAlerts() {
+    var me = state.me, days = me.notify_days == null ? 3 : Number(me.notify_days);
+    if (!days) return [];
+    var mine = {}; state.weddings.forEach(function (w) { if (w.my_role) mine[w.id] = w; });
+    var out = [];
+    (state.alertTasks || []).forEach(function (t) {
+      if (t.done || !t.due_date || !mine[t.wedding_id]) return;
+      var n = daysTo(t.due_date);
+      if (n <= days) out.push({ id: "t" + t.id, kind: "scadenza", n: n, title: t.title, wedding: mine[t.wedding_id], href: "#/m/" + t.wedding_id + "/scadenze" });
+    });
+    (state.alertPays || []).forEach(function (b) {
+      if (!b.due_date || !mine[b.wedding_id]) return;
+      var left = cost(b) - num(b.paid), n = daysTo(b.due_date);
+      if (left > 0 && n <= days && n >= -30) out.push({ id: "p" + b.id, kind: "pagamento", n: n, title: "Pagamento: " + b.category + " (" + eur(left) + ")", wedding: mine[b.wedding_id], href: "#/m/" + b.wedding_id + "/budget" });
+    });
+    return out.sort(function (a, b) { return a.n - b.n; });
+  }
+  var canNotify = function () { return "Notification" in window; };
+  function swReg() { return ("serviceWorker" in navigator && api.mode === "live") ? navigator.serviceWorker.getRegistration() : Promise.resolve(null); }
+  // Una notifica di sistema per ogni scadenza di oggi, domani o in ritardo, al massimo una volta al giorno.
+  async function notifyDevice(list) {
+    if (!canNotify() || Notification.permission !== "granted") return;
+    var today = todayIso(), reg = await swReg().catch(function () { return null; });
+    var fresh = list.filter(function (a) { return a.n <= 1 && store.local("nio-n-" + a.id) !== today; }).slice(0, 4);
+    fresh.forEach(function (a) {
+      var body = a.wedding.title + " · " + (a.n < 0 ? "in ritardo di " + (-a.n) + (a.n === -1 ? " giorno" : " giorni") : whenText(a.n === 0 ? today : a.n === 1 ? isoPlus(1) : today));
+      var opt = { body: body, tag: a.id, icon: "../apple-touch-icon.png", data: { url: location.pathname + a.href } };
+      try { if (reg) reg.showNotification(a.title, opt); else new Notification(a.title, opt); } catch (e) {}
+      store.setLocal("nio-n-" + a.id, today);
+    });
+  }
+  function isoPlus(n) { var d = new Date(); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function deviceBox() {
+    if (!canNotify()) return h("p", { class: "soft" }, "Questo browser non mostra notifiche. Su iPhone servono iOS 16.4 e l'app aggiunta alla schermata Home.");
+    if (Notification.permission === "granted") return h("p", { class: "good" }, "Le notifiche su questo dispositivo sono attive.");
+    if (Notification.permission === "denied") return h("p", { class: "soft" }, "Le notifiche sono bloccate per questo sito: si riattivano dalle impostazioni del browser.");
+    return btn("Attiva le notifiche su questo dispositivo", async function () {
+      var p = await Notification.requestPermission();
+      if (p === "granted") { toast("Notifiche attive."); notifyDevice(computeAlerts()); }
+      render();
+    }, "alt");
+  }
+  function alertsView() {
+    var list = computeAlerts(), days = Number(state.me.notify_days);
+    var late = list.filter(function (a) { return a.n < 0; }), soon = list.filter(function (a) { return a.n >= 0; });
+    var row = function (a) {
+      return h("li", null, h("a", { href: a.href }, h("b", null, a.title), h("small", null, a.wedding.title)),
+        h("span", { class: a.n < 0 ? "warn" : "soft" }, a.n < 0 ? "in ritardo di " + (-a.n) + (a.n === -1 ? " giorno" : " giorni") : a.n === 0 ? "oggi" : a.n === 1 ? "domani" : "tra " + a.n + " giorni"));
+    };
+    return [backLink(), pageHead("Avvisi", days ? "Scadenze e pagamenti dei prossimi " + days + (days === 1 ? " giorno" : " giorni") + ", e quelli in ritardo." : "Gli avvisi sono spenti: si riaccendono dal profilo."),
+      h("section", { class: "tile notify-box" }, h("h2", null, "Notifiche sul telefono e sul computer"),
+        h("p", { class: "soft" }, "Quando aprite Nozze in Ordine, ricevete una notifica per ciò che scade oggi, domani o è in ritardo. Aggiungendo l'app alla schermata Home l'avete sempre a un tocco."),
+        deviceBox(), h("a", { href: "#/profilo" }, "Quanti giorni prima avvisare")),
+      late.length ? h("section", { class: "group" }, h("h2", null, "In ritardo", h("span", { class: "count" }, late.length)), h("ul", { class: "alert-list" }, late.map(row))) : null,
+      soon.length ? h("section", { class: "group" }, h("h2", null, "In arrivo", h("span", { class: "count" }, soon.length)), h("ul", { class: "alert-list" }, soon.map(row))) : null,
+      !list.length && days ? empty("Niente in scadenza nei prossimi " + days + " giorni.") : null];
+  }
+
+  function backLink() { return h("a", { class: "back", href: "#/" }, "← Torna alla dashboard"); }
+
   async function profileView() {
     var me = state.me;
-    var f = h("form", { class: "grid-form card-form" }, field({ name: "full_name", label: "Nome e cognome", required: true, max: 120, autocomplete: "name" }, me.full_name),
-      h("div", { class: "fld" }, h("p", { class: "lbl" }, "Email"), h("p", null, me.email)),
-      h("div", { class: "fld" }, h("p", { class: "lbl" }, "Tipo di account"), h("p", null, LABEL.role[me.role])),
-      h("div", { class: "form-end" }, h("button", { class: "btn", type: "submit" }, "Salva")));
+    var role = me.role;
+    var fields = [{ name: "full_name", label: "Nome e cognome", required: true, max: 120, autocomplete: "name" }, { name: "phone", label: "Telefono", type: "tel", max: 40, autocomplete: "tel" }];
+    if (role === "planner") fields.push({ name: "business_name", label: "Nome dello studio o dell'attività", max: 120, autocomplete: "organization" }, { name: "city", label: "Zona in cui lavori", max: 80, placeholder: "Es. Napoli e provincia" });
+    else fields.push({ name: "city", label: "Città", max: 80 });
+    var f = h("form", { class: "grid-form" }, fields.map(function (x) { return field(x, me[x.name]); }),
+      h("div", { class: "form-end" }, h("button", { class: "btn", type: "submit" }, "Salva i dati")));
     f.addEventListener("submit", async function (e) {
-      e.preventDefault(); var n = f.elements.full_name.value.trim(); if (!n) return;
-      await attempt(function () { return api.updateMyName(me.id, n); }, "Nome aggiornato."); state.me.full_name = n; render();
+      e.preventDefault(); if (!f.checkValidity()) return f.reportValidity();
+      var d = readForm(f, fields);
+      await attempt(function () { return api.updateMyProfile(me.id, d); }, "Dati salvati."); Object.assign(state.me, d); render();
     });
-    var pw = api.mode === "live" ? h("form", { class: "grid-form card-form" }, field({ name: "password", label: "Nuova password", type: "password", required: true, autocomplete: "new-password", help: "Almeno 8 caratteri." }),
-      h("div", { class: "form-end" }, h("button", { class: "btn alt", type: "submit" }, "Cambia password"))) : null;
-    if (pw) pw.addEventListener("submit", async function (e) {
+    var nf = h("form", { class: "grid-form" }, field({ name: "notify_days", label: "Avvisami delle scadenze", type: "select", options: [["0", "Mai"], ["1", "Il giorno prima"], ["3", "3 giorni prima"], ["7", "Una settimana prima"], ["14", "Due settimane prima"]] }, String(me.notify_days == null ? 3 : me.notify_days)),
+      h("div", { class: "form-end" }, h("button", { class: "btn alt", type: "submit" }, "Salva")));
+    nf.addEventListener("submit", async function (e) {
+      e.preventDefault(); var v = Number(nf.elements.notify_days.value);
+      await attempt(function () { return api.updateMyProfile(me.id, { notify_days: v }); }, "Preferenza salvata."); state.me.notify_days = v; render();
+    });
+    var pw = api.mode === "live" ? h("form", { class: "grid-form" }, field({ name: "password", label: "Nuova password", type: "password", required: true, autocomplete: "new-password", help: "Almeno 8 caratteri." }),
+      h("div", { class: "form-end" }, h("button", { class: "btn alt", type: "submit" }, "Cambia password"))) : h("p", { class: "soft" }, "Nella demo la password non si cambia.");
+    if (pw.tagName === "FORM") pw.addEventListener("submit", async function (e) {
       e.preventDefault(); var p = pw.elements.password.value;
       if (p.length < 8) return toast("La password deve avere almeno 8 caratteri.", true);
       await attempt(function () { return api.updatePassword(p); }, "Password cambiata."); pw.reset();
     });
-    return [pageHead("Profilo", null), f, pw ? h("h2", { class: "sec" }, "Password") : null, pw,
-      h("p", { class: "soft small" }, "Per cambiare tipo di account o cancellarlo scrivi a info@nozzeinordine.com.")];
+
+    // la parte che cambia per ruolo
+    var ws = state.weddings, roleCard;
+    if (role === "coppia") {
+      roleCard = h("section", { class: "tile pcard" }, h("h2", null, "Il vostro matrimonio"),
+        ws.length ? h("ul", { class: "rows" }, ws.map(function (w) { return h("li", null, h("a", { href: "#/m/" + w.id + "/panoramica" }, w.title), h("span", { class: "soft" }, w.wedding_date ? fmtDate(w.wedding_date) : "data da decidere")); }))
+          : h("p", { class: "soft" }, "Non avete ancora creato il matrimonio."),
+        ws.length ? h("p", null, h("a", { href: "#/m/" + ws[0].id + "/persone" }, "Invita il partner o la wedding planner")) : btn("Crea il matrimonio", createWeddingFlow));
+    } else if (role === "planner") {
+      var active = ws.filter(function (w) { return w.my_role && (daysTo(w.wedding_date) == null || daysTo(w.wedding_date) >= 0); });
+      var soon90 = active.filter(function (w) { var n = daysTo(w.wedding_date); return n != null && n <= 90; });
+      roleCard = h("section", { class: "tile pcard" }, h("h2", null, "La tua attività"),
+        h("dl", { class: "kv" }, h("div", null, h("dt", null, "Matrimoni in corso"), h("dd", null, String(active.length))), h("div", null, h("dt", null, "Nei prossimi 90 giorni"), h("dd", null, String(soon90.length))),
+          h("div", null, h("dt", null, "Avvisi aperti"), h("dd", null, String(computeAlerts().length)))),
+        h("p", null, h("a", { href: "#/eventi" }, "Vai a tutti i tuoi matrimoni")));
+    } else {
+      roleCard = h("section", { class: "tile pcard" }, h("h2", null, "Amministrazione"),
+        h("p", { class: "soft" }, "Hai accesso a tutti gli utenti, ai matrimoni e alla lista d'attesa."),
+        h("ul", { class: "rows" }, h("li", null, h("a", { href: "#/admin" }, "Riepilogo")), h("li", null, h("a", { href: "#/admin/utenti" }, "Utenti e ruoli")), h("li", null, h("a", { href: "#/admin/lista" }, "Lista d'attesa")), h("li", null, h("a", { href: "#/eventi" }, "Tutti i matrimoni"))));
+    }
+    return [backLink(),
+      h("header", { class: "page-head profile-head" }, h("div", { class: "avatar", "aria-hidden": "true" }, (me.full_name || me.email).trim().charAt(0).toUpperCase()),
+        h("div", null, h("h1", null, me.full_name || "Il tuo profilo"), h("p", { class: "sub" }, LABEL.role[role] + (role === "planner" && me.business_name ? " · " + me.business_name : "") + " · " + me.email))),
+      h("div", { class: "profile-grid" },
+        h("section", { class: "tile pcard wide" }, h("h2", null, role === "planner" ? "I tuoi dati e l'attività" : "I tuoi dati"), h("p", { class: "soft small" }, "Email di accesso: " + me.email), f),
+        roleCard,
+        h("section", { class: "tile pcard" }, h("h2", null, "Avvisi"), nf, deviceBox()),
+        h("section", { class: "tile pcard" }, h("h2", null, "Accesso e sicurezza"), pw,
+          h("div", { class: "form-end" }, btn("Esci", async function () { await attempt(api.signOut); }, "alt")),
+          h("p", { class: "soft small" }, (me.created_at ? "Account creato il " + fmtDate(me.created_at) + ". " : "") + "Per cancellare l'account scrivi a info@nozzeinordine.com.")))];
   }
 
   /* ------------------------------------------------------------ planner: tutti i matrimoni */
@@ -823,6 +1196,13 @@
     if (!state.me) return;
     var r = await Promise.all([api.listWeddings(state.me), api.pendingInvites().catch(function () { return []; })]);
     state.weddings = r[0]; state.invites = r[1] || [];
+    var mineIds = state.weddings.filter(function (w) { return w.my_role; }).map(function (w) { return w.id; });
+    if (mineIds.length) {
+      var a = await Promise.all([api.list("tasks", null), api.list("budget_items", null)]);
+      state.alertTasks = a[0].filter(function (t) { return mineIds.indexOf(t.wedding_id) >= 0; });
+      state.alertPays = a[1].filter(function (b) { return mineIds.indexOf(b.wedding_id) >= 0; });
+    } else { state.alertTasks = []; state.alertPays = []; }
+    notifyDevice(computeAlerts());
   }
 
   var renderId = 0;
@@ -846,7 +1226,7 @@
         if (!w) { content = empty("Questo matrimonio non esiste o non hai accesso.", btn("Torna all'inizio", function () { go(""); })); }
         else {
           var sec = p[2] || "panoramica";
-          var view = { panoramica: overview, scadenze: tasksView, budget: budgetView, fornitori: vendorsView, invitati: guestsView, scaletta: timelineView, note: notesView, persone: peopleView, impostazioni: settingsView }[sec] || overview;
+          var view = { panoramica: overview, scadenze: tasksView, budget: budgetView, fornitori: vendorsView, invitati: guestsView, tavoli: tablesView, scaletta: timelineView, note: notesView, persone: peopleView, impostazioni: settingsView }[sec] || overview;
           if (sec === "note" && !isPlannerHere(w)) view = overview;
           root.replaceChildren(shell(h("p", { class: "loading" }, "Carico…")));
           content = await view(w);
@@ -854,6 +1234,7 @@
       } else if (p[0] === "eventi" && me.role !== "coppia") content = await eventsView();
       else if (p[0] === "admin" && me.role === "admin") content = await adminView(p[1]);
       else if (p[0] === "profilo") content = await profileView();
+      else if (p[0] === "avvisi") content = alertsView();
       else {
         // pagina iniziale secondo il ruolo
         if (me.role === "admin") return go("admin");
@@ -879,5 +1260,6 @@
       setTimeout(render, 0);
     }
   });
+  if (api.mode === "live" && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
   render();
 })();
