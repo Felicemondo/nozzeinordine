@@ -240,7 +240,7 @@
       { name: "household", label: "Nucleo familiare", max: 120, placeholder: "Es. Famiglia Russo" },
       { name: "rsvp", label: "Risposta", type: "select", options: opts(LABEL.rsvp) },
       { name: "menu", label: "Menù", type: "select", options: opts(LABEL.menu) },
-      { name: "notes", label: "Note", max: 500, placeholder: "Es. intolleranze, seggiolone" }
+      { name: "notes", label: "Note", max: 500, placeholder: "Es. arriva dopo la cerimonia" }
     ];
   }
 
@@ -698,8 +698,14 @@
       guests.length ? groupsBoard : null, menuLine, guests.length ? tools : null,
       lists.length ? lists : empty(guests.length ? "Nessun invitato con questi filtri." : "La lista è vuota. Aggiungete gli invitati scegliendo il gruppo: famiglia o amici di ciascuno, oppure amici comuni.")];
   }
+  // Una cella che inizia con = + - @ verrebbe letta come formula da Excel: l'apostrofo la lascia testo.
+  function csvCell(c) {
+    c = c == null ? "" : String(c);
+    if (/^[=+\-@\t\r]/.test(c)) c = "'" + c;
+    return /[";\n\r]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c;
+  }
   function download(name, rows) {
-    var text = "﻿" + rows.map(function (r) { return r.map(function (c) { c = c == null ? "" : String(c); return /[";\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(";"); }).join("\n");
+    var text = "﻿" + rows.map(function (r) { return r.map(csvCell).join(";"); }).join("\n");
     var a = h("a", { href: URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" })), download: name });
     document.body.append(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   }

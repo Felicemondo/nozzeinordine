@@ -316,7 +316,7 @@ write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati d
 <p ${rv()}>Il titolare del trattamento è Felice Mondo, persona fisica. Puoi scrivere a <a href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
 <h2 ${rv()}>Quali dati raccogliamo</h2>
 <ul ${rv()}><li>Email</li><li>Se sei una coppia o una wedding planner</li><li>Provincia o regione</li><li>Il prezzo che ti sembra giusto</li><li>Per le planner: numero di matrimoni l'anno, strumenti usati e se vuoi una chiamata</li><li>La data dell'iscrizione</li></ul>
-<p ${rv()}>Nella prima fase non raccogliamo dati su intolleranze alimentari o salute degli invitati. Se in futuro lo faremo, lo scriveremo qui e chiederemo un consenso specifico.</p>
+<p ${rv()}>Nella prima fase non raccogliamo dati su intolleranze alimentari o salute degli invitati. Per questo nel campo note degli invitati vi chiediamo di non scrivere dati sulla salute. Se in futuro li raccoglieremo, lo scriveremo qui e chiederemo un consenso specifico.</p>
 <h2 ${rv()}>Perché li raccogliamo</h2>
 <p ${rv()}>Per avvisarti quando la prima versione è pronta e per capire quali funzioni e quali prezzi servono. La base è il tuo consenso, che puoi revocare in qualsiasi momento.</p>
 <h2 ${rv()}>Per quanto tempo</h2>
