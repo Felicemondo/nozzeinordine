@@ -60,11 +60,11 @@
     me: async function () {
       var u = ok(await sb.auth.getUser()).user;
       if (!u) return null;
-      var p = ok(await sb.from("profiles").select("id, role, full_name, email, phone, business_name, city, notify_days, created_at").eq("id", u.id).maybeSingle());
+      var p = ok(await sb.from("profiles").select("id, role, full_name, email, phone, business_name, city, notify_days, weddings_per_year, work_mode, created_at").eq("id", u.id).maybeSingle());
       return p || { id: u.id, role: "coppia", full_name: "", email: u.email, phone: "", business_name: "", city: "", notify_days: 3 };
     },
     updateMyProfile: async function (id, patch) {
-      var allowed = {}; ["full_name", "phone", "business_name", "city", "notify_days"].forEach(function (k) { if (k in patch) allowed[k] = patch[k]; });
+      var allowed = {}; ["full_name", "phone", "business_name", "city", "notify_days", "weddings_per_year", "work_mode"].forEach(function (k) { if (k in patch) allowed[k] = patch[k]; });
       ok(await sb.from("profiles").update(allowed).eq("id", id));
     },
 

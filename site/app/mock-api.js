@@ -12,7 +12,7 @@
 
   var USERS = {
     coppia: { id: "u-anna", role: "coppia", full_name: "Anna Russo", email: "anna@esempio.it", phone: "", business_name: "", city: "Caserta", notify_days: 3, created_at: new Date(Date.now() - 86400000 * 20).toISOString() },
-    planner: { id: "u-bea", role: "planner", full_name: "Beatrice Esposito", email: "bea@esempio.it", phone: "333 000 0000", business_name: "Esposito Wedding Studio", city: "Napoli", notify_days: 7, created_at: new Date(Date.now() - 86400000 * 40).toISOString() },
+    planner: { id: "u-bea", role: "planner", full_name: "Beatrice Esposito", email: "bea@esempio.it", phone: "333 000 0000", business_name: "Esposito Wedding Studio", city: "Napoli", notify_days: 7, weddings_per_year: "1-5", work_mode: "autonomia", created_at: new Date(Date.now() - 86400000 * 40).toISOString() },
     admin: { id: "u-admin", role: "admin", full_name: "Amministrazione", email: "info@nozzeinordine.com", phone: "", business_name: "", city: "", notify_days: 3, created_at: new Date(Date.now() - 86400000 * 60).toISOString() }
   };
   var TEMPLATE = [
@@ -30,8 +30,8 @@
 
   var db = {
     profiles: [USERS.coppia, USERS.planner, USERS.admin,
-      { id: "u-marco", role: "coppia", full_name: "Marco De Luca", email: "marco@esempio.it" },
-      { id: "u-sara", role: "coppia", full_name: "Sara Gallo", email: "sara@esempio.it" }],
+      { id: "u-marco", role: "coppia", full_name: "Marco De Luca", email: "marco@esempio.it", created_at: null },
+      { id: "u-sara", role: "coppia", full_name: "Sara Gallo", email: "sara@esempio.it", created_at: null }],
     weddings: [], wedding_members: [], wedding_invites: [],
     budget_items: [], vendors: [], quotes: [], guests: [], tasks: [], timeline_items: [], internal_notes: [], seating_tables: [],
     waitlist: [
@@ -41,7 +41,9 @@
   };
 
   // come nel database: una scadenza calcolata nel passato nasce a una settimana da oggi
+  // e senza data non nasce nessuna scadenza automatica
   function seedTasks(w, clamp) {
+    if (!w.wedding_date || db.tasks.some(function (t) { return t.wedding_id === w.id && t.offset_months != null; })) return;
     var floor = addDays(7);
     TEMPLATE.forEach(function (t) {
       var due = addMonthsTo(w.wedding_date, t[2], t[3]);
@@ -52,7 +54,7 @@
   }
   function wedding(id, title, date, city, budget, guests, members) {
     var names = title.split(" e ");
-    var w = { id: id, title: title, partner_a: names[0] || "", partner_b: names[1] || "", wedding_date: date, city: city, ceremony: "religioso", budget_total: budget, guests_expected: guests, created_by: members[0][0], created_at: new Date().toISOString() };
+    var w = { id: id, title: title, partner_a: names[0] || "", partner_b: names[1] || "", wedding_date: date, city: city, ceremony: "religioso", budget_total: budget, guests_expected: guests, priorities: ["spese", "invitati"], stage: "qualcosa", created_by: members[0][0], created_at: new Date().toISOString() };
     db.weddings.push(w);
     members.forEach(function (m) { db.wedding_members.push({ wedding_id: id, user_id: m[0], member_role: m[1], created_at: w.created_at }); });
     seedTasks(w);
@@ -63,7 +65,11 @@
   var w1 = wedding("w-anna", "Anna e Marco", addDays(232), "Caserta", 26000, 150, [["u-anna", "sposi"], ["u-marco", "sposi"], ["u-bea", "planner"]]);
   wedding("w-sara", "Sara e Paolo", addDays(330), "Napoli", 32000, 180, [["u-bea", "planner"], ["u-sara", "sposi"]]);
   wedding("w-giulia", "Giulia e Andrea", addDays(345), "Salerno", 21000, 110, [["u-bea", "planner"]]);
-  db.tasks.forEach(function (t) { if (t.due_date && t.due_date < iso(new Date()) && Math.random() < 0.85) t.done = true; });
+  // per ogni matrimonio: le prime attività già passate sono fatte, le altre restano in ritardo (dati fissi, non casuali)
+  ["w-anna", "w-sara", "w-giulia"].forEach(function (wid, k) {
+    var past = db.tasks.filter(function (t) { return t.wedding_id === wid && t.due_date && t.due_date < iso(new Date()); });
+    past.slice(0, [4, 1, 3][k]).forEach(function (t) { t.done = true; });
+  });
   [["Location e ricevimento", "Villa con giardino", 10500, 9800, 3000, addDays(14)], ["Fotografo e video", "", 2400, 2200, 700, addDays(40)],
    ["Abiti", "Sposa e sposo", 3600, 2900, 1450, null], ["Musica", "Band per la festa", 1500, 1200, 300, addDays(60)],
    ["Fiori e allestimenti", "", 1800, 0, 0, null], ["Viaggio di nozze", "Giappone, 12 giorni", 4500, 0, 0, addDays(150)], ["Altre spese", "Bomboniere, partecipazioni, trasporti", 1700, 0, 0, null]]
@@ -130,7 +136,7 @@
     updatePassword: async function () { throw new Error("Non disponibile nella demo."); },
 
     me: async function () { await wait(); return me ? clone(me) : null; },
-    updateMyProfile: async function (id, patch) { ["full_name", "phone", "business_name", "city", "notify_days"].forEach(function (k) { if (k in patch) me[k] = patch[k]; }); },
+    updateMyProfile: async function (id, patch) { ["full_name", "phone", "business_name", "city", "notify_days", "weddings_per_year", "work_mode"].forEach(function (k) { if (k in patch) me[k] = patch[k]; }); },
 
     listWeddings: async function () {
       await wait();
@@ -142,7 +148,7 @@
     },
     createWedding: async function (data) {
       await wait();
-      var w = Object.assign({ id: uid(), city: "", partner_a: "", partner_b: "", ceremony: "da_decidere", budget_total: 0, guests_expected: 0, created_by: me.id, created_at: new Date().toISOString() }, data);
+      var w = Object.assign({ id: uid(), city: "", partner_a: "", partner_b: "", ceremony: "da_decidere", budget_total: 0, guests_expected: 0, priorities: [], stage: null, created_by: me.id, created_at: new Date().toISOString() }, data);
       db.weddings.push(w);
       db.wedding_members.push({ wedding_id: w.id, user_id: me.id, member_role: me.role === "planner" ? "planner" : "sposi", created_at: w.created_at });
       seedTasks(w, true);
@@ -152,8 +158,9 @@
     updateWedding: async function (id, patch) {
       guard("weddings", id);
       var w = db.weddings.filter(function (x) { return x.id === id; })[0];
-      var dateChanged = patch.wedding_date !== undefined && patch.wedding_date !== w.wedding_date;
+      var dateChanged = patch.wedding_date !== undefined && patch.wedding_date !== w.wedding_date, wasNull = !w.wedding_date;
       Object.assign(w, patch);
+      if (dateChanged && wasNull && !db.tasks.some(function (t) { return t.wedding_id === id && t.offset_months != null; })) { seedTasks(w, true); return; }
       if (dateChanged) db.tasks.forEach(function (t) { if (t.wedding_id === id && !t.done && t.offset_months != null) t.due_date = addMonthsTo(w.wedding_date, t.offset_months, t.offset_days); });
     },
     deleteWedding: async function (id) {
