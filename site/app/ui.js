@@ -1645,6 +1645,7 @@
       if (my !== renderId) return;
       var y = window.scrollY, same = root.dataset.r === location.hash;
       root.replaceChildren(shell(content));
+      if (!same) root.querySelector(".main").classList.add("enter"); // entrata solo cambiando pagina, non dopo un salvataggio
       root.dataset.r = location.hash;
       if (same) window.scrollTo(0, y); else window.scrollTo(0, 0);
       document.title = (document.querySelector(".page-head h1") || {}).textContent + " · Nozze in Ordine";

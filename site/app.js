@@ -2,6 +2,64 @@
   var root = document.documentElement;
   root.classList.add("js");
 
+  /* ---------- menu su telefono e tablet ---------- */
+  var burger = document.querySelector(".burger"), menu = document.getElementById("menu");
+  if (burger && menu) {
+    var label = burger.querySelector(".burger-label");
+    var setMenu = function (open, focusBack) {
+      menu.classList.toggle("open", open);
+      root.classList.toggle("menu-open", open);
+      burger.setAttribute("aria-expanded", String(open));
+      label.textContent = open ? "Chiudi" : "Menu";
+      if (open) menu.querySelector("a").focus({ preventScroll: true });
+      else if (focusBack) burger.focus();
+    };
+    burger.addEventListener("click", function () { setMenu(!menu.classList.contains("open")); });
+    menu.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu.classList.contains("open")) setMenu(false, true); });
+    matchMedia("(min-width: 1025px)").addEventListener("change", function (m) { if (m.matches) setMenu(false); });
+  }
+
+  /* ---------- entrate al passaggio: ogni blocco arriva una volta, nell'ordine in cui si legge ---------- */
+  var PICS = ".feat-pic, .side-pic, .project-pic, .glance-col > img, .inset-pic figure";
+  var BLOCKS = "main section:not(.hero) :is(h1, h2, .eyebrow, .num, .lead, .small, .ui, .planner-box, .defs > div, .later, .steps > li, .plan, details, .form-card, .signup-text > h3, .cta-in p, .cta-btns > *, .closing-btns > *, blockquote)";
+  function countUp(box) {
+    box.querySelectorAll("[data-weeks], [data-days]").forEach(function (b) {
+      var end = +b.textContent, t0 = performance.now();
+      if (!end) return;
+      (function step(t) {
+        var k = Math.min(1, (t - t0) / 1100);
+        b.textContent = String(Math.round(end * (1 - Math.pow(2, -10 * k))));
+        if (k < 1) requestAnimationFrame(step); else b.textContent = String(end);
+      })(t0);
+    });
+  }
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+    var nodes = Array.prototype.slice.call(document.querySelectorAll(BLOCKS + ", " + PICS));
+    nodes = nodes.filter(function (el) { return !nodes.some(function (o) { return o !== el && o.contains(el); }); });
+    var io = new IntersectionObserver(function (entries) {
+      var n = 0;
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var el = e.target;
+        io.unobserve(el);
+        el.style.setProperty("--d", Math.min(n++, 6) * 0.08 + "s");
+        el.classList.add("is-in");
+        countUp(el);
+        // a entrata finita si torna allo stato normale, così hover e pressione non ereditano i ritardi
+        setTimeout(function () { el.classList.remove("rv", "pic", "is-in"); el.style.removeProperty("--d"); }, 2600);
+      });
+    }, { rootMargin: "0px 0px -6% 0px" });
+    nodes.forEach(function (el) {
+      el.classList.add("rv");
+      if (el.matches(PICS)) el.classList.add("pic");
+      el.querySelectorAll(".mosaic i, .path li, .sched li").forEach(function (x) {
+        x.style.setProperty("--k", Array.prototype.indexOf.call(x.parentNode.children, x));
+      });
+      io.observe(el);
+    });
+  }
+
   /* ---------- la data del sì: settimane, giorni e fase in corso, sul giorno scelto ---------- */
   var STATUS = { past: "Già passata", now: "In corso", next: "Da avviare" };
   function addMonths(d, n) {

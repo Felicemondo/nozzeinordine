@@ -560,3 +560,19 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   .shell { display: block; }
   body { background: #fff; }
 }
+
+/* ---------------------------------------------------------------- movimento
+   Poco e veloce: la pagina nuova sale appena, i dialoghi si posano, il menu scorre. Niente con "riduci movimento". */
+@keyframes view-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+@media (prefers-reduced-motion: no-preference) {
+  .main.enter > * { animation: view-in .45s cubic-bezier(.22, 1, .36, 1) backwards; }
+  .main.enter > :nth-child(2) { animation-delay: .05s; }
+  .main.enter > :nth-child(3) { animation-delay: .1s; }
+  .main.enter > :nth-child(4) { animation-delay: .15s; }
+  .main.enter > :nth-child(n+5) { animation-delay: .2s; }
+  .dlg[open] { animation: dlg-in .32s cubic-bezier(.22, 1, .36, 1); }
+  .side { transition: transform .42s cubic-bezier(.76, 0, .24, 1), box-shadow .42s; }
+  .btn, .mini, .tabbar a { transition: background .15s, border-color .15s, color .15s, transform .14s; }
+  .btn:active, .mini:active { transform: scale(.97); }
+}
