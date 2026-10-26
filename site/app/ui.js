@@ -486,6 +486,13 @@
     return h("div", { class: "auth" }, h("div", { class: "auth-card" }, brand(tone || "ceramica"), card),
       h("figure", { class: "auth-pic" }, h("figcaption", null, "Chiostro di Santa Chiara, Napoli · foto Sailko, CC BY 3.0")));
   }
+  // Per ora gli account si aprono dalla lista d'attesa: chi non ha un invito compila il modulo sul sito
+  function noAccount(invited) {
+    return h("div", { class: "no-account" }, h("h2", null, invited ? "Non hai ricevuto un invito?" : "Non hai ancora un account?"),
+      h("p", null, "Per ora gli accessi si aprono dalla lista d'attesa: compila il modulo sul sito e ti scriviamo noi."),
+      h("div", { class: "choices two" }, linkBtn("../richiesta-coppia.html", "Siamo una coppia", "soft"), linkBtn("../richiesta-planner.html", "Sono una planner", "soft")),
+      invited ? null : h("p", { class: "small" }, "Hai ricevuto un invito a un matrimonio? ", h("a", { href: "#/registrati" }, "Crea l'account con l'email invitata")));
+  }
   function authScreen(kind) {
     var msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
     var say = function (t, bad) { msg.textContent = t; msg.className = "form-msg" + (bad ? " bad" : " good"); };
@@ -494,7 +501,7 @@
     if (kind === "registrati") {
       var roleOpt = function (v, t, checked) { return h("label", { class: "choice-card" }, h("input", { type: "radio", name: "role", value: v, checked: checked }), h("span", null, t)); };
       var f = h("form", { class: "auth-form", novalidate: true },
-        h("fieldset", null, h("legend", null, "Chi sei?"), h("div", { class: "choices two" }, roleOpt("coppia", "Organizziamo il nostro matrimonio", true), roleOpt("planner", "Organizzo matrimoni per lavoro"))),
+        h("fieldset", null, h("legend", null, "Chi sei?"), h("div", { class: "choices two" }, roleOpt("coppia", "Fai parte della coppia", true), roleOpt("planner", "Sei la wedding planner"))),
         field({ name: "full_name", label: "Nome e cognome", required: true, max: 120, autocomplete: "name", placeholder: "Ad esempio: Anna Russo" }),
         field({ name: "email", label: "Email", type: "email", required: true, autocomplete: "email", placeholder: "nome@esempio.it" }),
         passwordField("password", "Password", "new-password", "Almeno 8 caratteri."),
@@ -511,8 +518,8 @@
         catch (err) { say(err.message, true); }
         busy(f, false);
       });
-      card = [h("h1", null, "Crea il tuo spazio"), h("p", { class: "sub" }, "Dopo l'accesso configuri il tuo spazio: il vostro matrimonio o la tua attività di planner."), f,
-        h("p", { class: "alt-link" }, "Hai già un account? ", h("a", { href: "#/accedi" }, "Accedi"))];
+      card = [h("h1", null, "Accetta un invito"), h("p", { class: "sub" }, "Crea l'account con la stessa email a cui è arrivato l'invito: entrando troverai il matrimonio che ti aspetta."), f,
+        h("p", { class: "alt-link" }, "Hai già un account? ", h("a", { href: "#/accedi" }, "Accedi")), noAccount(true)];
     } else if (kind === "password") {
       var fp = h("form", { class: "auth-form", novalidate: true }, field({ name: "email", label: "Email", type: "email", required: true, autocomplete: "email" }),
         h("button", { class: "btn primary block", type: "submit" }, "Mandami il link"), msg);
@@ -535,7 +542,7 @@
       });
       card = [h("h1", null, "Bentornati"), h("p", { class: "sub" }, "Accedi al tuo spazio di Nozze in Ordine."), fl,
         h("p", { class: "alt-row" }, h("span", null, "Password dimenticata?"), h("a", { href: "#/password" }, "Recupera")),
-        h("p", { class: "alt-row" }, h("span", null, "Non hai un account?"), h("a", { href: "#/registrati" }, "Registrati"))];
+        noAccount()];
     }
     card.push(h("p", { class: "alt-link demo-link" }, "Vuoi solo guardare? ", h("a", { href: "demo.html" }, "Apri la demo con dati di esempio")));
     return authLayout(card);
@@ -1230,7 +1237,7 @@
         { name: "member_role", label: "Ruolo", type: "select", options: [["sposi", "Partner della coppia"], ["planner", "Wedding planner"]] }
       ], { member_role: "sposi" }, "Crea l'invito", function (d) { return api.createInvite(w.id, d.email, d.member_role, me); }, "Invito creato.");
     }, "bord");
-    var msg = "Ciao! Ti ho invitato a organizzare «" + w.title + "» su Nozze in Ordine. Apri " + link + " e accedi con questa stessa email: troverai l'invito appena entri.";
+    var msg = "Ciao! Ti ho invitato a organizzare «" + w.title + "» su Nozze in Ordine. Apri " + link + "#/registrati e crea l'account con questa stessa email (se ne hai già uno, accedi): troverai l'invito appena entri.";
     return [pageHead("Collaboratori", "Chi può accedere alla dashboard e ai dati del matrimonio.", null, chipInfo(weddingMeta(w))),
       panel("Membri", "Persone che possono accedere a questa dashboard.", badge(plural(members.length, "membro", "membri"), ""), h("ul", { class: "rows" }, members.map(function (m) {
         var self = m.user_id === me.id;
