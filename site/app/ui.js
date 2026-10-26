@@ -20,7 +20,8 @@
     priority: { spese: "Tenere sotto controllo le spese", fornitori: "Trovare i fornitori", invitati: "Organizzare gli invitati" },
     stage: { inizio: "Siamo all'inizio", qualcosa: "Qualcosa è già deciso", dettagli: "Mancano i dettagli" },
     perYear: { "1-5": "Da 1 a 5", "6-10": "Da 6 a 10", "11-20": "Da 11 a 20", "20+": "Più di 20" },
-    workMode: { autonomia: "Lavoro in autonomia", team: "Lavoro con un team" }
+    workMode: { autonomia: "Lavoro in autonomia", team: "Lavoro con un team" },
+    wl: { nuova: "Nuova", contattata: "Contattata", pilota: "In pilota", scartata: "Scartata" }
   };
   var store = {
     get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
@@ -1521,28 +1522,11 @@
               h("td", null, p.id === state.me.id ? h("span", { class: "muted small" }, "Il tuo account") : btn("Modifica ruolo", function () { editRole(p); }, "primary sm")));
           })))), h("p", { class: "muted small pad-t" }, "Ogni cambio di ruolo chiede una conferma. Non puoi togliere a te stesso il ruolo di amministratore."))];
     }
-    if (sub === "lista") {
-      var exp = btn("Esporta CSV", function () {
-        download("lista-attesa.csv", [["Data", "Profilo", "Email", "Zona", "Prezzo", "Matrimoni l'anno", "Strumenti", "Chiamata"]].concat(wait.map(function (x) {
-          var d = x.dati || {}; return [fmtDate(x.created_at), x.profilo, x.email, d.zona, d.prezzo, d.eventi, d.strumenti, d.chiamata ? "sì" : ""];
-        })));
-      }, "primary");
-      return [pageHead("Lista d'attesa", plural(wait.length, "profilo in attesa", "profili in attesa"), wait.length ? exp : null), tabs,
-        panel("Lista d'attesa", wait.filter(function (x) { return x.profilo === "planner"; }).length + " planner + " + wait.filter(function (x) { return x.profilo === "coppia"; }).length + " coppie · i prezzi sono interessi indicativi, non pagamenti",
-          h("div", { class: "note-box" }, h("b", null, "Accesso a dati personali"), h("p", null, "L'esportazione include email e zona: usala solo per scrivere a chi si è iscritto.")),
-          wait.length ? h("div", { class: "tscroll" }, h("table", { class: "tbl" }, h("caption", { class: "sr" }, "Lista d'attesa"),
-            h("thead", null, h("tr", null, ["Data", "Profilo", "Email", "Zona", "Interesse indicativo", "Dettagli"].map(function (x) { return h("th", { scope: "col" }, x); }))),
-            h("tbody", null, wait.map(function (x) {
-              var d = x.dati || {};
-              var price = d.prezzo ? (d.prezzo === "meno" ? "Pagherebbe meno" : d.prezzo + " €" + (x.profilo === "planner" ? "/mese" : " una tantum")) : "—";
-              return h("tr", null, h("td", null, fmtDate(x.created_at)), h("td", null, LABEL.role[x.profilo] || x.profilo), h("th", { scope: "row" }, x.email), h("td", null, d.zona || "—"), h("td", null, price),
-                h("td", null, [d.eventi ? d.eventi + " eventi/anno" : null, d.strumenti, d.chiamata ? "vuole una chiamata" : null].filter(Boolean).join(" · ") || "—"));
-            })))) : empty("Nessuna iscrizione", null, null, "table"))];
-    }
+    if (sub === "lista") return waitlistView(wait, tabs);
     var latest = wait.slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }).slice(0, 3);
     return [pageHead("Riepilogo", "Utenti, ruoli, lista d'attesa e accessi amministrativi.", null, chipInfo("Accesso amministrativo · dati aggregati", "lock")), tabs,
       kpis([kpi("Utenti totali", String(profiles.length), roleLine), kpi("Matrimoni", String(ws.length), "Conteggio aggregato senza dettagli evento"),
-        kpi("Lista d'attesa", String(wait.length), wait.filter(function (x) { return x.profilo === "planner"; }).length + " planner · " + wait.filter(function (x) { return x.profilo === "coppia"; }).length + " coppie"),
+        kpi("Lista d'attesa", String(wait.length), wait.filter(function (x) { return x.profilo === "planner"; }).length + " planner · " + wait.filter(function (x) { return x.profilo === "coppia"; }).length + " coppie · " + wait.filter(function (x) { return x.stato === "nuova"; }).length + " nuove"),
         kpi("Accesso amministrativo", String(count2("admin")), "Privilegi separati da eventi e ruoli pubblici")], "four"),
       h("div", { class: "split" },
         panel("Utenti e ruoli", "Conteggio per ruolo.", more("#/admin/utenti", "Vedi dettagli"), h("ul", { class: "plain-list" }, [["coppia", "users", "Coppie"], ["planner", "briefcase", "Planner"], ["admin", "user", "Amministratori"]].map(function (r) {
@@ -1551,7 +1535,81 @@
         panel("Lista d'attesa", null, more("#/admin/lista", "Vedi tutti"), h("div", null, latest.length ? h("ul", { class: "plain-list" }, latest.map(function (x) {
           var d = x.dati || {};
           return h("li", null, h("span", { class: "ic-circle soft" }, icon(x.profilo === "planner" ? "briefcase" : "users")), h("div", null, h("b", null, x.email), h("small", null, [LABEL.role[x.profilo], fmtDate(x.created_at), d.zona].filter(Boolean).join(" · "))));
-        })) : h("p", { class: "muted" }, "Nessuna iscrizione."), h("p", { class: "muted small" }, "Interessi economici ipotetici, non pagamenti.")), "compact"))];
+        })) : h("p", { class: "muted" }, "Nessuna iscrizione."), h("p", { class: "muted small" }, "Richieste dai moduli del sito: nessun pagamento.")), "compact"))];
+  }
+
+  /* ------------------------------------------------------------ lista d'attesa: richieste dai moduli del sito */
+  var MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+  var WL = {
+    zona: { caserta: "Caserta", napoli: "Napoli", salerno: "Salerno", avellino: "Avellino", benevento: "Benevento", altra: "Altra regione" },
+    planner: { si: "ha una planner", cerchiamo: "cerca una planner", no: "senza planner" },
+    prezzo49: { si: "Sì a 49 €", forse: "Forse a 49 €", no: "No a 49 €" },
+    pilota: { si: "vuole il pilota", info: "vuole saperne di più", aggiornamenti: "solo aggiornamenti" }
+  };
+  function wlWhen(d) {
+    if (!d.anno) return null;
+    if (d.anno === "nd") return "Data da decidere";
+    return (d.mese && d.mese !== "nd" ? MONTHS[+d.mese - 1] + " " : "") + (d.anno === "2029" ? "2029 o dopo" : d.anno);
+  }
+  function wlSummary(x) {
+    var d = x.dati || {}, list = function (v) { return Array.isArray(v) ? v.join(", ") : v; };
+    if (x.profilo === "planner") return [d.studio, WL.zona[d.zona] || d.zona, d.eventi ? d.eventi + " l'anno" : null, d.in_corso != null ? d.in_corso + " in corso" : null, WL.pilota[d.pilota], d.chiamata ? "vuole una chiamata" : null, d.telefono ? "tel. " + d.telefono : null, d.web].filter(Boolean).join(" · ");
+    if (d.modulo) return [d.nome, wlWhen(d), WL.zona[d.zona], d.invitati ? d.invitati.replace("fino-", "fino a ") + " invitati" : null, WL.planner[d.planner], WL.prezzo49[d.prezzo49], d.prova ? "prova l'anteprima" : null, d.pesi ? "pesa: " + list(d.pesi) : null].filter(Boolean).join(" · ");
+    return [WL.zona[d.zona] || d.zona, d.prezzo ? "prezzo " + d.prezzo : null].filter(Boolean).join(" · "); // iscrizioni dal modulo precedente
+  }
+  function waitlistView(wait, tabs) {
+    var f = store.get("nio-wl") || "", n = function (fn) { return wait.filter(fn).length; };
+    var couples = wait.filter(function (x) { return x.profilo === "coppia"; }), planners = wait.filter(function (x) { return x.profilo === "planner"; });
+    var ongoing = planners.reduce(function (t, x) { return t + (Number((x.dati || {}).in_corso) || 0); }, 0);
+    var priced = couples.filter(function (x) { return (x.dati || {}).prezzo49; });
+    var yes = n(function (x) { return (x.dati || {}).prezzo49 === "si"; }), maybe = n(function (x) { return (x.dati || {}).prezzo49 === "forse"; });
+    var months = {};
+    couples.forEach(function (x) { var d = x.dati || {}; if (!d.anno) return; var k = d.anno === "nd" ? "zz" : d.anno + "-" + (d.mese && d.mese !== "nd" ? d.mese : "99"); months[k] = (months[k] || 0) + 1; });
+    var monthRows = Object.keys(months).sort().map(function (k) {
+      var y = k.slice(0, 4), m = k.slice(5);
+      return [k === "zz" ? "Data da decidere" : (m === "99" ? "" : MONTHS[+m - 1] + " ") + (y === "2029" ? "2029 o dopo" : y) + (m === "99" ? ", mese da decidere" : ""), months[k]];
+    });
+    var maxM = Math.max.apply(null, monthRows.map(function (r) { return r[1]; }).concat(1));
+    var shown = wait.filter(function (x) { return !f || x.profilo === f || x.stato === f; });
+    var pg = pager(shown.length, 20, "nio-wlp-" + f, "richieste");
+    var seg = h("div", { class: "seg", role: "group", "aria-label": "Filtra le richieste" }, [["", "Tutte · " + wait.length], ["coppia", "Coppie · " + couples.length], ["planner", "Planner · " + planners.length], ["nuova", "Nuove · " + n(function (x) { return x.stato === "nuova"; })]].map(function (o) {
+      return h("button", { type: "button", class: f === o[0] ? "on" : null, "aria-pressed": String(f === o[0]), onclick: function () { store.set("nio-wl", o[0]); render(); } }, o[1]);
+    }));
+    var exp = btn("Esporta CSV", function () {
+      var head = ["Data", "Profilo", "Stato", "Email", "Nomi o studio", "Zona", "Mese", "Anno", "Invitati", "Budget", "Planner", "Già prenotato", "Strumenti", "Difficoltà", "A 49 €", "Prova l'anteprima", "Team", "Matrimoni l'anno", "In corso", "Spesa software", "Pilota", "Chiamata", "Telefono", "Sito o Instagram", "Note"];
+      download("lista-attesa.csv", [head].concat(wait.map(function (x) {
+        var d = x.dati || {}, j = function (v) { return Array.isArray(v) ? v.join(", ") : v; };
+        return [fmtDate(x.created_at), x.profilo, LABEL.wl[x.stato] || x.stato, x.email, d.nome || d.studio, d.zona, d.mese, d.anno, d.invitati, d.budget, d.planner, j(d.prenotato), d.strumenti, j(d.pesi || d.perdite), d.prezzo49 || d.prezzo, d.prova ? "sì" : "", d.team, d.eventi, d.in_corso, d.spesa, d.pilota, d.chiamata ? "sì" : "", d.telefono, d.web, d.note];
+      })));
+    }, "primary");
+    var setStato = function (x) {
+      return h("label", { class: "status-pill" }, h("span", { class: "sr" }, "Stato della richiesta di " + x.email),
+        h("select", { onchange: async function (e) { await attempt(function () { return api.setWaitlistStatus(x.id, e.target.value); }, "Stato aggiornato."); x.stato = e.target.value; } },
+          opts(LABEL.wl).map(function (o) { return h("option", { value: o[0], selected: (x.stato || "nuova") === o[0] }, o[1]); })));
+    };
+    return [pageHead("Lista d'attesa", plural(wait.length, "richiesta", "richieste") + " dai moduli del sito", wait.length ? exp : null), tabs,
+      kpis([kpi("Richieste", String(wait.length), couples.length + " coppie · " + planners.length + " planner"),
+        kpi("Da gestire", String(n(function (x) { return x.stato === "nuova"; })), "Richieste ancora nello stato «Nuova»", "", n(function (x) { return x.stato === "nuova"; }) ? "terra" : ""),
+        kpi("Matrimoni in corso", String(ongoing), "Dichiarati da " + plural(planners.filter(function (x) { return (x.dati || {}).in_corso != null; }).length, "planner", "planner")),
+        kpi("Pagherebbero 49 €", String(yes), maybe + " forse · su " + plural(priced.length, "coppia che ha risposto", "coppie che hanno risposto"))], "four"),
+      h("div", { class: "split" },
+        panel("Matrimoni per mese", "Dalle risposte delle coppie.", null, monthRows.length ? h("ul", { class: "plain-list wl-months" }, monthRows.map(function (r) {
+          return h("li", null, h("b", null, r[0]), bar([[r[1], "cer"]], maxM, r[1] + " su " + maxM), h("span", { class: "muted" }, plural(r[1], "coppia", "coppie")));
+        })) : h("p", { class: "muted" }, "Ancora nessuna data dalle coppie."), "compact"),
+        panel("Programma pilota", "Dalle risposte delle planner.", null, h("ul", { class: "plain-list" },
+          [["Vogliono farne parte", n(function (x) { return (x.dati || {}).pilota === "si"; })], ["Vogliono saperne di più", n(function (x) { return (x.dati || {}).pilota === "info"; })], ["Chiedono una chiamata", n(function (x) { return x.profilo === "planner" && (x.dati || {}).chiamata; })], ["Già in pilota", n(function (x) { return x.stato === "pilota"; })]].map(function (r) {
+            return h("li", null, h("b", null, r[0]), h("span", { class: "muted" }, String(r[1])));
+          })), "compact")),
+      panel("Richieste", null, null, [
+        h("div", { class: "note-box" }, h("b", null, "Accesso a dati personali"), h("p", null, "Email, telefoni e note servono solo per rispondere a chi ha scritto. L'esportazione contiene tutto: conservala con cura.")),
+        seg,
+        shown.length ? h("div", { class: "tscroll" }, h("table", { class: "tbl" }, h("caption", { class: "sr" }, "Richieste"),
+          h("thead", null, h("tr", null, ["Data", "Profilo", "Email", "Dettagli", "Note", "Stato"].map(function (x) { return h("th", { scope: "col" }, x); }))),
+          h("tbody", null, shown.slice(pg.from, pg.to).map(function (x) {
+            var d = x.dati || {};
+            return h("tr", null, h("td", null, fmtDate(x.created_at)), h("td", null, LABEL.role[x.profilo] || x.profilo), h("th", { scope: "row" }, x.email),
+              h("td", null, wlSummary(x) || "—"), h("td", { class: "muted" }, d.note || "—"), h("td", null, setStato(x)));
+          })))) : empty("Nessuna richiesta", f ? "Nessuna richiesta con questo filtro." : null, null, "table"), pg.el])];
   }
 
   /* ------------------------------------------------------------ pagine di recupero */

@@ -125,6 +125,7 @@
     /* ---- amministrazione ---- */
     listProfiles: async function () { return ok(await sb.from("profiles").select("*").order("created_at", { ascending: false })); },
     setRole: async function (uid, role) { ok(await sb.rpc("admin_set_role", { target: uid, new_role: role })); },
-    listWaitlist: async function () { return ok(await sb.from("waitlist").select("*").order("created_at", { ascending: false })); }
+    listWaitlist: async function () { return ok(await sb.from("waitlist").select("*").order("created_at", { ascending: false })); },
+    setWaitlistStatus: async function (id, stato) { ok(await sb.from("waitlist").update({ stato: stato }).eq("id", id)); }
   };
 })();

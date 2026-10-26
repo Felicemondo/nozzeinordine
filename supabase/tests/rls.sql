@@ -33,6 +33,7 @@ begin
   execute 'set local role authenticated';
   select count(*) into n from public.weddings; log := log || 'C vede matrimoni altrui (0)=' || n || E'\n';
   select count(*) into n from public.waitlist; log := log || 'C vede lista attesa (0)=' || n || E'\n';
+  update public.waitlist set stato = 'pilota'; get diagnostics n = row_count; log := log || 'C cambia stato lista (0)=' || n || E'\n';
   begin insert into public.budget_items (wedding_id, category) values (w, 'Intrusione'); log := log || 'C scrive budget di A: PERMESSO (male)' || E'\n';
   exception when others then log := log || 'C scrive budget di A: negato' || E'\n'; end;
   begin perform public.accept_invite(tok); log := log || 'C usa invito di B: PERMESSO (male)' || E'\n';
@@ -77,11 +78,23 @@ begin
   exception when others then log := log || 'anon legge matrimoni: negato' || E'\n'; end;
   begin insert into public.waitlist (profilo, email, consenso) values ('coppia', '=HYPERLINK("x")@a.it', true); log := log || 'lista: email-formula PERMESSA (male)' || E'\n';
   exception when others then log := log || 'lista: email-formula negata' || E'\n'; end;
-  begin insert into public.waitlist (profilo, email, consenso, dati) values ('coppia', 'grande@nozzeinordine.test', true, jsonb_build_object('x', repeat('a', 3000))); log := log || 'lista: dati enormi PERMESSI (male)' || E'\n';
+  begin insert into public.waitlist (profilo, email, consenso, dati) values ('coppia', 'grande@nozzeinordine.test', true, jsonb_build_object('x', repeat('a', 7000))); log := log || 'lista: dati enormi PERMESSI (male)' || E'\n';
   exception when others then log := log || 'lista: dati enormi negati' || E'\n'; end;
   for i in 1..3 loop insert into public.waitlist (profilo, email, consenso) values ('coppia', 'ripetuta@nozzeinordine.test', true); end loop;
   begin insert into public.waitlist (profilo, email, consenso) values ('coppia', 'RIPETUTA@nozzeinordine.test', true); log := log || 'lista: quarta iscrizione PERMESSA (male)' || E'\n';
   exception when others then log := log || 'lista: quarta iscrizione negata' || E'\n'; end;
+  begin insert into public.waitlist (profilo, email, consenso, stato) values ('planner', 'stato@nozzeinordine.test', true, 'pilota'); log := log || 'lista: stato scelto da chi si iscrive PERMESSO (male)' || E'\n';
+  exception when others then log := log || 'lista: stato scelto da chi si iscrive negato' || E'\n'; end;
+  begin update public.waitlist set stato = 'pilota'; log := log || 'lista: anon cambia stato PERMESSO (male)' || E'\n';
+  exception when others then log := log || 'lista: anon cambia stato negato' || E'\n'; end;
+  execute 'reset role';
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  execute 'set local role authenticated';
+  update public.waitlist set stato = 'contattata' where email ilike 'ripetuta@nozzeinordine.test'; get diagnostics n = row_count;
+  log := log || 'D admin cambia stato (3)=' || n || E'\n';
+  begin update public.waitlist set email = 'cambiata@nozzeinordine.test' where email ilike 'ripetuta@nozzeinordine.test'; log := log || 'D admin cambia email iscritto: PERMESSO (male)' || E'\n';
+  exception when others then log := log || 'D admin cambia email iscritto: negato' || E'\n'; end;
   execute 'reset role';
 
   raise exception E'RISULTATI (tutto annullato)\n%', log;

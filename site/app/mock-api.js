@@ -35,8 +35,10 @@
     weddings: [], wedding_members: [], wedding_invites: [],
     budget_items: [], vendors: [], quotes: [], guests: [], tasks: [], timeline_items: [], internal_notes: [], seating_tables: [],
     waitlist: [
-      { id: 1, created_at: new Date(Date.now() - 86400000 * 3).toISOString(), profilo: "planner", email: "studio@esempio.it", consenso: true, dati: { zona: "napoli", prezzo: "29", eventi: "5-10" } },
-      { id: 2, created_at: new Date(Date.now() - 86400000).toISOString(), profilo: "coppia", email: "coppia@esempio.it", consenso: true, dati: { zona: "caserta", prezzo: "49" } }
+      { id: 1, created_at: new Date(Date.now() - 86400000 * 3).toISOString(), profilo: "planner", email: "studio@esempio.it", consenso: true, stato: "contattata", dati: { modulo: "richiesta-1", studio: "Studio Esempio", zona: "napoli", team: "2-3", eventi: "5-10", in_corso: 7, strumenti: "fogli-whatsapp", perdite: ["pagamenti", "sposi"], pilota: "si", chiamata: true } },
+      { id: 2, created_at: new Date(Date.now() - 86400000 * 2).toISOString(), profilo: "coppia", email: "coppia@esempio.it", consenso: true, stato: "nuova", dati: { modulo: "richiesta-1", nome: "Lucia e Paolo", mese: "06", anno: "2027", zona: "caserta", invitati: "100-150", planner: "no", pesi: ["budget", "tavoli"], prezzo49: "si", prova: true, note: "Ci servirebbe soprattutto la parte dei tavoli." } },
+      { id: 3, created_at: new Date(Date.now() - 86400000).toISOString(), profilo: "coppia", email: "sposi@esempio.it", consenso: true, stato: "nuova", dati: { modulo: "richiesta-1", mese: "09", anno: "2027", zona: "salerno", invitati: "50-100", planner: "cerchiamo", prezzo49: "forse" } },
+      { id: 4, created_at: new Date(Date.now() - 3600000 * 5).toISOString(), profilo: "coppia", email: "noi@esempio.it", consenso: true, stato: "nuova", dati: { modulo: "richiesta-1", mese: "nd", anno: "nd", zona: "napoli", invitati: "nd", planner: "no", prezzo49: "no" } }
     ]
   };
 
@@ -229,6 +231,10 @@
       if (u === me.id && role !== "admin") throw new Error("Non puoi togliere a te stesso il ruolo di amministratore");
       db.profiles.filter(function (p) { return p.id === u; })[0].role = role;
     },
-    listWaitlist: async function () { if (me.role !== "admin") throw new Error("Non hai i permessi per questa operazione."); return clone(db.waitlist); }
+    listWaitlist: async function () { if (me.role !== "admin") throw new Error("Non hai i permessi per questa operazione."); return clone(db.waitlist).sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }); },
+    setWaitlistStatus: async function (id, stato) {
+      if (me.role !== "admin") throw new Error("Non hai i permessi per questa operazione.");
+      db.waitlist.filter(function (x) { return x.id === id; })[0].stato = stato;
+    }
   };
 })();

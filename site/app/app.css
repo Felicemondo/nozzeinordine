@@ -186,6 +186,7 @@ button.ic-circle:hover { box-shadow: 0 0 0 3px #C7D8DC; }
 .plain-list { display: grid; gap: 14px; }
 .plain-list li { display: flex; gap: 12px; align-items: center; }
 .plain-list li > div { display: grid; }
+.wl-months li { display: grid; grid-template-columns: minmax(110px, auto) minmax(60px, 1fr) auto; }
 .plain-list small { color: var(--muted); }
 .plain-list .muted { margin-left: 6px; font-size: 14px; }
 .link-list { display: grid; gap: 6px; }

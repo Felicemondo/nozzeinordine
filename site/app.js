@@ -22,7 +22,7 @@
 
   /* ---------- entrate al passaggio: ogni blocco arriva una volta, nell'ordine in cui si legge ---------- */
   var PICS = ".feat-pic, .side-pic, .project-pic, .glance-col > img, .inset-pic figure";
-  var BLOCKS = "main section:not(.hero) :is(h1, h2, .eyebrow, .num, .lead, .small, .ui, .planner-box, .defs > div, .later, .steps > li, .plan, details, .form-card, .signup-text > h3, .cta-in p, .cta-btns > *, .closing-btns > *, blockquote)";
+  var BLOCKS = "main section:not(.hero) :is(h1, h2, .eyebrow, .num, .lead, .small, .ui, .planner-box, .defs > div, .later, .steps > li, .plan, details, .form-card, .next, .pilot-steps > li, .cta-in p, .cta-btns > *, .closing-btns > *, blockquote)";
   function countUp(box) {
     box.querySelectorAll("[data-weeks], [data-days]").forEach(function (b) {
       var end = +b.textContent, t0 = performance.now();
@@ -112,53 +112,94 @@
     if (w) draw(box, w);
   });
 
-  /* ---------- lista d'attesa ---------- */
-  var PREZZI = {
-    coppia: [
-      { v: "29", t: "29 €", s: "Una tantum per matrimonio" },
-      { v: "49", t: "49 €", s: "Una tantum per matrimonio" },
-      { v: "69", t: "69 €", s: "Una tantum per matrimonio" },
-      { v: "meno", t: "Pagherei meno", s: "Meno di 29 €" }
-    ],
-    planner: [
-      { v: "19", t: "19 € al mese", s: "Per tutti i tuoi matrimoni" },
-      { v: "29", t: "29 € al mese", s: "Per tutti i tuoi matrimoni" },
-      { v: "49", t: "49 € al mese", s: "Per tutti i tuoi matrimoni" },
-      { v: "meno", t: "Pagherei meno", s: "Meno di 19 € al mese" }
-    ]
-  };
-
+  /* ---------- richieste: moduli in tre passaggi per coppie e planner ---------- */
   var SUPABASE_URL = "https://msokhiezfsmkqsvzgmmi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_kBqdAb3VA2lb4YJ45aA_2Q_0c0EQ85Q";
 
-  var form = document.getElementById("waitlist");
+  var form = document.getElementById("richiesta");
   if (!form) return;
-  var profilo = form.getAttribute("data-profile") || "coppia";
-  var box = document.getElementById("prezzi");
+  var profilo = form.getAttribute("data-profile");
+  var steps = Array.prototype.slice.call(form.querySelectorAll(".step"));
   var status = document.getElementById("status");
   var btn = document.getElementById("invia");
+  var cur = 0;
 
-  function drawPrices() {
-    box.innerHTML = "";
-    PREZZI[profilo].forEach(function (o, i) {
-      var id = "pr-" + i;
-      var d = document.createElement("div");
-      d.className = "opt";
-      var inpt = document.createElement("input");
-      inpt.type = "radio"; inpt.name = "prezzo"; inpt.id = id; inpt.value = o.v;
-      if (i === 1) inpt.checked = true;
-      var lab = document.createElement("label");
-      lab.htmlFor = id;
-      var strong = document.createElement("span");
-      strong.className = "price"; strong.textContent = o.t;
-      var small = document.createElement("small");
-      small.textContent = o.s;
-      lab.appendChild(strong); lab.appendChild(small);
-      d.appendChild(inpt); d.appendChild(lab);
-      box.appendChild(d);
-    });
+  function say(msg, cls) { status.textContent = msg; status.className = cls || ""; }
+
+  function show(i, focus) {
+    cur = i;
+    steps.forEach(function (s, k) { s.classList.toggle("on", k === i); });
+    form.classList.toggle("multi", i > 0);
+    form.classList.toggle("last", i === steps.length - 1);
+    form.querySelector(".progress-n").textContent = (i + 1) + " di " + steps.length;
+    form.querySelector(".progress b").style.width = ((i + 1) / steps.length * 100) + "%";
+    say("");
+    if (focus) {
+      steps[i].querySelector(".step-t").focus({ preventScroll: true });
+      var top = form.getBoundingClientRect().top + window.scrollY - 140;
+      if (window.scrollY > top) window.scrollTo({ top: top });
+    }
   }
-  drawPrices();
+
+  // Errori accanto al campo: il primo riceve il fuoco, i valori restano
+  function clearErr(box) {
+    box.querySelectorAll(".field-err").forEach(function (e) { e.remove(); });
+    box.querySelectorAll("[aria-invalid]").forEach(function (e) { e.removeAttribute("aria-invalid"); e.removeAttribute("aria-describedby"); });
+    box.querySelectorAll(".fs.bad").forEach(function (e) { e.classList.remove("bad"); });
+    box.classList.remove("bad");
+  }
+  function markErr(el, msg) {
+    var id = "err-" + (el.name || el.id);
+    var p = document.createElement("p");
+    p.className = "field-err"; p.id = id; p.textContent = msg;
+    if (el.type === "radio" || el.type === "checkbox" && el.closest(".fs")) {
+      var fs = el.closest(".fs"); fs.classList.add("bad"); fs.appendChild(p);
+    } else if (el.type === "checkbox") {
+      el.closest(".check").insertAdjacentElement("afterend", p);
+    } else {
+      el.setAttribute("aria-invalid", "true"); el.closest(".fld").appendChild(p);
+    }
+    el.setAttribute("aria-describedby", id);
+  }
+  function message(el) {
+    if (el.name === "email") return el.value.trim() ? "Controlla l'indirizzo email: sembra incompleto." : "Scrivi la tua email.";
+    if (el.name === "consenso") return "Serve il consenso per poterti scrivere.";
+    if (el.type === "radio") return "Scegli una risposta.";
+    if (el.type === "number") return "Scrivi un numero tra 0 e 200.";
+    if (el.tagName === "SELECT") return "Scegli un'opzione.";
+    return "Questo campo serve.";
+  }
+  function check(box) {
+    clearErr(box);
+    var bad = [], seen = {};
+    box.querySelectorAll("input, select, textarea").forEach(function (el) {
+      if (el.name === "sito_web" || seen[el.name]) return;
+      var ok;
+      if (el.type === "radio") { seen[el.name] = 1; ok = !el.required || !!form.querySelector('input[name="' + el.name + '"]:checked'); }
+      else if (el.type === "email") ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim());
+      else if (el.type === "checkbox") ok = !el.required || el.checked;
+      else if (el.type === "number") ok = (!el.required && el.value === "") || (/^\d+$/.test(el.value) && +el.value <= 200);
+      else ok = !el.required || !!el.value.trim();
+      if (!ok) { bad.push(el); markErr(el, message(el)); }
+    });
+    if (bad.length) { bad[0].focus(); say(bad.length === 1 ? "Manca una risposta: la trovi evidenziata." : "Mancano " + bad.length + " risposte: le trovi evidenziate.", "err"); }
+    return !bad.length;
+  }
+
+  form.querySelector("[data-next]").addEventListener("click", function () { if (check(steps[cur])) show(cur + 1, true); });
+  form.querySelector("[data-back]").addEventListener("click", function () { clearErr(steps[cur]); show(cur - 1, true); });
+  // Invio dentro un campo: avanti, non invio del modulo
+  form.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && e.target.tagName === "INPUT" && cur < steps.length - 1) { e.preventDefault(); form.querySelector("[data-next]").click(); }
+  });
+  // Appena si corregge un campo, il suo errore sparisce
+  form.addEventListener("change", function (e) {
+    var box = e.target.closest(".fs, .fld");
+    if (box) { clearErr(box); return; }
+    var c = e.target.closest(".check"), n = c && c.nextElementSibling;
+    if (n && n.classList.contains("field-err")) { n.remove(); e.target.removeAttribute("aria-describedby"); }
+  });
+  show(0, false);
 
   // Campo trappola per i bot: le persone non lo vedono
   var trap = document.createElement("input");
@@ -167,31 +208,45 @@
   trap.className = "trap";
   form.appendChild(trap);
 
-  function say(msg, cls) { status.textContent = msg; status.className = cls || ""; }
+  function collect() {
+    var dati = { modulo: "richiesta-1" };
+    new FormData(form).forEach(function (v, k) {
+      if (k === "consenso" || k === "email" || k === "sito_web") return;
+      v = String(v).trim().slice(0, 500);
+      if (!v) return;
+      var el = form.elements[k];
+      if (el && el.length && el[0] && el[0].type === "checkbox") (dati[k] = dati[k] || []).push(v);
+      else if (el && el.type === "checkbox") dati[k] = true;
+      else if (el && el.type === "number") dati[k] = +v;
+      else dati[k] = v;
+    });
+    return dati;
+  }
+
+  function finish() {
+    var done = document.getElementById("fatto");
+    say(""); form.hidden = true; done.hidden = false;
+    done.querySelector("h2").focus({ preventScroll: true });
+    var top = done.getBoundingClientRect().top + window.scrollY - 140;
+    window.scrollTo({ top: Math.max(0, top) });
+  }
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    var email = form.elements["email"].value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { say("Controlla l'indirizzo email: sembra incompleto.", "err"); form.elements["email"].focus(); return; }
-    if (!form.elements["consenso"].checked) { say("Spunta il consenso per poterti scrivere quando la prima versione è pronta.", "err"); return; }
-    if (trap.value) { say("Sei in lista. Ti scriviamo appena la prima versione è pronta.", "good"); form.reset(); drawPrices(); return; }
-    var dati = {};
-    new FormData(form).forEach(function (v, k) {
-      if (k !== "consenso" && k !== "email" && k !== "sito_web") dati[k] = String(v);
-    });
-    if (form.elements["chiamata"]) dati.chiamata = form.elements["chiamata"].checked;
+    if (cur < steps.length - 1) { form.querySelector("[data-next]").click(); return; }
+    if (!check(steps[cur])) return;
+    if (trap.value) { finish(); return; }
     btn.disabled = true; say("Un momento…");
     try {
       var res = await fetch(SUPABASE_URL + "/rest/v1/waitlist", {
         method: "POST",
         headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json", "Prefer": "return=minimal" },
-        body: JSON.stringify({ profilo: profilo, email: email, consenso: true, dati: dati })
+        body: JSON.stringify({ profilo: profilo, email: form.elements["email"].value.trim(), consenso: true, dati: collect() })
       });
       if (!res.ok) throw new Error("http " + res.status);
-      say("Sei in lista. Ti scriviamo appena la prima versione è pronta.", "good");
-      form.reset(); drawPrices();
+      finish();
     } catch (err) {
-      say("Non è stato possibile salvare l'iscrizione. Riprova tra poco o scrivici a info@nozzeinordine.com.", "err");
+      say("Non è stato possibile inviare la richiesta. Le risposte sono ancora qui: riprova tra poco o scrivici a info@nozzeinordine.com.", "err");
     }
     btn.disabled = false;
   });
