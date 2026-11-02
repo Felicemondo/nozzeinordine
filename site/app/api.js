@@ -75,6 +75,7 @@
         var mine = (w.wedding_members || []).filter(function (m) { return m.user_id === me.id; })[0];
         w.my_role = mine ? mine.member_role : null;
         w.members_count = (w.wedding_members || []).length;
+        w.has_planner = (w.wedding_members || []).some(function (m) { return m.member_role === "planner"; });
         delete w.wedding_members;
         return w;
       });

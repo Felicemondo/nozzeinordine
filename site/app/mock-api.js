@@ -56,7 +56,7 @@
   }
   function wedding(id, title, date, city, budget, guests, members) {
     var names = title.split(" e ");
-    var w = { id: id, title: title, partner_a: names[0] || "", partner_b: names[1] || "", wedding_date: date, city: city, ceremony: "religioso", budget_total: budget, guests_expected: guests, priorities: ["spese", "invitati"], stage: "qualcosa", created_by: members[0][0], created_at: new Date().toISOString() };
+    var w = { id: id, title: title, partner_a: names[0] || "", partner_b: names[1] || "", wedding_date: date, city: city, ceremony: "religioso", budget_total: budget, guests_expected: guests, priorities: ["spese", "invitati"], stage: "qualcosa", vendor_categories: [], created_by: members[0][0], created_at: new Date().toISOString() };
     db.weddings.push(w);
     members.forEach(function (m) { db.wedding_members.push({ wedding_id: id, user_id: m[0], member_role: m[1], created_at: w.created_at }); });
     seedTasks(w);
@@ -64,7 +64,8 @@
   }
 
   // dati di esempio, coerenti con quelli del sito
-  var w1 = wedding("w-anna", "Anna e Marco", addDays(232), "Caserta", 26000, 150, [["u-anna", "sposi"], ["u-marco", "sposi"], ["u-bea", "planner"]]);
+  // Anna e Marco organizzano da soli; Beatrice segue Sara e Paolo (la coppia lì è in sola lettura)
+  wedding("w-anna", "Anna e Marco", addDays(232), "Caserta", 26000, 150, [["u-anna", "sposi"], ["u-marco", "sposi"]]);
   wedding("w-sara", "Sara e Paolo", addDays(330), "Napoli", 32000, 180, [["u-bea", "planner"], ["u-sara", "sposi"]]);
   wedding("w-giulia", "Giulia e Andrea", addDays(345), "Salerno", 21000, 110, [["u-bea", "planner"]]);
   // per ogni matrimonio: le prime attività già passate sono fatte, le altre restano in ritardo (dati fissi, non casuali)
@@ -72,41 +73,52 @@
     var past = db.tasks.filter(function (t) { return t.wedding_id === wid && t.due_date && t.due_date < iso(new Date()); });
     past.slice(0, [4, 1, 3][k]).forEach(function (t) { t.done = true; });
   });
-  [["Location e ricevimento", "Villa con giardino", 10500, 9800, 3000, addDays(14)], ["Fotografo e video", "", 2400, 2200, 700, addDays(40)],
-   ["Abiti", "Sposa e sposo", 3600, 2900, 1450, null], ["Musica", "Band per la festa", 1500, 1200, 300, addDays(60)],
-   ["Fiori e allestimenti", "", 1800, 0, 0, null], ["Viaggio di nozze", "Giappone, 12 giorni", 4500, 0, 0, addDays(150)], ["Altre spese", "Bomboniere, partecipazioni, trasporti", 1700, 0, 0, null]]
-    .forEach(function (b) { db.budget_items.push({ id: uid(), wedding_id: w1.id, category: b[0], description: b[1], planned: b[2], contracted: b[3], paid: b[4], due_date: b[5], created_at: new Date().toISOString() }); });
-  var vc = { id: uid(), wedding_id: w1.id, category: "Catering", name: "Sapori di Terra di Lavoro", contact: "081 000 0000", status: "in_trattativa", notes: "Degustazione da fissare", created_at: new Date().toISOString() };
-  var vf = { id: uid(), wedding_id: w1.id, category: "Fotografo", name: "Studio Luce", contact: "studio@esempio.it", status: "confermato", notes: "", created_at: new Date().toISOString() };
-  var vm = { id: uid(), wedding_id: w1.id, category: "Musica", name: "Trio Vesuvio", contact: "", status: "da_scegliere", notes: "", created_at: new Date().toISOString() };
-  db.vendors.push(vc, vf, vm);
-  db.quotes.push(
-    { id: uid(), wedding_id: w1.id, vendor_id: vc.id, label: "Menù A", amount: 95, per_person: true, includes: "Aperitivo incluso", expires_on: addDays(36), chosen: true, created_at: new Date().toISOString() },
-    { id: uid(), wedding_id: w1.id, vendor_id: vc.id, label: "Menù B", amount: 82, per_person: true, includes: "Aperitivo escluso", expires_on: addDays(51), chosen: false, created_at: new Date().toISOString() },
-    { id: uid(), wedding_id: w1.id, vendor_id: vf.id, label: "Servizio completo", amount: 2200, per_person: false, includes: "Album e video", expires_on: null, chosen: true, created_at: new Date().toISOString() });
-  // 64 invitati in cinque gruppi, e una sala con sei tavoli già in parte sistemata
+  // gli stessi dati di esempio per il matrimonio della coppia e per quello seguito dalla planner
+  function sample(wid) {
+    var now = new Date().toISOString();
+    [["Location e ricevimento", "Villa con giardino", 0, 0, 3000, addDays(14), 0, 0, 3500], ["Catering", "Menù di cinque portate", 0, 0, 2000, addDays(30), 95, 45, null],
+     ["Fotografo e video", "Studio Luce", 2400, 2200, 700, addDays(40)], ["Abiti e accessori", "Sposa e sposo", 3600, 2900, 1450, addDays(90)], ["Musica e intrattenimento", "Band per la festa", 1500, 1200, 300, addDays(60)],
+     ["Fiori e allestimenti", "", 1800, 0, 0, null], ["Bomboniere", "Ceramica di Vietri", 0, 0, 0, null, 12, 0, null], ["Partecipazioni e stampa", "Carta cotone", 0, 0, 0, null, 6.5, 0, null],
+     ["Viaggio di nozze", "Giappone, 12 giorni", 4500, 0, 0, addDays(150)]]
+      .forEach(function (b) { db.budget_items.push({ id: uid(), wedding_id: wid, category: b[0], description: b[1], planned: b[2], contracted: b[3], paid: b[4], due_date: b[5], unit_price: b[6] || 0, unit_child: b[7] || 0, rental_amount: b[8] == null ? null : b[8], created_at: now }); });
+    var v = function (category, name, contact, status, notes, quotes) {
+      var x = { id: uid(), wedding_id: wid, category: category, name: name, contact: contact, status: status, notes: notes, created_at: now };
+      db.vendors.push(x);
+      quotes.forEach(function (q) { db.quotes.push({ id: uid(), wedding_id: wid, vendor_id: x.id, label: q[0], amount: q[1], per_person: q[2], includes: q[3] || "", expires_on: q[4] || null, chosen: false, created_at: now }); });
+    };
+    v("Catering", "Sapori di Terra di Lavoro", "081 000 0000", "in_trattativa", "Cinque portate, prodotti del territorio. Degustazione da fissare.", [["Menù", 95, true, "Aperitivo incluso", addDays(36)], ["Open bar", 1200, false, "Tre ore dopo la torta"]]);
+    v("Catering", "Cucina dei Campi", "cucina@esempio.it", "da_scegliere", "Menù a km zero, torta nuziale inclusa.", [["Menù", 88, true, "Torta inclusa", addDays(51)], ["Allestimento buffet", 900, false]]);
+    v("Fotografo e video", "Studio Luce", "studio@esempio.it", "confermato", "Servizio completo con drone.", [["Servizio completo", 2200, false, "Album e video"]]);
+    v("Fotografo e video", "Scatti Veri", "333 111 2222", "scartato", "Solo foto, niente video.", [["Reportage", 1900, false]]);
+    v("Musica e intrattenimento", "Trio Vesuvio", "", "da_scegliere", "Musica dal vivo per rito e aperitivo.", [["Rito e aperitivo", 900, false]]);
+    v("Musica e intrattenimento", "DJ Notte", "dj@esempio.it", "in_trattativa", "DJ set fino all'una, luci incluse.", [["DJ set", 750, false], ["Luci", 250, false]]);
+    // 64 invitati in cinque gruppi: famiglie a nuclei di quattro con qualche bambino, amici uno per uno
+    var gi = 0, menus = ["standard", "standard", "standard", "vegetariano", "standard", "no_pesce", "standard", "vegano"], ALL = [[], [], ["glutine"], [], [], ["lattosio"], [], [], [], ["frutta_guscio"]];
+    GROUPS.forEach(function (gr) {
+      for (var k = 0; k < gr[2]; k++) {
+        var r = gi % 9 === 4 ? "no" : gi % 7 === 3 ? "in_attesa" : "si", fam = gr[0].indexOf("famiglia") === 0, kid = fam && k % 4 === 3;
+        db.guests.push({ id: uid(), wedding_id: wid, household: fam ? gr[1] + " " + (1 + Math.floor(k / 4)) : "", name: (kid ? "Bambino · " : "") + FIRST[(gi * 7) % FIRST.length] + " " + gr[3], guest_group: gr[0], rsvp: r,
+          age_band: kid ? (k === 3 ? "under3" : "bambino") : "adulto", menu: menus[gi % menus.length], allergies: ALL[gi % ALL.length], allergies_note: "", notes: "", table_id: null, seat_number: null, created_at: now });
+        gi++;
+      }
+    });
+    var first = db.seating_tables.length;
+    TABLES.forEach(function (t) { db.seating_tables.push({ id: uid(), wedding_id: wid, name: t[0], seats: t[1], shape: t[2], kind: t[5] || "ospiti", pos_x: t[3], pos_y: t[4], created_at: now }); });
+    var seat = function (group, tableIdx, howMany) {
+      var t = db.seating_tables[first + tableIdx], n = 0;
+      db.guests.filter(function (g) { return g.wedding_id === wid && g.guest_group === group && g.rsvp !== "no" && !g.table_id; }).slice(0, howMany).forEach(function (g) { g.table_id = t.id; g.seat_number = ++n; });
+    };
+    seat("famiglia_a", 1, 10); seat("famiglia_b", 2, 9); seat("amici_a", 4, 6);
+    [["11:00", "Preparazione della sposa", "Casa della sposa", "Truccatrice", "a"], ["12:00", "Preparazione dello sposo", "Casa dello sposo", "Testimone", "b"],
+     ["15:30", "Arrivo degli invitati", "Chiesa di San Michele", "Wedding planner", "comune"], ["16:00", "Cerimonia", "Chiesa di San Michele", "Celebrante", "comune"],
+     ["17:30", "Foto di gruppo", "Sagrato", "Fotografo", "comune"], ["18:30", "Aperitivo in giardino", "Villa", "Catering", "comune"], ["20:00", "Cena", "Villa", "Catering", "comune"]]
+      .forEach(function (t) { db.timeline_items.push({ id: uid(), wedding_id: wid, start_time: t[0] + ":00", title: t[1], place: t[2], owner: t[3], party: t[4], created_at: now }); });
+  }
   var FIRST = ["Giovanni", "Maria", "Luca", "Carmela", "Francesca", "Davide", "Elena", "Pietro", "Rosa", "Antonio", "Chiara", "Salvatore", "Teresa", "Vincenzo", "Giulia", "Alessandro", "Sofia", "Raffaele", "Martina", "Gennaro", "Laura", "Ciro", "Valentina", "Pasquale", "Federica", "Michele", "Serena", "Nicola", "Ilaria", "Domenico", "Paola", "Stefano"];
   var GROUPS = [["famiglia_a", "Famiglia Russo", 16, "Russo"], ["famiglia_b", "Famiglia De Luca", 14, "De Luca"], ["amici_a", "Amici di Anna", 12, "Bianchi"], ["amici_b", "Amici di Marco", 12, "Romano"], ["amici_comuni", "Amici comuni", 10, "Conti"]];
-  var gi = 0, menus = ["standard", "standard", "standard", "vegetariano", "standard", "bambini", "standard", "vegano"];
-  GROUPS.forEach(function (gr) {
-    for (var k = 0; k < gr[2]; k++) {
-      var r = gi % 9 === 4 ? "no" : gi % 7 === 3 ? "in_attesa" : "si";
-      db.guests.push({ id: uid(), wedding_id: w1.id, household: gr[1] + (gr[0].indexOf("famiglia") === 0 ? " " + (1 + Math.floor(k / 4)) : ""), name: FIRST[(gi * 7) % FIRST.length] + " " + gr[3], guest_group: gr[0], rsvp: r, menu: menus[gi % menus.length], notes: "", table_id: null, seat_number: null, created_at: new Date().toISOString() });
-      gi++;
-    }
-  });
-  var TABLES = [["Tavolo degli sposi", 8, "rettangolare", 50, 12], ["Capri", 10, "rotondo", 18, 42], ["Ischia", 10, "rotondo", 50, 45], ["Procida", 10, "rotondo", 82, 42], ["Amalfi", 12, "rotondo", 30, 78], ["Positano", 12, "rotondo", 70, 78]];
-  TABLES.forEach(function (t) { db.seating_tables.push({ id: uid(), wedding_id: w1.id, name: t[0], seats: t[1], shape: t[2], pos_x: t[3], pos_y: t[4], created_at: new Date().toISOString() }); });
-  // famiglie ai tavoli 2 e 3, amici in parte al 5: il resto da sistemare
-  function seat(group, tableIdx, howMany) {
-    var t = db.seating_tables[tableIdx], n = 0;
-    db.guests.filter(function (g) { return g.guest_group === group && g.rsvp !== "no" && !g.table_id; }).slice(0, howMany).forEach(function (g) { g.table_id = t.id; g.seat_number = ++n; });
-  }
-  seat("famiglia_a", 1, 10); seat("famiglia_b", 2, 9); seat("amici_a", 4, 6);
-  [["15:30", "Arrivo degli invitati", "Chiesa di San Michele", "Wedding planner"], ["16:00", "Cerimonia", "Chiesa di San Michele", "Celebrante"],
-   ["17:30", "Foto di gruppo", "Sagrato", "Fotografo"], ["18:30", "Aperitivo in giardino", "Villa", "Catering"], ["20:00", "Cena", "Villa", "Catering"]]
-    .forEach(function (t) { db.timeline_items.push({ id: uid(), wedding_id: w1.id, start_time: t[0] + ":00", title: t[1], place: t[2], owner: t[3], created_at: new Date().toISOString() }); });
-  db.internal_notes.push({ id: uid(), wedding_id: w1.id, body: "La sposa preferisce non avere fiori bianchi sui tavoli.", created_by: "u-bea", created_at: new Date().toISOString() });
+  var TABLES = [["Sposi", 2, "rettangolare", 50, 12, "sposi"], ["Capri", 10, "rotondo", 18, 42], ["Ischia", 10, "rotondo", 50, 45], ["Procida", 10, "rotondo", 82, 42], ["Amalfi", 12, "rotondo", 30, 78], ["Positano", 12, "rotondo", 70, 78]];
+  sample("w-anna"); sample("w-sara");
+  db.internal_notes.push({ id: uid(), wedding_id: "w-sara", body: "La sposa preferisce non avere fiori bianchi sui tavoli.", created_by: "u-bea", created_at: new Date().toISOString() });
   db.wedding_invites.push({ id: uid(), wedding_id: "w-giulia", email: "giulia@esempio.it", member_role: "sposi", token: uid(), accepted_at: null, expires_at: addDays(30), created_at: new Date().toISOString() });
 
   var me = null, listeners = [];
@@ -122,12 +134,19 @@
     if (!me) throw new Error("Accesso richiesto");
     if (table === "internal_notes" ? !isPlanner(wid) : !isMember(wid)) throw new Error("Non hai i permessi per questa operazione.");
   }
+  // come nel database: con una planner nel matrimonio, la coppia scrive solo invitati e tavoli
+  var hasPlanner = function (wid) { return db.wedding_members.some(function (m) { return m.wedding_id === wid && m.member_role === "planner"; }); };
+  function guardWrite(table, wid) {
+    guard(table, wid);
+    if (table !== "guests" && table !== "seating_tables" && !isPlanner(wid) && hasPlanner(wid)) throw new Error("Non hai i permessi per questa operazione.");
+  }
   var cmp = function (k, asc) { return function (a, b) { var x = a[k], y = b[k]; if (x == null) return 1; if (y == null) return -1; return (x < y ? -1 : x > y ? 1 : 0) * (asc ? 1 : -1); }; };
   var ORDER = { budget_items: ["category", true], vendors: ["category", true], quotes: ["created_at", true], guests: ["household", true], tasks: ["due_date", true], timeline_items: ["start_time", true], internal_notes: ["created_at", false], seating_tables: ["created_at", true] };
 
   window.NIO_API = {
     mode: "demo",
     demoUsers: USERS,
+    _db: db, // solo per le prove automatiche della demo
     session: async function () { return me ? { user: { id: me.id } } : null; },
     onAuthChange: function (cb) { listeners.push(cb); },
     signIn: async function () { throw new Error("Nella demo scegli un profilo qui sotto: non servono password."); },
@@ -145,12 +164,12 @@
       return clone(db.weddings.filter(function (w) { return isMember(w.id); }).map(function (w) {
         var ms = db.wedding_members.filter(function (m) { return m.wedding_id === w.id; });
         var mine = ms.filter(function (m) { return m.user_id === me.id; })[0];
-        return Object.assign({}, w, { my_role: mine ? mine.member_role : null, members_count: ms.length });
+        return Object.assign({}, w, { my_role: mine ? mine.member_role : null, members_count: ms.length, has_planner: ms.some(function (m) { return m.member_role === "planner"; }) });
       }).sort(cmp("wedding_date", true)));
     },
     createWedding: async function (data) {
       await wait();
-      var w = Object.assign({ id: uid(), city: "", partner_a: "", partner_b: "", ceremony: "da_decidere", budget_total: 0, guests_expected: 0, priorities: [], stage: null, created_by: me.id, created_at: new Date().toISOString() }, data);
+      var w = Object.assign({ id: uid(), city: "", partner_a: "", partner_b: "", ceremony: "da_decidere", budget_total: 0, guests_expected: 0, priorities: [], stage: null, vendor_categories: [], created_by: me.id, created_at: new Date().toISOString() }, data);
       db.weddings.push(w);
       db.wedding_members.push({ wedding_id: w.id, user_id: me.id, member_role: me.role === "planner" ? "planner" : "sposi", created_at: w.created_at });
       seedTasks(w, true);
@@ -158,7 +177,7 @@
     },
     getWedding: async function (id) { await wait(); return isMember(id) ? clone(db.weddings.filter(function (w) { return w.id === id; })[0] || null) : null; },
     updateWedding: async function (id, patch) {
-      guard("weddings", id);
+      guardWrite("weddings", id);
       var w = db.weddings.filter(function (x) { return x.id === id; })[0];
       var dateChanged = patch.wedding_date !== undefined && patch.wedding_date !== w.wedding_date, wasNull = !w.wedding_date;
       Object.assign(w, patch);
@@ -180,7 +199,7 @@
     removeMember: async function (wid, u) { guard("weddings", wid); db.wedding_members = db.wedding_members.filter(function (m) { return !(m.wedding_id === wid && m.user_id === u); }); },
     listInvites: async function (wid) { guard("weddings", wid); return clone(db.wedding_invites.filter(function (i) { return i.wedding_id === wid; })); },
     createInvite: async function (wid, email, role) {
-      guard("weddings", wid);
+      guardWrite("weddings", wid);
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) throw new Error("Uno dei valori non è valido.");
       db.wedding_invites.push({ id: uid(), wedding_id: wid, email: email.trim(), member_role: role, token: uid(), accepted_at: null, expires_at: addDays(30), created_at: new Date().toISOString() });
     },
@@ -198,17 +217,19 @@
       await wait();
       // come il database: si possono inserire più righe insieme
       [].concat(row).forEach(function (row) {
-        guard(table, row.wedding_id);
+        guardWrite(table, row.wedding_id);
         var base = { id: uid(), created_at: new Date().toISOString() };
-        if (table === "guests") Object.assign(base, { table_id: null, seat_number: null, guest_group: "amici_comuni" });
-        if (table === "seating_tables") Object.assign(base, { seats: 10, shape: "rotondo", pos_x: 50, pos_y: 50 });
+        if (table === "guests") Object.assign(base, { table_id: null, seat_number: null, guest_group: "amici_comuni", age_band: "adulto", allergies: [], allergies_note: "" });
+        if (table === "seating_tables") Object.assign(base, { seats: 10, shape: "rotondo", kind: "ospiti", pos_x: 50, pos_y: 50 });
+        if (table === "timeline_items") base.party = "comune";
+        if (table === "budget_items") Object.assign(base, { unit_price: 0, unit_child: 0, rental_amount: null });
         db[table].push(Object.assign(base, row));
       });
     },
     update: async function (table, id, patch) {
       await wait();
       var r = db[table].filter(function (x) { return x.id === id; })[0];
-      guard(table, r.wedding_id);
+      guardWrite(table, r.wedding_id);
       // stesse regole del database per tavoli e posti
       if (table === "guests" && patch.table_id) {
         var t = db.seating_tables.filter(function (x) { return x.id === patch.table_id && x.wedding_id === r.wedding_id; })[0];
@@ -223,7 +244,7 @@
     remove: async function (table, id) {
       await wait();
       var r = db[table].filter(function (x) { return x.id === id; })[0];
-      guard(table, r.wedding_id);
+      guardWrite(table, r.wedding_id);
       db[table] = db[table].filter(function (x) { return x.id !== id; });
       if (table === "vendors") db.quotes = db.quotes.filter(function (q) { return q.vendor_id !== id; });
       if (table === "seating_tables") db.guests.forEach(function (g) { if (g.table_id === id) { g.table_id = null; g.seat_number = null; } });

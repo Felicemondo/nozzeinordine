@@ -58,11 +58,26 @@ begin
   perform public.accept_invite(tok);
   select count(*) into n from public.weddings where id = w; log := log || 'B vede matrimonio dopo invito (1)=' || n || E'\n';
   insert into public.internal_notes (wedding_id, body) values (w, 'Nota riservata');
+  insert into public.budget_items (wedding_id, category, unit_price, unit_child, rental_amount) values (w, 'Catering', 90, 40, null);
+  log := log || 'B planner scrive budget: ok' || E'\n';
   execute 'reset role';
 
+  -- Con una planner nel matrimonio la coppia legge tutto e modifica solo invitati e tavoli
   perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
   execute 'set local role authenticated';
   select count(*) into n from public.internal_notes; log := log || 'A vede note interne (0)=' || n || E'\n';
+  select count(*) into n from public.budget_items where wedding_id = w; log := log || 'A con planner legge budget (1)=' || n || E'\n';
+  begin insert into public.budget_items (wedding_id, category) values (w, 'Fiori'); log := log || 'A con planner scrive budget: PERMESSO (male)' || E'\n';
+  exception when others then log := log || 'A con planner scrive budget: negato' || E'\n'; end;
+  begin insert into public.timeline_items (wedding_id, start_time, title, party) values (w, '10:00', 'Trucco', 'a'); log := log || 'A con planner scrive programma: PERMESSO (male)' || E'\n';
+  exception when others then log := log || 'A con planner scrive programma: negato' || E'\n'; end;
+  update public.weddings set city = 'Roma' where id = w; get diagnostics n = row_count; log := log || 'A con planner cambia citta (0)=' || n || E'\n';
+  update public.tasks set done = true where wedding_id = w; get diagnostics n = row_count; log := log || 'A con planner completa attivita (0)=' || n || E'\n';
+  insert into public.seating_tables (wedding_id, name, seats, shape) values (w,'Imperiale', 100, 'imperiale') returning id into v2;
+  insert into public.guests (wedding_id, name, age_band, allergies, menu, table_id, seat_number) values (w, 'Ospite', 'bambino', '{glutine,altro}', 'no_pesce', v2, 87);
+  log := log || 'A con planner aggiunge tavolo imperiale e invitato al posto 87: ok' || E'\n';
+  begin insert into public.guests (wedding_id, name, allergies) values (w, 'Strano', '{veleno}'); log := log || 'allergia fuori elenco PERMESSA (male)' || E'\n';
+  exception when others then log := log || 'allergia fuori elenco negata' || E'\n'; end;
   execute 'reset role';
 
   perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
