@@ -82,7 +82,6 @@ const foot = `<footer class="foot"><div class="wrap"><div class="foot-main"><div
 <nav aria-label="Pagine"><a href="coppie.html">Per le coppie</a><a href="planner.html">Per le planner</a><a href="prezzi.html">Prezzi</a></nav>
 <nav aria-label="Lista d'attesa e accesso"><a href="index.html#lista">Lista d'attesa</a><a href="app/">Accedi</a><a href="app/demo.html">Demo</a></nav></div>
 <div class="foot-line"><span>© 2026 Nozze in Ordine · dalla Campania</span><a href="privacy.html">Privacy</a></div></div></footer><script src="app.js"></script></body></html>`;
-const banner = (text) => `<div class="banner"><div class="wrap"><p>${text}</p><span class="tag">In costruzione</span></div></div>`;
 const eyebrow = (t, cls = "") => `<p class="eyebrow${cls ? " " + cls : ""}">${t}</p>`;
 const btn = (href, label, cls = "") => `<a class="btn${cls ? " " + cls : ""}" href="${href}">${label} ${ARROW}</a>`;
 const hero = ({ k, eb, h1, p, a, b, fine, corner, tall }) => `<section class="hero${tall ? " tall" : ""}" aria-labelledby="h1">${img(k, { lazy: false, cls: "hero-img" })}<div class="wrap hero-in">
@@ -123,8 +122,8 @@ ${select("strumenti", "Cosa usate oggi per organizzarvi?", [["fogli", "Fogli di 
 ${chips("pesi", "Cosa vi pesa di più?", [["budget", "Tenere il budget"], ["preventivi", "Confrontare i preventivi"], ["invitati", "Le risposte degli invitati"], ["scadenze", "Ricordare le scadenze"], ["coordinarsi", "Coordinarci tra noi e con le famiglie"], ["tavoli", "La disposizione dei tavoli"]])}
 ${area("note", "C'è altro che vorreste dirci?", "Per esempio: cosa vi farebbe risparmiare più tempo")}`],
   ["Come vi scriviamo", `${input("nome", "I vostri nomi", "text", { req: false, ph: "Anna e Marco", attrs: 'autocomplete="name" maxlength="120"' })}${EMAIL}
-${radios("prezzo49", "Il piano Completo costerà 49 €, una volta sola per il matrimonio. Lo prendereste?", [["si", "Sì, se fa quello che promette"], ["forse", "Forse, dopo averlo provato"], ["no", "No, ci basterebbe il piano gratuito"]])}
-${tick("prova", "Ci piacerebbe provare l'anteprima e dirvi cosa ne pensiamo.")}${CONSENT}`]
+${radios("prezzo49", "Il piano Completo costa 49 €, una volta sola per il matrimonio. Lo prendereste?", [["si", "Sì, se fa quello che promette"], ["forse", "Forse, dopo averlo provato"], ["no", "No, ci basterebbe il piano gratuito"]])}
+${tick("prova", "Ci piacerebbe essere tra le prime coppie a provarlo.")}${CONSENT}`]
 ], "Invia la richiesta");
 
 const FORM_PLANNER = requestForm("planner", [
@@ -137,7 +136,7 @@ ${select("strumenti", "Cosa usi oggi per organizzare?", [["fogli-whatsapp", "Fog
 ${select("spesa", "Quanto spendi oggi in software per il lavoro?", [["niente", "Niente"], ["sotto-20", "Meno di 20 € al mese"], ["20-50", "Da 20 a 50 € al mese"], ["50+", "Più di 50 € al mese"], ["nd", "Preferisco non dirlo"]], { req: false })}
 ${chips("perdite", "Dove perdi più tempo?", [["fornitori", "Preventivi e fornitori"], ["pagamenti", "Acconti e saldi"], ["invitati", "Invitati e tavoli"], ["sposi", "Messaggi con gli sposi"], ["scalette", "Scalette del giorno"], ["documenti", "Documenti e contratti"]])}
 ${area("note", "C'è altro che vorresti dirci?", "Per esempio: lo strumento che ti manca di più")}`],
-  ["Il programma pilota", `${radios("pilota", "Ti interessa il programma pilota?", [["si", "Sì, vorrei farne parte", "Gratuito, per le prime 10 planner in Campania"], ["info", "Vorrei saperne di più"], ["aggiornamenti", "Per ora solo aggiornamenti"]])}
+  ["La prova pilota", `${radios("pilota", "Ti interessa la prova pilota?", [["si", "Sì, vorrei farne parte", "Gratuito, per le prime 10 planner in Campania"], ["info", "Vorrei saperne di più"], ["aggiornamenti", "Mi bastano gli aggiornamenti"]])}
 ${tick("chiamata", "Mi farebbe piacere una chiamata di 25 minuti per raccontare come lavoro.")}
 ${input("telefono", "Telefono", "tel", { req: false, ph: "Se preferisci essere chiamata", attrs: 'autocomplete="tel" maxlength="30"' })}${EMAIL}${CONSENT}`]
 ], "Invia la candidatura");
@@ -156,30 +155,29 @@ const ctaBand = ({ h, p, href, label, fine }) => `<section class="cta-dark" id="
 write("index.html", head("Nozze in Ordine | Il tuo sì, un tassello alla volta", "Budget, fornitori, invitati e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner. Partiamo dalla Campania.") + top("") + `
 <main id="main">
 ${hero({ k: "home", eb: eyebrow("Il vostro matrimonio, con calma", "light"), h1: "Il tuo sì, un tassello alla volta.", p: "Budget, fornitori, invitati e scadenze in uno spazio condiviso. Per organizzare ogni dettaglio con maggiore tranquillità.",
-  a: btn("richiesta-coppia.html", "Sono una coppia"), b: btn("richiesta-planner.html", "Sono una wedding planner", "ghost"), fine: "Prima versione in costruzione · Lista d'attesa gratuita · Nessun pagamento ora", corner: "01 / Il sì" })}
-${banner("Stiamo parlando con coppie e planner in Campania prima di costruire. Le schermate qui sotto sono anteprime con dati di esempio.")}
+  a: btn("richiesta-coppia.html", "Sono una coppia"), b: btn("richiesta-planner.html", "Sono una wedding planner", "ghost"), fine: "Gratis per iniziare · Per coppie e wedding planner · Dalla Campania", corner: "01 / Il sì" })}
 ${feat({ k: "budget", n: "01", h: "Il budget che torna sempre.", p: "Previsto, firmato, pagato e residuo per ogni voce. Senza rifare i conti ogni sera.", card: BUDGET_CARD, side: "left" })}
 ${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a partire dal giorno del matrimonio.", card: PATH_CARD, side: "right", bg: "sand" })}
 ${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Nuclei familiari, risposte e menù nello stesso elenco. Un invito, una riga.", card: RSVP_CARD(), side: "left", bg: "mist" })}
 ${editorial("costiera", "Tante cose da tenere insieme. Un posto in cui ritrovarle.")}
 <section class="project" aria-labelledby="prog"><div class="wrap">
-${eyebrow("Il progetto")}<h2 id="prog">Come e perché stiamo costruendo questo.</h2><p class="lead narrow">Partiamo dalla Campania, parlando con coppie e planner, prima di costruire. Le foto qui sono evocative — non mostrano eventi che abbiamo organizzato né un team.</p>
+${eyebrow("Come si comincia")}<h2 id="prog">Tre passi per mettere ordine.</h2><p class="lead narrow">Dalla lista d'attesa al vostro spazio condiviso, senza fogli sparsi e senza file da rincorrere.</p>
 <div class="project-grid"><ol class="steps">
-<li><span>01</span><h3>Ascoltiamo.</h3><p>Parliamo con coppie e wedding planner campane. 25 minuti a testa: ci interessa capire cosa oggi fa perdere tempo e cosa manca davvero.</p></li>
-<li><span>02</span><h3>Proviamo.</h3><p>Uno spazio prototipale con dati di esempio, da provare insieme alle prime persone interessate. Niente promesse: solo prove reali.</p></li>
-<li><span>03</span><h3>Costruiamo.</h3><p>La prima versione nasce da ciò che le conversazioni e le prove ci diranno. Ti scriviamo quando è pronta: nessun pagamento ora.</p></li></ol>
-<figure class="project-pic">${img("fiori")}<figcaption>${eyebrow("Dove siamo ora")}<p>Stiamo raccogliendo le prime iscrizioni. La prima versione non è ancora disponibile.</p></figcaption></figure></div></div></section>
-<section class="cta-dark" id="lista" aria-labelledby="lst"><div class="wrap cta-in"><div><h2 id="lst">Entra in lista d'attesa.</h2><p>Lista gratuita, nessun pagamento. Ti scriviamo solo quando la prima versione è pronta, partendo dalla Campania.</p></div>
-<div class="cta-btns"><a class="choice light" href="richiesta-coppia.html">Sono una coppia ${ARROW}</a><a class="choice" href="richiesta-planner.html">Sono una wedding planner ${ARROW}</a><p>Nessun acquisto. Nessun accesso immediato.</p></div></div></section>
+<li><span>01</span><h3>Vi iscrivete.</h3><p>Ci raccontate il matrimonio in tre brevi passaggi: quando, quanti invitati, a che punto siete.</p></li>
+<li><span>02</span><h3>Vi apriamo lo spazio.</h3><p>Entrate con la vostra email e trovate le scadenze già calcolate sulla data del matrimonio.</p></li>
+<li><span>03</span><h3>Lo condividete.</h3><p>Invitate il partner o la vostra planner: ognuno vede ciò che gli serve, e nessuno rifà il lavoro due volte.</p></li></ol>
+<figure class="project-pic">${img("fiori")}<figcaption>${eyebrow("Dalla Campania")}<p>Pensato per chi si sposa qui, una coppia e una planner alla volta.</p></figcaption></figure></div></div></section>
+<section class="cta-dark" id="lista" aria-labelledby="lst"><div class="wrap cta-in"><div><h2 id="lst">Entra in lista d'attesa.</h2><p>Lista gratuita, nessun pagamento. Ti scriviamo appena c'è posto per te, partendo dalla Campania.</p></div>
+<div class="cta-btns"><a class="choice light" href="richiesta-coppia.html">Sono una coppia ${ARROW}</a><a class="choice" href="richiesta-planner.html">Sono una wedding planner ${ARROW}</a><p>Gratis, in pochi minuti.</p></div></div></section>
 </main>` + foot);
 
 /* =========================================================== COPPIE */
 const PHASES = [["12+ mesi prima", "Data, budget e location"], ["9–11 mesi prima", "Fornitori principali e preventivi"], ["6–8 mesi prima", "Save the date e abiti"], ["3–5 mesi prima", "Dettagli, inviti e menù"], ["1–2 mesi prima", "Conferme finali e saldi"], ["Settimana del sì", "Scaletta e responsabili"]];
 write("coppie.html", head("Per le coppie | Nozze in Ordine", "Budget, preventivi, invitati e scadenze nello stesso posto condiviso, per organizzare il matrimonio con calma.") + top("coppie.html") + `
 <main id="main">
-${hero({ k: "coppie", tall: true, eb: `<p class="pill">In costruzione · Lista d'attesa gratuita</p>${eyebrow("Per le coppie", "light")}`, h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati e scadenze nello stesso posto condiviso. Uno spazio che stiamo costruendo partendo dalle coppie campane.",
-  a: btn("richiesta-coppia.html", "Iscrivetevi alla lista"), b: btn("#funzioni", "Cosa include", "ghost"), fine: "Anteprime con dati di esempio · Non un prodotto già accessibile" })}
-<section class="journey" aria-labelledby="perc"><div class="wrap"><div class="journey-head"><div>${eyebrow("Dal primo pensiero al giorno del sì")}<h2 id="perc">Un posto per tenere tutto insieme.</h2></div><p class="small">Anteprima con dati di esempio</p></div>
+${hero({ k: "coppie", tall: true, eb: eyebrow("Per le coppie", "light"), h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati e scadenze nello stesso posto condiviso. Pensato per le coppie che si sposano in Campania.",
+  a: btn("richiesta-coppia.html", "Iscrivetevi alla lista"), b: btn("#funzioni", "Cosa include", "ghost"), fine: "Piano gratuito · Completo a 49 €, una volta sola" })}
+<section class="journey" aria-labelledby="perc"><div class="wrap"><div class="journey-head"><div>${eyebrow("Dal primo pensiero al giorno del sì")}<h2 id="perc">Un posto per tenere tutto insieme.</h2></div><p class="small">Provate con la vostra data</p></div>
 <div class="planner-box" data-wedding="2027-06-12"><div class="calc"><label for="data-si">La data del sì</label><div class="date-in"><input type="date" id="data-si" value="2027-06-12">${CAL}</div>
 <div class="count big"><b data-weeks>32</b><i>/</i><b data-days>5</b><span>settimane</span><span>giorni</span></div><p class="small" id="cd-msg" role="status"></p></div>
 <ol class="phases">${PHASES.map(([t, d], i) => `<li data-step="${i}"><b>${t}</b><span>${d}</span><small>Da avviare</small></li>`).join("")}</ol></div>
@@ -188,73 +186,71 @@ ${hero({ k: "coppie", tall: true, eb: `<p class="pill">In costruzione · Lista d
 ${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a partire dal giorno del matrimonio, così sapete sempre cosa resta da fare.", card: PATH_CARD, side: "right" })}
 ${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Un invito, una riga. Nuclei familiari, risposte e menù in un elenco condiviso con il partner e con chi vi aiuta.", card: RSVP_CARD(" · dati di esempio"), side: "left", bg: "mist" })}
 ${editorial("viale", "Ogni dettaglio al suo posto. Ogni momento da vivere.")}
-<section class="split-list" id="funzioni" aria-labelledby="funz"><div class="wrap">${eyebrow("Uno spazio condiviso")}<h2 id="funz">Cosa troverete nella prima versione.</h2>
+<section class="split-list" id="funzioni" aria-labelledby="funz"><div class="wrap">${eyebrow("Uno spazio condiviso")}<h2 id="funz">Cosa trovate nel vostro spazio.</h2>
 <div class="split-grid"><div>${defs([["Budget e pagamenti", "Previsto, contrattualizzato, pagato e saldo residuo per ogni voce di spesa."], ["Fornitori e preventivi", "Scheda, contatti, allegati e stato della decisione, con i preventivi affiancati."], ["Checklist con scadenze", "Le attività si calcolano a partire dalla data del matrimonio."], ["Invitati e RSVP", "Nuclei familiari, risposte e menù, con esportazione."], ["Scaletta del giorno", "Orari, luoghi, responsabili e contatti per la giornata, da condividere."], ["Ruoli e documenti", "Sposi, planner e collaboratori con i loro permessi, e un archivio unico dei contratti."]])}
-<p class="later">Per ora non ci sono marketplace di fornitori, app per telefono, chat interna e pagamenti ai fornitori. Prima vogliamo capire cosa serve a chi organizza un matrimonio.</p></div>
+<p class="later">Niente marketplace di fornitori e niente pubblicità: lo spazio è vostro, e i fornitori li scegliete voi.</p></div>
 <figure class="side-pic">${img("versione")}<figcaption>I dettagli restano vostri. L'ordine diventa condiviso.</figcaption></figure></div></div></section>
 <section class="aside-band sand" aria-labelledby="pl"><div class="wrap aside-in"><div>${eyebrow("Insieme, senza doppioni")}<h2 id="pl">C'è una wedding planner al vostro fianco?</h2><p class="lead">Potrà invitarvi nel suo spazio. Vedrete budget, scadenze e documenti condivisi, senza rifare nulla e senza scambiarvi file.</p>${btn("planner.html", "Scopri la parte per le planner", "line")}</div>
 <figure class="side-pic">${img("fiori")}<figcaption>Chi vi accompagna ha il suo ruolo. Voi avete il vostro spazio.</figcaption></figure></div></section>
-${ctaBand({ h: "Entrate in lista d'attesa.", p: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Il piano gratuito resta gratuito; il Completo costerà 49 €, una volta sola.", href: "richiesta-coppia.html", label: "Compilate la richiesta", fine: "Oggi non pagate nulla." })}
+${ctaBand({ h: "Entrate in lista d'attesa.", p: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Il piano gratuito resta gratuito; il Completo costerà 49 €, una volta sola.", href: "richiesta-coppia.html", label: "Compilate la richiesta", fine: "Iscriversi è gratis." })}
 </main>` + foot);
 
 /* =========================================================== PLANNER */
 write("planner.html", head("Per le wedding planner | Nozze in Ordine", "Tutti i matrimoni che segui in un unico spazio, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi.") + top("planner.html") + `
 <main id="main">
-${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per più eventi, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi. Cerchiamo le prime planner pilota in Campania.",
-  a: btn("richiesta-planner.html", "Candidati al pilota"), b: btn("#colpo", "Come funziona", "ghost"), fine: "Prima versione in costruzione · Lista d'attesa gratuita · Nessun pagamento ora", corner: "01 / Il coordinamento" })}
-${banner("Stiamo parlando con planner in Campania prima di costruire. Le schermate qui sotto sono anteprime con dati di esempio.")}
+${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per più eventi, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi. Per le prime 10 planner in Campania la prova pilota è gratuita.",
+  a: btn("richiesta-planner.html", "Candidati alla prova pilota"), b: btn("#colpo", "Come funziona", "ghost"), fine: "Prova pilota gratuita · Per le prime 10 planner in Campania", corner: "01 / Il coordinamento" })}
 <section class="glance" id="colpo" aria-labelledby="gl"><div class="wrap">${eyebrow("Il lavoro a colpo d'occhio")}<h2 id="gl">Una dashboard pensata per più eventi.</h2><p class="lead narrow">Budget, fornitori, scadenze e documenti in un unico spazio. Non è un'agenzia: è uno strumento per chi coordina più matrimoni contemporaneamente.</p>
 <div class="glance-grid"><div class="glance-col">${img("scrivania")}${PLANNER_TABLE}</div><div class="glance-col">${img("coord")}${SCHEDULE}</div></div></div></section>
 <section class="split-list" aria-labelledby="cam"><div class="wrap">${eyebrow("Cosa cambia")}<h2 id="cam">Cosa cambia per la tua organizzazione.</h2>
 <div class="split-grid"><div>${defs([["Template duplicabili", "Checklist, budget e scaletta da riusare a ogni nuovo evento."], ["Portale per gli sposi", "Gli sposi vedono ciò che condividi, con budget, scadenze e documenti nello stesso spazio."], ["Acconti e saldi per evento", "Chi ha pagato cosa e cosa scade questa settimana, su tutti gli eventi."], ["Scaletta condivisa", "Orari e responsabili del giorno, da mandare a fornitori e collaboratori."], ["Collaboratori con ruoli", "Ognuno vede e modifica solo ciò che gli compete."]])}
-<p class="later">Non c'è un CRM per i contratti con i clienti né la firma elettronica: per ora lavoriamo su ciò che succede dopo che l'incarico è firmato. Queste anteprime mostrano solo un'ipotesi di partenza.</p></div>
+<p class="later">Nozze in Ordine comincia dove finisce la trattativa: dall'incarico firmato al giorno del sì.</p></div>
 <figure class="side-pic">${img("cambia")}<figcaption>Immagine evocativa: preparazione, coordinamento e controllo di più eventi.</figcaption></figure></div></div></section>
-<section class="matrix mist" aria-labelledby="chi"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Ruoli e collaborazione")}<h2 id="chi">Chi vede e modifica cosa.</h2></div><p class="lead">Un'ipotesi di partenza per i permessi, da correggere con chi organizza davvero. Questa matrice serve solo a capire come potrebbe funzionare la collaborazione.</p></div>
+<section class="matrix mist" aria-labelledby="chi"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Ruoli e collaborazione")}<h2 id="chi">Chi vede e modifica cosa.</h2></div><p class="lead">Ogni persona vede e modifica solo ciò che le compete. Le note interne restano tue.</p></div>
 <div class="ui flush"><div class="tscroll"><table class="tbl roles"><thead><tr><th>Nello spazio condiviso</th><th>La planner</th><th>Gli sposi</th></tr></thead><tbody>
 <tr><th scope="row">Preventivi</th><td>Li carica e li gestisce</td><td>Li confrontano e approvano</td></tr><tr><th scope="row">Scadenze</th><td>Le assegna</td><td>Completano le loro</td></tr>
 <tr><th scope="row">Documenti</th><td>Li carica</td><td>Li leggono e scaricano</td></tr><tr><th scope="row">Note interne</th><td>Le scrive e le legge</td><td>Non le vedono</td></tr></tbody></table></div></div></div></section>
-<section class="aside-band" aria-labelledby="part"><div class="wrap aside-in"><div>${eyebrow("Il progetto")}<h2 id="part">Come e perché stiamo costruendo questo.</h2><p class="lead">Partiamo dalla Campania, parlando con planner prima di costruire. Le foto qui sono evocative — non mostrano eventi che abbiamo organizzato né un team.</p><p class="lead">Cerchiamo le prime planner pilota in Campania. Funzioni, disponibilità e condizioni sono da concordare insieme.</p>${btn("richiesta-planner.html", "Raccontaci il tuo metodo", "line")}</div>
+<section class="aside-band" aria-labelledby="part"><div class="wrap aside-in"><div>${eyebrow("La prova pilota")}<h2 id="part">Costruito sul tuo metodo.</h2><p class="lead">Le prime 10 planner in Campania usano Nozze in Ordine sui loro matrimoni, gratis per tutta la prova pilota. Ogni mese ci dicono cosa serve, e lo strumento cresce intorno al loro lavoro.</p>${btn("richiesta-planner.html", "Raccontaci il tuo metodo", "line")}</div>
 <figure class="side-pic">${img("partiamo")}<figcaption>Immagine evocativa: preparazione, coordinamento e controllo di più eventi.</figcaption></figure></div></section>
 <section class="inset-pic" aria-label="Immagine"><div class="wrap"><figure>${img("dettaglio")}<figcaption><em>Ogni dettaglio al suo posto. Ogni momento da vivere.</em><span>Nozze in Ordine · Dalla Campania</span></figcaption></figure></div></section>
-${ctaBand({ h: "Candidati al programma pilota.", p: "Cerchiamo le prime 10 wedding planner in Campania per costruire lo strumento insieme. Gratuito per tutta la durata del pilota: il prezzo dopo lo decidiamo insieme.", href: "richiesta-planner.html", label: "Invia la candidatura", fine: "Nessun pagamento, nessun impegno." })}
+${ctaBand({ h: "Candidati alla prova pilota.", p: "Cerchiamo le prime 10 wedding planner in Campania per costruire lo strumento insieme. È gratuita per tutta la sua durata: il prezzo dopo lo decidiamo insieme.", href: "richiesta-planner.html", label: "Invia la candidatura", fine: "Nessun pagamento, nessun impegno." })}
 </main>` + foot);
 
 /* =========================================================== PREZZI */
 const plan = ({ name, price, sub, items, dark, tag, href, cta = "Entra in lista" }) => `<article class="plan${dark ? " dark" : ""}"><div class="plan-top"><h3>${name}</h3>${tag ? `<span class="tag soft">${tag}</span>` : ""}</div><p class="plan-price">${price}</p><p class="small">${sub}</p><hr>
 <ul>${items.map((i) => `<li>${CHECK}${i}</li>`).join("")}</ul><a class="btn ${dark ? "light" : "line"}" href="${href}">${cta} ${ARROW}</a></article>`;
-const faq = [["Devo pagare adesso?", "No. Oggi non addebitiamo nulla: la prima versione è in costruzione. Il piano Completo costerà 49 € quando sarà disponibile, e potrete sempre restare sul piano gratuito."],
+const faq = [["Devo pagare adesso?", "No. Iscriversi alla lista d'attesa è gratuito. Il piano Completo costa 49 €, una volta sola, e potete sempre restare sul piano gratuito."],
   ["Il piano Completo è un abbonamento?", "No. Sono 49 € una volta sola, per tutto il matrimonio: un matrimonio si organizza una volta."],
   ["Cosa resta gratis?", "Checklist con le scadenze, budget sintetico, fino a 50 invitati e 3 fornitori, e lo spazio condiviso con il partner. Senza limiti di tempo."],
-  ["Perché per le planner non c'è un prezzo?", "Perché vogliamo deciderlo con chi lo usa. Le prime 10 planner in Campania lo provano gratis durante il programma pilota; il prezzo dopo lo concordiamo insieme, e non parte nessun addebito senza il vostro consenso."],
+  ["Perché per le planner non c'è un prezzo?", "Perché vogliamo deciderlo con chi lo usa. Le prime 10 planner in Campania lo provano gratis durante la prova pilota; il prezzo dopo lo concordiamo insieme, e non parte nessun addebito senza il vostro consenso."],
   ["Cosa succede ai miei dati?", `Usiamo le risposte ai moduli per scrivervi e per capire cosa costruire. I dettagli sono nella <a href="privacy.html">pagina privacy</a>.`]];
-write("prezzi.html", head("Prezzi | Nozze in Ordine", "Per le coppie: gratis per iniziare, 49 € una volta sola per il piano Completo. Per le wedding planner: un programma pilota gratuito.") + top("prezzi.html") + `
+write("prezzi.html", head("Prezzi | Nozze in Ordine", "Per le coppie: gratis per iniziare, 49 € una volta sola per il piano Completo. Per le wedding planner: una prova pilota gratuita.") + top("prezzi.html") + `
 <main id="main">
-${banner("La prima versione è in costruzione: oggi non addebitiamo nulla. I prezzi qui sotto sono quelli previsti al lancio.")}
-<section class="price-hero" aria-labelledby="h1"><div class="wrap price-hero-in"><div>${eyebrow("Prezzi")}<h1 id="h1">Gratis per iniziare.</h1><p class="lead">Per le coppie un prezzo solo, una volta per matrimonio. Per le wedding planner un programma pilota gratuito: il prezzo lo decidiamo insieme, dopo.</p>
-${defs([["Per le coppie", "Piano gratuito, oppure Completo a 49 € una volta sola."], ["Per le planner", "Programma pilota gratuito per le prime 10 planner in Campania."]])}<p class="small note">La lista d'attesa è gratuita e non richiede pagamenti.</p></div>
+<section class="price-hero" aria-labelledby="h1"><div class="wrap price-hero-in"><div>${eyebrow("Prezzi")}<h1 id="h1">Gratis per iniziare.</h1><p class="lead">Per le coppie un prezzo solo, una volta per matrimonio. Per le wedding planner una prova pilota gratuita: il prezzo lo decidiamo insieme, dopo.</p>
+${defs([["Per le coppie", "Piano gratuito, oppure Completo a 49 € una volta sola."], ["Per le planner", "Prova pilota gratuita per le prime 10 planner in Campania."]])}<p class="small note">La lista d'attesa è gratuita e non richiede pagamenti.</p></div>
 <figure class="side-pic">${img("prezzi", { lazy: false })}<figcaption>${EVOC}</figcaption></figure></div></section>
 <section class="plans-band sand" aria-labelledby="pc"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per le coppie")}<h2 id="pc">Per le coppie.</h2></div><p class="lead">Un pagamento unico per matrimonio, perché l'organizzazione dura il tempo che serve e poi finisce. Potete restare sul piano gratuito quanto volete.</p></div>
 <div class="plans">${plan({ href: "richiesta-coppia.html", name: "Gratis", price: "0 €", sub: "Per iniziare a mettere ordine, senza limiti di tempo", items: ["Checklist con scadenze", "Budget sintetico", "Fino a 50 invitati", "Fino a 3 fornitori", "Spazio condiviso con il partner"] })}
-${plan({ href: "richiesta-coppia.html", name: "Completo", price: "49 €", sub: "Una volta sola per il matrimonio · prezzo previsto al lancio", items: ["Tutto il piano gratuito", "Invitati illimitati, risposte e tavoli", "Preventivi affiancati e pagamenti", "Documenti e contratti", "Scaletta del giorno ed esportazione dei dati"], dark: true, tag: "Al lancio" })}</div></div></section>
-<section class="plans-band" aria-labelledby="pp"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per chi organizza")}<h2 id="pp">Per le wedding planner.</h2></div><p class="lead">Non c'è ancora un prezzo, ed è voluto: lo strumento lo costruiamo con le prime planner, e il prezzo lo decidiamo con loro.</p></div>
-<div class="plans"><article class="plan"><div class="plan-top"><h3>Come funziona il pilota</h3></div><ol class="pilot-steps"><li><b>Ti candidi.</b><span>Tre passaggi su come lavori e quanti matrimoni segui.</span></li><li><b>Ci sentiamo.</b><span>Una chiamata di 25 minuti per capire il tuo metodo.</span></li><li><b>Lo usi sui tuoi matrimoni.</b><span>Gratis per tutto il pilota, con un confronto ogni mese su cosa migliorare.</span></li><li><b>Decidiamo il prezzo insieme.</b><span>Non parte nessun addebito senza il tuo consenso.</span></li></ol></article>
-${plan({ href: "richiesta-planner.html", name: "Programma pilota", price: "Gratuito", sub: "Per le prime 10 planner in Campania", items: ["Eventi illimitati durante il pilota", "Portale condiviso con gli sposi", "Template duplicabili", "Scadenze, acconti e saldi per evento", "Collaboratori con i loro permessi"], dark: true, tag: "10 posti", cta: "Candidati" })}</div></div></section>
+${plan({ href: "richiesta-coppia.html", name: "Completo", price: "49 €", sub: "Una volta sola, per tutto il matrimonio", items: ["Tutto il piano gratuito", "Invitati illimitati, risposte e tavoli", "Preventivi affiancati e pagamenti", "Documenti e contratti", "Scaletta del giorno ed esportazione dei dati"], dark: true })}</div></div></section>
+<section class="plans-band" aria-labelledby="pp"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per chi organizza")}<h2 id="pp">Per le wedding planner.</h2></div><p class="lead">Il prezzo per le planner lo decidiamo con chi partecipa alla prova pilota, sul lavoro vero e non su una tabella.</p></div>
+<div class="plans"><article class="plan"><div class="plan-top"><h3>Come funziona la prova pilota</h3></div><ol class="pilot-steps"><li><b>Ti candidi.</b><span>Tre passaggi su come lavori e quanti matrimoni segui.</span></li><li><b>Ci sentiamo.</b><span>Una chiamata di 25 minuti per capire il tuo metodo.</span></li><li><b>Lo usi sui tuoi matrimoni.</b><span>Gratis per tutta la prova pilota, con un confronto ogni mese su cosa migliorare.</span></li><li><b>Decidiamo il prezzo insieme.</b><span>Non parte nessun addebito senza il tuo consenso.</span></li></ol></article>
+${plan({ href: "richiesta-planner.html", name: "Prova pilota", price: "Gratuita", sub: "Per le prime 10 planner in Campania", items: ["Eventi illimitati durante la prova pilota", "Portale condiviso con gli sposi", "Template duplicabili", "Scadenze, acconti e saldi per evento", "Collaboratori con i loro permessi"], dark: true, tag: "10 posti", cta: "Candidati" })}</div></div></section>
 <section class="faq-band mist" aria-labelledby="faq"><div class="wrap faq-in"><div>${eyebrow("Prima di iscriversi")}<h2 id="faq">Domande frequenti.</h2>
 <div class="faq">${faq.map(([q, a], i) => `<details${i === 0 ? " open" : ""}><summary>${q}</summary><p>${a}</p></details>`).join("")}</div></div>
 <figure class="side-pic">${img("pergolato")}<figcaption>${EVOC}</figcaption></figure></div></section>
-<section class="closing" aria-labelledby="fine"><div class="wrap closing-in"><div>${eyebrow("Il prossimo tassello")}<h2 id="fine">Scegliete da dove partire.</h2><p class="lead">Un modulo per le coppie, uno per le planner: poche domande, circa quattro minuti. Oggi non pagate nulla.</p></div>
+<section class="closing" aria-labelledby="fine"><div class="wrap closing-in"><div>${eyebrow("Il prossimo tassello")}<h2 id="fine">Scegliete da dove partire.</h2><p class="lead">Un modulo per le coppie, uno per le planner: poche domande, circa quattro minuti, senza pagare nulla.</p></div>
 <div class="closing-btns">${btn("richiesta-coppia.html", "Sono una coppia")}${btn("richiesta-planner.html", "Sono una wedding planner", "line")}</div></div></section>
 </main>` + foot);
 
 /* =========================================================== RICHIESTE */
 requestPage({ file: "richiesta-coppia.html", title: "Lista d'attesa per le coppie | Nozze in Ordine", desc: "Tre brevi passaggi sul vostro matrimonio per entrare in lista d'attesa. Piano gratuito, Completo a 49 € una volta sola.",
-  h1: "Entrate in lista d'attesa.", lead: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Ci aiutano a capire cosa costruire per primo e a scrivervi quando la prima versione è pronta.",
-  next: ["Vi scriviamo solo quando la prima versione è pronta.", "Il piano gratuito resta gratuito. Il Completo costerà 49 €, una volta sola.", "Oggi non pagate nulla."],
-  pic: "versione", form: FORM_COUPLE, done: ["Grazie, siete in lista.", "Vi scriviamo quando la prima versione è pronta. Nel frattempo potete provare la demo, con dati di esempio."] });
-requestPage({ file: "richiesta-planner.html", title: "Programma pilota per le wedding planner | Nozze in Ordine", desc: "Candidati al programma pilota gratuito di Nozze in Ordine per le prime 10 wedding planner in Campania.",
-  h1: "Candidati al programma pilota.", lead: "Cerchiamo le prime 10 wedding planner in Campania per costruire lo strumento insieme. Tre passaggi su come lavori, circa cinque minuti.",
-  next: ["Leggiamo ogni candidatura e ti scriviamo per fissare una chiamata, se ti va.", "Durante il pilota non paghi nulla.", "Il prezzo dopo il pilota lo decidiamo insieme: niente addebiti senza il tuo consenso."],
-  pic: "partiamo", form: FORM_PLANNER, done: ["Grazie, candidatura ricevuta.", "Ti scriviamo per raccontarti il pilota e, se ti va, fissare una chiamata. Nel frattempo puoi provare la demo, con dati di esempio."] });
+  h1: "Entrate in lista d'attesa.", lead: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Ci servono per prepararvi lo spazio giusto e per scrivervi appena c'è posto.",
+  next: ["Vi scriviamo appena c'è posto per voi.", "Il piano gratuito resta gratuito. Il Completo costa 49 €, una volta sola.", "Iscriversi non costa nulla."],
+  pic: "versione", form: FORM_COUPLE, done: ["Grazie, siete in lista.", "Vi scriviamo appena c'è posto per voi. Nel frattempo potete provare la demo, con dati di esempio."] });
+requestPage({ file: "richiesta-planner.html", title: "Prova pilota per le wedding planner | Nozze in Ordine", desc: "Candidati alla prova pilota gratuita di Nozze in Ordine per le prime 10 wedding planner in Campania.",
+  h1: "Candidati alla prova pilota.", lead: "Cerchiamo le prime 10 wedding planner in Campania per costruire lo strumento insieme. Tre passaggi su come lavori, circa cinque minuti.",
+  next: ["Leggiamo ogni candidatura e ti scriviamo per fissare una chiamata, se ti va.", "Durante la prova pilota non paghi nulla.", "Il prezzo dopo la prova pilota lo decidiamo insieme: niente addebiti senza il tuo consenso."],
+  pic: "partiamo", form: FORM_PLANNER, done: ["Grazie, candidatura ricevuta.", "Ti scriviamo per raccontarti la prova pilota e, se ti va, fissare una chiamata. Nel frattempo puoi provare la demo, con dati di esempio."] });
 
 /* =========================================================== PRIVACY */
 write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati delle richieste e della lista d'attesa di Nozze in Ordine.") + top("") + `
@@ -265,10 +261,10 @@ write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati d
 <h2>Chi tratta i dati</h2>
 <p>Il titolare del trattamento è Felice Mondo, persona fisica. Puoi scrivere a <a href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
 <h2>Quali dati raccogliamo</h2>
-<ul><li>Email, e se lo scrivi il vostro nome o quello dello studio</li><li>Se sei una coppia o una wedding planner, la provincia o la regione e la data della richiesta</li><li>Per le coppie: mese e anno del matrimonio, invitati e budget indicativi, se avete una planner, cosa avete già prenotato, cosa usate per organizzarvi, cosa vi pesa di più, se prendereste il piano Completo e se volete provare l'anteprima</li><li>Per le planner: sito o profilo Instagram, come lavori, matrimoni l'anno e in corso, strumenti e spesa in software, dove perdi più tempo, interesse per il programma pilota, se vuoi una chiamata e, se lo scrivi, il telefono</li><li>Le note che scegli di scriverci</li></ul>
+<ul><li>Email, e se lo scrivi il vostro nome o quello dello studio</li><li>Se sei una coppia o una wedding planner, la provincia o la regione e la data della richiesta</li><li>Per le coppie: mese e anno del matrimonio, invitati e budget indicativi, se avete una planner, cosa avete già prenotato, cosa usate per organizzarvi, cosa vi pesa di più, se prendereste il piano Completo e se volete essere tra i primi a provarlo</li><li>Per le planner: sito o profilo Instagram, come lavori, matrimoni l'anno e in corso, strumenti e spesa in software, dove perdi più tempo, interesse per la prova pilota, se vuoi una chiamata e, se lo scrivi, il telefono</li><li>Le note che scegli di scriverci</li></ul>
 <p>Nella prima fase non raccogliamo dati su intolleranze alimentari o salute degli invitati. Per questo nel campo note degli invitati vi chiediamo di non scrivere dati sulla salute. Se in futuro li raccoglieremo, lo scriveremo qui e chiederemo un consenso specifico.</p>
 <h2>Perché li raccogliamo</h2>
-<p>Per risponderti, per avvisarti quando la prima versione è pronta, per organizzare il programma pilota con le planner e per capire quali funzioni servono davvero. Le risposte le leggiamo noi e le contiamo in forma aggregata; non le vendiamo e non le cediamo. La base è il tuo consenso, che puoi revocare in qualsiasi momento.</p>
+<p>Per risponderti, per scriverti quando c'è posto, per organizzare la prova pilota con le planner e per capire quali funzioni servono davvero. Le risposte le leggiamo noi e le contiamo in forma aggregata; non le vendiamo e non le cediamo. La base è il tuo consenso, che puoi revocare in qualsiasi momento.</p>
 <h2>Per quanto tempo</h2>
 <p>Conserviamo i dati per 12 mesi dall'iscrizione, oppure fino a quando revochi il consenso se succede prima. Alla scadenza ti chiediamo se vuoi restare in lista; se non rispondi, li cancelliamo.</p>
 <h2>I tuoi diritti</h2>

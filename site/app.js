@@ -108,6 +108,8 @@
         draw(box, v);
       };
       inp.addEventListener("input", upd); inp.addEventListener("change", upd);
+      // un clic in qualsiasi punto del riquadro apre il calendario
+      inp.closest(".date-in").addEventListener("click", function () { try { inp.showPicker(); } catch (e) { inp.focus(); } });
     }
     if (w) draw(box, w);
   });

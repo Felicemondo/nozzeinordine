@@ -21,7 +21,7 @@
     stage: { inizio: "Siamo all'inizio", qualcosa: "Qualcosa è già deciso", dettagli: "Mancano i dettagli" },
     perYear: { "1-5": "Da 1 a 5", "6-10": "Da 6 a 10", "11-20": "Da 11 a 20", "20+": "Più di 20" },
     workMode: { autonomia: "Lavoro in autonomia", team: "Lavoro con un team" },
-    wl: { nuova: "Nuova", contattata: "Contattata", pilota: "In pilota", scartata: "Scartata" }
+    wl: { nuova: "Nuova", contattata: "Contattata", pilota: "Nella prova pilota", scartata: "Scartata" }
   };
   var store = {
     get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
@@ -282,11 +282,11 @@
     ],
     budget_items: [
       { name: "category", label: "Voce", type: "select", required: true, options: CATS.map(function (c) { return [c, c]; }) },
-      { name: "description", label: "Dettaglio", max: 200, placeholder: "Es. Villa con giardino" },
+      { name: "description", label: "Dettaglio", required: true, max: 200, placeholder: "Es. Villa con giardino" },
       { name: "planned", label: "Costo stimato (€)", type: "number", min: 0, step: "0.01", help: "Quanto pensate di spendere per questa voce." },
-      { name: "contracted", label: "Importo del contratto, se firmato (€)", type: "number", min: 0, step: "0.01", help: "Quando c'è, prende il posto della stima." },
-      { name: "paid", label: "Già pagato (€)", type: "number", min: 0, step: "0.01" },
-      { name: "due_date", label: "Prossimo pagamento", type: "date" }
+      { name: "contracted", label: "Importo del contratto (€)", type: "number", min: 0, step: "0.01", required: true, help: "Quando c'è, prende il posto della stima. Scrivete 0 se non c'è ancora un contratto." },
+      { name: "paid", label: "Già pagato (€)", type: "number", min: 0, step: "0.01", required: true, help: "Scrivete 0 se non avete ancora pagato nulla." },
+      { name: "due_date", label: "Prossimo pagamento", type: "date", noOpt: true, help: "Serve finché resta qualcosa da pagare." }
     ],
     tables: [
       { name: "name", label: "Nome del tavolo", required: true, max: 60, placeholder: "Es. Capri", wide: true },
@@ -296,7 +296,7 @@
     vendors: [
       { name: "category", label: "Categoria", required: true, max: 80, list: ["Location", "Catering", "Fotografo", "Video", "Musica", "Fiori", "Abiti", "Trucco e capelli", "Partecipazioni", "Trasporti", "Altro"] },
       { name: "name", label: "Nome del fornitore", required: true, max: 120 },
-      { name: "contact", label: "Contatto (telefono o email)", max: 200 },
+      { name: "contact", label: "Contatto (telefono o email)", required: true, max: 200 },
       { name: "status", label: "Stato", type: "select", options: opts(LABEL.vendor) },
       { name: "notes", label: "Note", type: "textarea", max: 2000, wide: true }
     ],
@@ -317,7 +317,7 @@
     ],
     timeline_items: [
       { name: "start_time", label: "Ora", type: "time", required: true },
-      { name: "title", label: "Momento", required: true, max: 120, placeholder: "Es. Cerimonia" },
+      { name: "title", label: "Descrizione", required: true, max: 120, placeholder: "Es. Cerimonia" },
       { name: "place", label: "Dove", max: 120 },
       { name: "owner", label: "Chi coordina", max: 120, placeholder: "Es. Fotografo" }
     ],
@@ -365,7 +365,7 @@
   function empty(title, text, action, ic) {
     return h("div", { class: "empty" }, ic ? h("span", { class: "empty-ic" }, icon(ic)) : null, h("h2", null, title), text ? h("p", null, text) : null, action || null);
   }
-  function eyebrow() { return api.mode === "demo" ? h("p", { class: "eyebrow" }, "Anteprima · Dati di esempio") : null; }
+  function eyebrow() { return api.mode === "demo" ? h("p", { class: "eyebrow" }, "Demo · Dati di esempio") : null; }
   function weddingMeta(w) { return [w.wedding_date ? fmtDate(w.wedding_date, true) : "Data da scegliere", w.city, w.ceremony && w.ceremony !== "da_decidere" ? "rito " + LABEL.ceremony[w.ceremony].toLowerCase() : null].filter(Boolean).join(" · "); }
   function chipInfo(text, ic) { return h("span", { class: "info-chip" }, icon(ic || "calendar"), text); }
   function pageHead(title, sub, actions, chip) {
@@ -486,10 +486,10 @@
     return h("div", { class: "auth" }, h("div", { class: "auth-card" }, brand(tone || "ceramica"), card),
       h("figure", { class: "auth-pic" }, h("figcaption", null, "Chiostro di Santa Chiara, Napoli · foto Sailko, CC BY 3.0")));
   }
-  // Per ora gli account si aprono dalla lista d'attesa: chi non ha un invito compila il modulo sul sito
+  // Gli account si aprono dalla lista d'attesa: chi non ha un invito compila il modulo sul sito
   function noAccount(invited) {
     return h("div", { class: "no-account" }, h("h2", null, invited ? "Non hai ricevuto un invito?" : "Non hai ancora un account?"),
-      h("p", null, "Per ora gli accessi si aprono dalla lista d'attesa: compila il modulo sul sito e ti scriviamo noi."),
+      h("p", null, "Gli accessi si aprono dalla lista d'attesa: compila il modulo sul sito e ti scriviamo noi."),
       h("div", { class: "choices two" }, linkBtn("../richiesta-coppia.html", "Siamo una coppia", "soft"), linkBtn("../richiesta-planner.html", "Sono una planner", "soft")),
       invited ? null : h("p", { class: "small" }, "Hai ricevuto un invito a un matrimonio? ", h("a", { href: "#/registrati" }, "Crea l'account con l'email invitata")));
   }
@@ -555,7 +555,7 @@
         h("div", { class: "demo-facts" }, h("div", null, h("b", null, "Demo"), h("span", null, demo)), h("div", null, h("b", null, "Focus"), h("span", null, focus))),
         h("footer", null, h("span", null, foot), h("button", { class: "btn " + (primary ? "primary" : "ghost"), type: "button", onclick: pick(role) }, "Apri demo " + (role === "coppia" ? "coppia" : role === "planner" ? "planner" : "amministrazione"), icon("arrow"))));
     };
-    return h("div", { class: "chooser" }, h("header", { class: "chooser-top" }, brand("ceramica"), badge("Anteprima · Dati di esempio", "")),
+    return h("div", { class: "chooser" }, h("header", { class: "chooser-top" }, brand("ceramica"), badge("Demo · Dati di esempio", "")),
       h("div", { class: "chooser-in" }, h("div", { class: "chooser-text" }, h("h1", null, "Scegli la demo"), h("p", null, "Esplora il prodotto con dati di esempio, dal punto di vista di una coppia o di un wedding planner."), h("a", { href: "index.html" }, "Torna all'accesso")),
         h("div", { class: "chooser-cards" }, h("p", { class: "eyebrow" }, "Seleziona il punto di vista"), h("p", { class: "sub" }, "Scegli l'esperienza che vuoi esplorare."),
           card("Organizziamo il nostro matrimonio", "La vista ideale per chi pianifica la propria cerimonia e il ricevimento.", "Coppia", "Anna e Marco · matrimonio a Caserta", "priorità, budget, invitati e tavoli", "Anna e Marco · Caserta", "coppia", true),
@@ -774,11 +774,18 @@
   function taskRow(t, w, nextId, opts) {
     opts = opts || {};
     var st = taskStatus(t, nextId), late = st[1] === "late";
-    var toggle = h("button", { type: "button", class: "ic-circle tgl " + (t.done ? "ok" : late ? "terra" : ""), "aria-pressed": String(!!t.done), "aria-label": (t.done ? "Riapri: " : "Segna come completata: ") + t.title,
-      onclick: async function () { await attempt(function () { return api.update("tasks", t.id, { done: !t.done }); }, t.done ? "Attività riaperta." : "Attività completata."); await refreshAlerts(); render(); } }, icon(t.done ? "check" : "calendar"));
+    var setDone = async function (done) {
+      if (!!t.done === done) return;
+      await attempt(function () { return api.update("tasks", t.id, { done: done }); }, done ? "Attività completata." : "Attività riaperta."); await refreshAlerts(); render();
+    };
+    var tick = function (done, label) {
+      var on = !!t.done === done;
+      return h("button", { type: "button", class: "tick" + (on ? " on" : ""), "aria-pressed": String(on), onclick: function () { setDone(done); } }, h("span", { class: "tbox", "aria-hidden": "true" }, on ? icon("check") : null), label);
+    };
+    var ticks = h("span", { class: "ticks", role: "group", "aria-label": "Stato di " + t.title }, tick(false, "Da fare"), tick(true, "Completata"));
     var meta = opts.meta || [t.due_date ? (opts.rel ? whenText(t.due_date) : fmtDate(t.due_date)) : "senza scadenza", opts.wedding ? opts.wedding : LABEL.assignee[t.assignee]].join(" · ");
-    return rowItem({ lead: opts.noToggle ? h("span", { class: "ic-circle " + (late ? "terra" : "") }, icon("calendar")) : toggle, title: t.title, meta: meta, cls: t.done ? "done" : null,
-      side: [badge(st[0], st[1]), opts.actions ? h("span", { class: "row-actions" },
+    return rowItem({ lead: h("span", { class: "ic-circle " + (t.done ? "ok" : late ? "terra" : "") }, icon(t.done ? "check" : "calendar")), title: t.title, meta: meta, cls: t.done ? "done" : null,
+      side: [st[1] === "ok" || st[1] === "todo" ? null : badge(st[0], st[1]), opts.noToggle ? null : ticks, opts.actions ? h("span", { class: "row-actions" },
         mini("Modifica", function () { editDialog("Modifica attività", F.tasks, Object.assign({}, t, { phase: String(t.phase) }), "Salva", function (d) { d.phase = Number(d.phase); return api.update("tasks", t.id, d); }, "Salvato."); }),
         mini("Elimina", async function () { if (!await confirmBox("Eliminare l'attività?", "«" + t.title + "» verrà tolta dalla lista.", "Elimina")) return; await attempt(function () { return api.remove("tasks", t.id); }, "Eliminata."); render(); }, "danger")) : null] });
   }
@@ -874,9 +881,13 @@
   }
 
   /* ------------------------------------------------------------ budget */
+  // Finché resta qualcosa da pagare serve la data del prossimo pagamento
+  function checkBudget(d) {
+    if (cost(d) > num(d.paid) && !d.due_date) throw new Error("Scrivete la data del prossimo pagamento: resta ancora qualcosa da pagare.");
+  }
   async function budgetView(w) {
     var items = await api.list("budget_items", w.id), t = budgetTotals(items), cap = num(w.budget_total);
-    var addFn = function () { editDialog("Nuova voce di spesa", F.budget_items, { category: CATS[0] }, "Aggiungi", function (d) { d.wedding_id = w.id; return api.insert("budget_items", d); }, "Voce aggiunta."); };
+    var addFn = function () { editDialog("Nuova voce di spesa", F.budget_items, { category: CATS[0] }, "Aggiungi", function (d) { checkBudget(d); d.wedding_id = w.id; return api.insert("budget_items", d); }, "Voce aggiunta."); };
     var left = t.total - t.paid;
     var head = pageHead("Budget e pagamenti", "Quanto spenderete in tutto, quanto avete già pagato e come si divide la spesa.", null, chipInfo(weddingMeta(w)));
     var k = kpis([kpi("Costo previsto", eur(t.total), "Somma di " + plural(items.length, "voce", "voci")), kpi("Già pagato", eur(t.paid), "Acconti e pagamenti registrati"), kpi("Da pagare", eur(left), "Importi ancora da versare"),
@@ -893,11 +904,11 @@
       h("caption", { class: "sr" }, "Voci di spesa"),
       h("thead", null, h("tr", null, ["Voce", "Costo", "Già pagato", "Da pagare", "Prossimo pagamento", "Azioni"].map(function (x, i) { return h("th", { scope: "col", class: i >= 1 && i <= 3 ? "n" : null }, x); }))),
       h("tbody", null, sorted.map(function (b) {
-        var c = cost(b), pct = t.total ? Math.round(c / t.total * 100) : 0;
-        return h("tr", null, h("th", { scope: "row" }, h("b", null, b.category), h("small", null, [b.description, num(b.contracted) > 0 ? "contratto" : c ? "stima" : "costo da scrivere", pct ? pct + "% del totale" : null].filter(Boolean).join(" · "))),
+        var c = cost(b), pct = t.total ? Math.round(c / t.total * 100) : 0, settled = c > 0 && num(b.paid) >= c;
+        return h("tr", { class: settled ? "settled" : null }, h("th", { scope: "row" }, h("b", null, b.category, settled ? badge("Saldato", "ok") : null), h("small", null, [b.description, num(b.contracted) > 0 ? "contratto" : c ? "stima" : "costo da scrivere", pct ? pct + "% del totale" : null].filter(Boolean).join(" · "))),
           h("td", { class: "n" }, eur(c)), h("td", { class: "n" }, eur(b.paid)), h("td", { class: "n" }, eur(Math.max(0, c - num(b.paid)))), h("td", null, b.due_date ? fmtDate(b.due_date) : "—"),
           h("td", null, h("span", { class: "row-actions" },
-            mini("Modifica", function () { editDialog("Modifica voce", F.budget_items, b, "Salva", function (d) { return api.update("budget_items", b.id, d); }, "Salvato."); }),
+            mini("Modifica", function () { editDialog("Modifica voce", F.budget_items, b, "Salva", function (d) { checkBudget(d); return api.update("budget_items", b.id, d); }, "Salvato."); }),
             mini("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina la spesa")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger"))));
       })),
       h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), h("td", null, "—"), h("td", null)))));
@@ -1036,11 +1047,21 @@
     var seatsTotal = tables.reduce(function (a, t) { return a + t.seats; }, 0);
     var at = function (t, n) { return guests.filter(function (x) { return x.table_id === t.id && x.seat_number === n; })[0]; };
     var addGuest = btn("Aggiungi invitato", function () {
-      editDialog("Nuovo invitato", guestFields(w), { guest_group: store.get("nio-group") || "amici_comuni", rsvp: "in_attesa", menu: "standard" }, "Aggiungi", function (d) { d.wedding_id = w.id; return api.insert("guests", d); }, "Invitato aggiunto.");
+      var fields = guestFields(w);
+      fields.splice(1, 0, { name: "count", label: "Quante persone", type: "number", step: "1", noOpt: true, placeholder: "1", help: "Per una famiglia o una coppia: le aggiungete tutte insieme, poi potete metterle anche a tavoli diversi." });
+      editDialog("Nuovo invitato", fields, { guest_group: store.get("nio-group") || "amici_comuni", rsvp: "in_attesa", menu: "standard", count: 1 }, "Aggiungi", function (d) {
+        var n = Math.round(num(d.count)) || 1;
+        if (n > 30) throw new Error("Al massimo 30 persone alla volta.");
+        delete d.count; d.wedding_id = w.id;
+        if (n > 1 && !d.household) d.household = d.name;
+        var rows = []; for (var i = 1; i <= n; i++) rows.push(Object.assign({}, d, { name: i === 1 ? d.name : d.name + " · " + i }));
+        return api.insert("guests", n > 1 ? rows : d);
+      }, "Invitati aggiunti.");
     }, "primary", "plus");
-    var addTable = btn("Aggiungi tavolo", function () {
+    var newTable = function () {
       tableEditDialog(null, function (d) { var pos = freeSpot(tables); d.pos_x = pos[0]; d.pos_y = pos[1]; d.wedding_id = w.id; return api.insert("seating_tables", d); }).then(function (d) { if (d) { toast("Tavolo aggiunto alla sala."); render(); } });
-    }, "soft", "table");
+    };
+    var addTable = btn("Aggiungi tavolo", newTable, "soft", "table");
     function csv() {
       var rows = [["Nome", "Gruppo", "Nucleo", "Risposta", "Menù", "Tavolo", "Posto", "Note"]].concat(guests.map(function (x) { return [x.name, groupLabel(w, x.guest_group), x.household, LABEL.rsvp[x.rsvp], LABEL.menu[x.menu], byId[x.table_id] ? byId[x.table_id].name : "", x.seat_number || "", x.notes]; }));
       download("invitati-" + w.title.replace(/\W+/g, "-").toLowerCase() + ".csv", rows);
@@ -1131,9 +1152,9 @@
       }) : h("p", { class: "muted" }, guests.length ? "Tutti hanno un posto." : "Aggiungete gli invitati: chi viene comparirà qui finché non ha un posto."));
 
     var sala = h("section", { class: "sala", id: "sala", "aria-labelledby": "sala-h" },
-      h("div", { class: "sala-main" }, h("div", { class: "sala-tools" }, h("h2", { id: "sala-h", class: "serif" }, "La sala"), tables.length ? zoomBar : null), legend,
+      h("div", { class: "sala-main" }, h("div", { class: "sala-tools" }, h("h2", { id: "sala-h", class: "serif" }, "La sala"), btn("Aggiungi tavolo", newTable, tables.length ? "soft sm" : "primary", "plus"), tables.length ? zoomBar : null), legend,
         h("div", { class: "hall-frame" }, wrap,
-          h("p", { class: "hall-note" }, icon("info"), tables.length ? "Trascinate i tavoli per disporre la sala. Toccate un posto per scegliere chi ci siede: i posti di chi è in attesa sono provvisori finché non conferma." : "Disegnate la sala: tavoli da 8 a 12 posti, con il loro nome."))),
+          h("p", { class: "hall-note" }, icon("info"), tables.length ? "Trascinate i tavoli per disporre la sala. Toccate un posto per scegliere chi ci siede: i posti di chi è in attesa sono provvisori finché non conferma." : "Disegnate la sala con «Aggiungi tavolo»: tavoli da 8 a 12 posti, con il loro nome."))),
       waitingPanel);
 
     /* ---- elenco invitati: ricerca, filtri e pagine, raggruppato per gruppo ---- */
@@ -1551,7 +1572,7 @@
     zona: { caserta: "Caserta", napoli: "Napoli", salerno: "Salerno", avellino: "Avellino", benevento: "Benevento", altra: "Altra regione" },
     planner: { si: "ha una planner", cerchiamo: "cerca una planner", no: "senza planner" },
     prezzo49: { si: "Sì a 49 €", forse: "Forse a 49 €", no: "No a 49 €" },
-    pilota: { si: "vuole il pilota", info: "vuole saperne di più", aggiornamenti: "solo aggiornamenti" }
+    pilota: { si: "vuole la prova pilota", info: "vuole saperne di più", aggiornamenti: "solo aggiornamenti" }
   };
   function wlWhen(d) {
     if (!d.anno) return null;
@@ -1561,7 +1582,7 @@
   function wlSummary(x) {
     var d = x.dati || {}, list = function (v) { return Array.isArray(v) ? v.join(", ") : v; };
     if (x.profilo === "planner") return [d.studio, WL.zona[d.zona] || d.zona, d.eventi ? d.eventi + " l'anno" : null, d.in_corso != null ? d.in_corso + " in corso" : null, WL.pilota[d.pilota], d.chiamata ? "vuole una chiamata" : null, d.telefono ? "tel. " + d.telefono : null, d.web].filter(Boolean).join(" · ");
-    if (d.modulo) return [d.nome, wlWhen(d), WL.zona[d.zona], d.invitati ? d.invitati.replace("fino-", "fino a ") + " invitati" : null, WL.planner[d.planner], WL.prezzo49[d.prezzo49], d.prova ? "prova l'anteprima" : null, d.pesi ? "pesa: " + list(d.pesi) : null].filter(Boolean).join(" · ");
+    if (d.modulo) return [d.nome, wlWhen(d), WL.zona[d.zona], d.invitati ? d.invitati.replace("fino-", "fino a ") + " invitati" : null, WL.planner[d.planner], WL.prezzo49[d.prezzo49], d.prova ? "vuole provarlo tra i primi" : null, d.pesi ? "pesa: " + list(d.pesi) : null].filter(Boolean).join(" · ");
     return [WL.zona[d.zona] || d.zona, d.prezzo ? "prezzo " + d.prezzo : null].filter(Boolean).join(" · "); // iscrizioni dal modulo precedente
   }
   function waitlistView(wait, tabs) {
@@ -1583,7 +1604,7 @@
       return h("button", { type: "button", class: f === o[0] ? "on" : null, "aria-pressed": String(f === o[0]), onclick: function () { store.set("nio-wl", o[0]); render(); } }, o[1]);
     }));
     var exp = btn("Esporta CSV", function () {
-      var head = ["Data", "Profilo", "Stato", "Email", "Nomi o studio", "Zona", "Mese", "Anno", "Invitati", "Budget", "Planner", "Già prenotato", "Strumenti", "Difficoltà", "A 49 €", "Prova l'anteprima", "Team", "Matrimoni l'anno", "In corso", "Spesa software", "Pilota", "Chiamata", "Telefono", "Sito o Instagram", "Note"];
+      var head = ["Data", "Profilo", "Stato", "Email", "Nomi o studio", "Zona", "Mese", "Anno", "Invitati", "Budget", "Planner", "Già prenotato", "Strumenti", "Difficoltà", "A 49 €", "Tra i primi a provarlo", "Team", "Matrimoni l'anno", "In corso", "Spesa software", "Pilota", "Chiamata", "Telefono", "Sito o Instagram", "Note"];
       download("lista-attesa.csv", [head].concat(wait.map(function (x) {
         var d = x.dati || {}, j = function (v) { return Array.isArray(v) ? v.join(", ") : v; };
         return [fmtDate(x.created_at), x.profilo, LABEL.wl[x.stato] || x.stato, x.email, d.nome || d.studio, d.zona, d.mese, d.anno, d.invitati, d.budget, d.planner, j(d.prenotato), d.strumenti, j(d.pesi || d.perdite), d.prezzo49 || d.prezzo, d.prova ? "sì" : "", d.team, d.eventi, d.in_corso, d.spesa, d.pilota, d.chiamata ? "sì" : "", d.telefono, d.web, d.note];
@@ -1603,8 +1624,8 @@
         panel("Matrimoni per mese", "Dalle risposte delle coppie.", null, monthRows.length ? h("ul", { class: "plain-list wl-months" }, monthRows.map(function (r) {
           return h("li", null, h("b", null, r[0]), bar([[r[1], "cer"]], maxM, r[1] + " su " + maxM), h("span", { class: "muted" }, plural(r[1], "coppia", "coppie")));
         })) : h("p", { class: "muted" }, "Ancora nessuna data dalle coppie."), "compact"),
-        panel("Programma pilota", "Dalle risposte delle planner.", null, h("ul", { class: "plain-list" },
-          [["Vogliono farne parte", n(function (x) { return (x.dati || {}).pilota === "si"; })], ["Vogliono saperne di più", n(function (x) { return (x.dati || {}).pilota === "info"; })], ["Chiedono una chiamata", n(function (x) { return x.profilo === "planner" && (x.dati || {}).chiamata; })], ["Già in pilota", n(function (x) { return x.stato === "pilota"; })]].map(function (r) {
+        panel("Prova pilota", "Dalle risposte delle planner.", null, h("ul", { class: "plain-list" },
+          [["Vogliono farne parte", n(function (x) { return (x.dati || {}).pilota === "si"; })], ["Vogliono saperne di più", n(function (x) { return (x.dati || {}).pilota === "info"; })], ["Chiedono una chiamata", n(function (x) { return x.profilo === "planner" && (x.dati || {}).chiamata; })], ["Già nella prova pilota", n(function (x) { return x.stato === "pilota"; })]].map(function (r) {
             return h("li", null, h("b", null, r[0]), h("span", { class: "muted" }, String(r[1])));
           })), "compact")),
       panel("Richieste", null, null, [

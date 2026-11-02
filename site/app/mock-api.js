@@ -195,11 +195,15 @@
       return clone(db[table].filter(function (r) { return wid ? r.wedding_id === wid : (table === "internal_notes" ? isPlanner(r.wedding_id) : isMember(r.wedding_id)); }).sort(cmp(o[0], o[1])));
     },
     insert: async function (table, row) {
-      await wait(); guard(table, row.wedding_id);
-      var base = { id: uid(), created_at: new Date().toISOString() };
-      if (table === "guests") Object.assign(base, { table_id: null, seat_number: null, guest_group: "amici_comuni" });
-      if (table === "seating_tables") Object.assign(base, { seats: 10, shape: "rotondo", pos_x: 50, pos_y: 50 });
-      db[table].push(Object.assign(base, row));
+      await wait();
+      // come il database: si possono inserire più righe insieme
+      [].concat(row).forEach(function (row) {
+        guard(table, row.wedding_id);
+        var base = { id: uid(), created_at: new Date().toISOString() };
+        if (table === "guests") Object.assign(base, { table_id: null, seat_number: null, guest_group: "amici_comuni" });
+        if (table === "seating_tables") Object.assign(base, { seats: 10, shape: "rotondo", pos_x: 50, pos_y: 50 });
+        db[table].push(Object.assign(base, row));
+      });
     },
     update: async function (table, id, patch) {
       await wait();

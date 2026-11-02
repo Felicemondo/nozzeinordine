@@ -174,6 +174,13 @@ h2.serif.big { font-size: 28px; }
 .row-main a { color: inherit; text-decoration: none; }
 .row-main small { color: var(--muted); }
 .row-side { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.ticks { display: inline-flex; gap: 4px; }
+.tick { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 4px 10px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 14px; color: var(--muted); cursor: pointer; }
+.tick:hover { background: var(--sand); }
+.tick.on { color: var(--ink); font-weight: 600; }
+.tick .tbox { width: 20px; height: 20px; border: 1.5px solid #B9AF9F; border-radius: 5px; display: grid; place-items: center; background: #fff; }
+.tick.on .tbox { background: var(--olive-soft); border-color: var(--olive-soft); color: #fff; }
+.tick .tbox .ic { width: 14px; height: 14px; }
 .row.done .row-main b { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(92, 86, 77, .5); }
 .ic-circle { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--ceramica); color: #fff; flex: none; border: 0; padding: 0; }
 .ic-circle .ic { width: 19px; height: 19px; }
@@ -223,6 +230,9 @@ button.ic-circle:hover { box-shadow: 0 0 0 3px #C7D8DC; }
 .tbl th, .tbl td { text-align: left; padding: 14px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .tbl thead th { background: #EDE5D8; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 .tbl tbody tr { background: #FFFEFB; }
+.tbl tbody tr.settled { background: var(--ok-tint); }
+.tbl tbody tr.settled th b { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tbl tbody tr.settled .badge { min-height: 24px; padding: 1px 10px; font-size: 12px; }
 .tbl tbody th { font-weight: 600; }
 .tbl th small, .tbl td small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
 .tbl .n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -250,6 +260,9 @@ button.ic-circle:hover { box-shadow: 0 0 0 3px #C7D8DC; }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 10px; }
 .fld input, .fld select, .fld textarea { width: 100%; min-height: 48px; padding: 10px 14px; border: 1px solid var(--line-2); border-radius: var(--r-field); background: #FFFEFB; font-size: 15px; }
 .fld textarea { min-height: 96px; resize: vertical; }
+/* stessa freccia per le scelte e per i campi con suggerimenti */
+.fld select, .fld input[list] { -webkit-appearance: none; appearance: none; padding-right: 40px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235C564D' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+.fld input[list]::-webkit-calendar-picker-indicator { opacity: 0; cursor: pointer; }
 .fld input:disabled { background: var(--sand); color: var(--muted); }
 .fld input:user-invalid { border-color: var(--terra-ink); }
 .fld small { color: var(--muted); }
@@ -345,6 +358,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
 .sala { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
 .sala-main { display: grid; gap: 12px; min-width: 0; }
 .sala-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sala-tools h2 { margin-right: auto; }
 .hall-frame { background: var(--grout); border-radius: var(--r-card); padding: 10px; display: grid; gap: 10px; }
 .hall-note { display: flex; gap: 10px; align-items: flex-start; background: #F2E7C9; border: 1px solid #D9C48E; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 .hall-note .ic { color: #8A6A1E; margin-top: 1px; }
