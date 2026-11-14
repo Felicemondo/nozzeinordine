@@ -1,6 +1,6 @@
 # Nozze in Ordine
 
-Sito di lista d'attesa e identità visiva di Nozze in Ordine, una dashboard per organizzare matrimoni (coppie e wedding planner), a partire dalla Campania.
+Sito di lista d'attesa e identità visiva di Nozze in Ordine, una dashboard per organizzare matrimoni (coppie e wedding planner), nata in Campania e aperta a tutta Italia.
 
 ## Contenuto
 

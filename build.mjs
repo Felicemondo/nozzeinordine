@@ -24,24 +24,26 @@ const CAL = `<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect
 
 /* ---------- immagini ---------- */
 const IMG = {
-  home: ["home-hero", 1024, 1024, "Una lunga tavola apparecchiata all'aperto, con candele color terracotta, fiori bianchi e bicchieri di cristallo."],
-  budget: ["tavola-budget", 1152, 928, "Un coperto con piatto dorato, tovagliolo legato con un nastro e un centrotavola di rose."],
-  scadenze: ["bouquet-scadenze", 1200, 896, "Le mani di una sposa con l'anello che stringono un piccolo bouquet di rose chiare."],
-  invitati: ["tavolata-invitati", 1024, 1024, "Invitati che ridono a una lunga tavolata tra le colline, sotto un pergolato."],
-  costiera: ["editoriale-costiera", 1200, 896, "Una tavolata su una terrazza affacciata su un paese della costiera."],
-  fiori: ["fiori-progetto", 1200, 896, "Una donna sistema un centrotavola di rose bianche e ulivo in un cortile di pietra."],
-  coppie: ["coppie-hero", 1024, 1024, "Due sposi camminano mano nella mano lungo un viale alberato."],
-  viale: ["editoriale-viale", 1584, 672, "Un viale di ulivi al tramonto, con una coppia di spalle."],
-  versione: ["coppie-versione", 928, 1152, "Un coperto su tovaglia di lino, con partecipazioni legate da un nastro azzurro e una rosa bianca."],
-  planner: ["planner-hero", 1376, 768, "Una wedding planner con auricolare e cartellina in un giardino allestito per un matrimonio."],
-  scrivania: ["planner-scrivania", 1376, 768, "Una planner alla scrivania tra raccoglitori, campioni di colore e un portatile."],
-  coord: ["planner-coordinamento", 1152, 928, "Una planner rivede la piantina della sala con una coppia, su una terrazza."],
-  cambia: ["planner-cosa-cambia", 928, 1152, "Una lunga tavola apparecchiata in un giardino sul mare."],
-  partiamo: ["planner-come-partiamo", 1200, 896, "Una tavola apparecchiata con piatti azzurri, ulivo e cartoncini segnaposto."],
-  dettaglio: ["planner-dettaglio", 1584, 672, "Una cena di matrimonio su una terrazza sopra il mare della costiera."],
-  prezzi: ["prezzi-tavola", 928, 1152, "Un piatto con una rosa bianca e un rametto d'ulivo su una tovaglia di lino, con cartoncini."],
-  pergolato: ["prezzi-pergolato", 896, 1200, "Una lunga tavola sotto un pergolato di glicine, con candele e fiori."],
+  home: ["tavola-pergolato", 1440, 960, "Una tavola apparecchiata sotto un pergolato, tra gli alberi e le rocce."],
+  budget: ["tavola-legno-fiori", 1440, 960, "Una tavola di legno apparecchiata all'aperto, con sedie incrociate e centrotavola di fiori."],
+  scadenze: ["calendario-fiori", 1440, 900, "Un calendario mensile su un tavolo bianco, con una matita e fiori arancioni."],
+  invitati: ["tavolata-alberi", 1440, 960, "Una lunga tavola di legno con i bicchieri pronti, all'ombra degli alberi."],
+  costiera: ["terrazza-costa", 1440, 960, "Tavoli e sedie su una terrazza affacciata su un paese della costa e sul mare."],
+  fiori: ["cortile-fiori", 1440, 1201, "Un cortile di pietra con un tavolo, sedie bianche, vasi di fiori e piante."],
+  coppie: ["tavola-uliveto", 1440, 960, "Un tavolo con le sedie in mezzo a un uliveto, con le colline sullo sfondo."],
+  viale: ["cipressi-tramonto", 1440, 960, "Un prato al tramonto, con cipressi e case all'orizzonte."],
+  versione: ["carta-fiori", 1152, 1440, "Cartoncini e partecipazioni su un tavolo chiaro, con rose e fiori di campo."],
+  planner: ["allestimento-cerimonia", 1440, 958, "Un giardino allestito per una cerimonia all'aperto, con file di sedie e fiori bianchi."],
+  scrivania: ["quaderno-rosa", 1440, 939, "Un quaderno a spirale, una penna e una rosa su un tavolo bianco."],
+  coord: ["navata-cerimonia", 1440, 958, "Una navata di fiori bianchi tra le sedie, in un giardino pronto per la cerimonia."],
+  cambia: ["arco-mare", 1051, 1440, "Un arco di pietra che si apre su una scala bianca e sul mare."],
+  partiamo: ["patio-ulivo-mare", 1440, 1080, "Un patio con tavoli, sedie e un ulivo, affacciato sul mare."],
+  dettaglio: ["terrazza-tramonto", 1440, 960, "Tavoli apparecchiati su una terrazza sul mare, al tramonto."],
+  prezzi: ["tovaglioli-azzurri", 960, 1440, "Una tavola all'aperto con piatti, tovaglioli azzurri e bicchieri."],
+  pergolato: ["tavola-limoni", 960, 1440, "Una tavola apparecchiata con un runner verde, limoni e fiori gialli."],
 };
+// Crediti Unsplash (autore e pagina della foto), mostrati nella privacy
+const PHOTO_CREDITS = [["tavola-pergolato", "Steffen Lemmerzahl", "https://unsplash.com/@steffen_l?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-set-up-for-a-meal-under-a-pergolated-roof-z9MAxYlXv3s?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["tavola-legno-fiori", "Bruno Ngarukiye", "https://unsplash.com/@itsbrunoagain?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/wooden-table-set-for-outdoor-dining-with-floral-centerpieces-YrThd1lBFu4?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["calendario-fiori", "Debby Hudson", "https://unsplash.com/@hudsoncrafted?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/white-and-black-printer-paper-TMfDf6ItsZI?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["tavolata-alberi", "Jacob Diehl", "https://unsplash.com/@jacob_diehl_film?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-long-table-set-up-with-empty-wine-glasses-hV0y0KAJWno?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["terrazza-costa", "Arthur Tseng", "https://unsplash.com/@arthur3607?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-seating-overlooking-a-coastal-village-and-ocean-fgN1TeHcUKs?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cortile-fiori", "George Karelitsky", "https://unsplash.com/@georgekar?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-outside-6V7eOl67DM0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["tavola-uliveto", "Anastasia Saldatava", "https://unsplash.com/@asaldatava?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-in-an-olive-grove-oNMk0OOul80?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cipressi-tramonto", "Rafael Peier", "https://unsplash.com/@rafaelpeier?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/sunset-over-a-green-field-and-buildings-with-cypress-trees-EyzMwZkyUoY?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["carta-fiori", "Diana Light", "https://unsplash.com/@dreamcatchlight?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/three-flowers-and-a-card-on-a-table-IP70EVPkjNs?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["allestimento-cerimonia", "Jonathan Borba", "https://unsplash.com/@jonathanborba?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-chairs-and-floral-decorations-EQcRRfDLIts?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["quaderno-rosa", "Kelly Sikkema", "https://unsplash.com/@kellysikkema?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/orange-rose-flower-H0QV32-mak8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["navata-cerimonia", "Jonathan Borba", "https://unsplash.com/@jonathanborba?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-floral-arch-and-green-arch-_a4OJrB5Q4A?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["arco-mare", "Karwin Luo", "https://unsplash.com/@karw1n?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/archway-view-to-a-spiral-staircase-and-ocean-zNOgrItIMiE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["patio-ulivo-mare", "Jonas from Berlin", "https://unsplash.com/@jonasfromberlin?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/patio-with-tables-chairs-olive-tree-and-scenic-ocean-view-rX2DMYxsma0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["terrazza-tramonto", "Cory Bjork", "https://unsplash.com/@corybjork?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-with-a-view-of-the-ocean-WatdiKeHuho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["tovaglioli-azzurri", "Bruno Ngarukiye", "https://unsplash.com/@itsbrunoagain?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/elegant-outdoor-table-setting-with-light-blue-napkins-and-glasses-V0xzy924lCA?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["tavola-limoni", "Bruno Ngarukiye", "https://unsplash.com/@itsbrunoagain?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-beautifully-set-outdoor-dining-table-with-floral-centerpiece-fJbpoLw1YYM?utm_source=felice_mondo_progetti&amp;utm_medium=referral"]];
 const img = (k, { lazy = true, cls = "" } = {}) => { const [f, w, h, alt] = IMG[k]; return `<img src="img/${f}.jpg" width="${w}" height="${h}" alt="${alt}"${cls ? ` class="${cls}"` : ""}${lazy ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"'}>`; };
 const EVOC = "Immagine evocativa · non rappresenta un evento organizzato da Nozze in Ordine.";
 
@@ -81,18 +83,19 @@ const top = (cur) => `<a class="skip" href="#main">Vai al contenuto</a><header c
 const foot = `<footer class="foot"><div class="wrap"><div class="foot-main"><div><p class="foot-brand">Nozze in Ordine</p><p>Per il vostro sì.</p></div>
 <nav aria-label="Pagine"><a href="coppie.html">Per le coppie</a><a href="planner.html">Per le planner</a><a href="prezzi.html">Prezzi</a></nav>
 <nav aria-label="Lista d'attesa e accesso"><a href="index.html#lista">Lista d'attesa</a><a href="app/">Accedi</a><a href="app/demo.html">Demo</a></nav></div>
-<div class="foot-line"><span>© 2026 Nozze in Ordine · dalla Campania</span><a href="privacy.html">Privacy</a></div></div></footer><script src="app.js"></script></body></html>`;
+<div class="foot-line"><span>© 2026 Nozze in Ordine · Nato in Campania, per tutta Italia</span><a href="privacy.html">Privacy</a></div></div></footer><script src="app.js"></script></body></html>`;
 const eyebrow = (t, cls = "") => `<p class="eyebrow${cls ? " " + cls : ""}">${t}</p>`;
 const btn = (href, label, cls = "") => `<a class="btn${cls ? " " + cls : ""}" href="${href}">${label} ${ARROW}</a>`;
 const hero = ({ k, eb, h1, p, a, b, fine, corner, tall }) => `<section class="hero${tall ? " tall" : ""}" aria-labelledby="h1">${img(k, { lazy: false, cls: "hero-img" })}<div class="wrap hero-in">
 ${eb}<h1 id="h1">${h1}</h1><p class="hero-p">${p}</p><div class="actions">${a}${b}</div><p class="fine">${fine}</p></div>${corner ? `<p class="corner">${corner}</p>` : ""}</section>`;
 const feat = ({ k, n, h, p, card, side = "left", bg = "", id = "" }) => `<section class="feat ${side}${bg ? " " + bg : ""}"${id ? ` id="${id}"` : ""} aria-labelledby="f${n}"><figure class="feat-pic">${img(k)}</figure>
 <div class="feat-text"><p class="num">${n}</p><h2 id="f${n}">${h}</h2><p class="lead">${p}</p>${card}</div></section>`;
-const editorial = (k, quote, cap = "Nozze in Ordine · Dalla Campania") => `<section class="editorial" aria-label="Immagine">${img(k)}<blockquote><p>${quote}</p></blockquote><p class="cap">${cap}</p></section>`;
+const editorial = (k, quote, cap = "Nozze in Ordine · In tutta Italia") => `<section class="editorial" aria-label="Immagine">${img(k)}<blockquote><p>${quote}</p></blockquote><p class="cap">${cap}</p></section>`;
 const defs = (rows) => `<dl class="defs">${rows.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join("")}</dl>`;
 
 /* ---------- richieste: un modulo per coppie e uno per planner, in tre passaggi ---------- */
-const ZONE = [["caserta", "Provincia di Caserta"], ["napoli", "Provincia di Napoli"], ["salerno", "Provincia di Salerno"], ["avellino", "Provincia di Avellino"], ["benevento", "Provincia di Benevento"], ["altra", "Altra regione"]];
+// I vecchi valori per provincia (caserta, napoli…) restano leggibili in dashboard: vedi WL.zona in site/app/ui.js
+const ZONE = [["abruzzo", "Abruzzo"], ["basilicata", "Basilicata"], ["calabria", "Calabria"], ["campania", "Campania"], ["emilia-romagna", "Emilia-Romagna"], ["friuli-venezia-giulia", "Friuli Venezia Giulia"], ["lazio", "Lazio"], ["liguria", "Liguria"], ["lombardia", "Lombardia"], ["marche", "Marche"], ["molise", "Molise"], ["piemonte", "Piemonte"], ["puglia", "Puglia"], ["sardegna", "Sardegna"], ["sicilia", "Sicilia"], ["toscana", "Toscana"], ["trentino-alto-adige", "Trentino-Alto Adige"], ["umbria", "Umbria"], ["valle-d-aosta", "Valle d'Aosta"], ["veneto", "Veneto"], ["estero", "All'estero"]];
 const OPTL = ` <span class="optl">· facoltativo</span>`;
 const select = (id, label, items, { req = true, hint = "" } = {}) => `<div class="fld"><label for="${id}">${label}${req ? "" : OPTL}</label><select id="${id}" name="${id}"${req ? " required" : ""}><option value="">Scegli…</option>${items.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>${hint ? `<p class="hint">${hint}</p>` : ""}</div>`;
 const input = (id, label, type, { req = true, ph = "", hint = "", attrs = "" } = {}) => `<div class="fld"><label for="${id}">${label}${req ? "" : OPTL}</label><input type="${type}" id="${id}" name="${id}"${req ? " required" : ""}${ph ? ` placeholder="${ph}"` : ""}${attrs ? " " + attrs : ""}>${hint ? `<p class="hint">${hint}</p>` : ""}</div>`;
@@ -136,7 +139,7 @@ ${select("strumenti", "Cosa usi oggi per organizzare?", [["fogli-whatsapp", "Fog
 ${select("spesa", "Quanto spendi oggi in software per il lavoro?", [["niente", "Niente"], ["sotto-20", "Meno di 20 € al mese"], ["20-50", "Da 20 a 50 € al mese"], ["50+", "Più di 50 € al mese"], ["nd", "Preferisco non dirlo"]], { req: false })}
 ${chips("perdite", "Dove perdi più tempo?", [["fornitori", "Preventivi e fornitori"], ["pagamenti", "Acconti e saldi"], ["invitati", "Invitati e tavoli"], ["sposi", "Messaggi con gli sposi"], ["scalette", "Scalette del giorno"], ["documenti", "Documenti e contratti"]])}
 ${area("note", "C'è altro che vorresti dirci?", "Per esempio: lo strumento che ti manca di più")}`],
-  ["La prova pilota", `${radios("pilota", "Ti interessa la prova pilota?", [["si", "Sì, vorrei farne parte", "Gratuito, per le prime 10 planner in Campania"], ["info", "Vorrei saperne di più"], ["aggiornamenti", "Mi bastano gli aggiornamenti"]])}
+  ["La prova pilota", `${radios("pilota", "Ti interessa la prova pilota?", [["si", "Sì, vorrei farne parte", "Gratuito, per le prime 10 planner"], ["info", "Vorrei saperne di più"], ["aggiornamenti", "Mi bastano gli aggiornamenti"]])}
 ${tick("chiamata", "Mi farebbe piacere una chiamata di 25 minuti per raccontare come lavoro.")}
 ${input("telefono", "Telefono", "tel", { req: false, ph: "Se preferisci essere chiamata", attrs: 'autocomplete="tel" maxlength="30"' })}${EMAIL}${CONSENT}`]
 ], "Invia la candidatura");
@@ -152,10 +155,10 @@ const ctaBand = ({ h, p, href, label, fine }) => `<section class="cta-dark" id="
 <div class="cta-btns"><a class="choice light" href="${href}">${label} ${ARROW}</a><p>${fine}</p></div></div></section>`;
 
 /* =========================================================== HOME */
-write("index.html", head("Nozze in Ordine | Il tuo sì, un tassello alla volta", "Budget, fornitori, invitati e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner. Partiamo dalla Campania.") + top("") + `
+write("index.html", head("Nozze in Ordine | Il tuo sì, un tassello alla volta", "Budget, fornitori, invitati e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner, in tutta Italia.") + top("") + `
 <main id="main">
 ${hero({ k: "home", eb: eyebrow("Il vostro matrimonio, con calma", "light"), h1: "Il tuo sì, un tassello alla volta.", p: "Budget, fornitori, invitati e scadenze in uno spazio condiviso. Per organizzare ogni dettaglio con maggiore tranquillità.",
-  a: btn("richiesta-coppia.html", "Sono una coppia"), b: btn("richiesta-planner.html", "Sono una wedding planner", "ghost"), fine: "Gratis per iniziare · Per coppie e wedding planner · Dalla Campania", corner: "01 / Il sì" })}
+  a: btn("richiesta-coppia.html", "Sono una coppia"), b: btn("richiesta-planner.html", "Sono una wedding planner", "ghost"), fine: "Gratis per iniziare · Per coppie e wedding planner · In tutta Italia", corner: "01 / Il sì" })}
 ${feat({ k: "budget", n: "01", h: "Il budget che torna sempre.", p: "Previsto, firmato, pagato e residuo per ogni voce. Senza rifare i conti ogni sera.", card: BUDGET_CARD, side: "left" })}
 ${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a partire dal giorno del matrimonio.", card: PATH_CARD, side: "right", bg: "sand" })}
 ${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Nuclei familiari, risposte e menù nello stesso elenco. Un invito, una riga.", card: RSVP_CARD(), side: "left", bg: "mist" })}
@@ -166,8 +169,8 @@ ${eyebrow("Come si comincia")}<h2 id="prog">Tre passi per mettere ordine.</h2><p
 <li><span>01</span><h3>Vi iscrivete.</h3><p>Ci raccontate il matrimonio in tre brevi passaggi: quando, quanti invitati, a che punto siete.</p></li>
 <li><span>02</span><h3>Vi apriamo lo spazio.</h3><p>Entrate con la vostra email e trovate le scadenze già calcolate sulla data del matrimonio.</p></li>
 <li><span>03</span><h3>Lo condividete.</h3><p>Invitate il partner o la vostra planner: ognuno vede ciò che gli serve, e nessuno rifà il lavoro due volte.</p></li></ol>
-<figure class="project-pic">${img("fiori")}<figcaption>${eyebrow("Dalla Campania")}<p>Pensato per chi si sposa qui, una coppia e una planner alla volta.</p></figcaption></figure></div></div></section>
-<section class="cta-dark" id="lista" aria-labelledby="lst"><div class="wrap cta-in"><div><h2 id="lst">Entra in lista d'attesa.</h2><p>Lista gratuita, nessun pagamento. Ti scriviamo appena c'è posto per te, partendo dalla Campania.</p></div>
+<figure class="project-pic">${img("fiori")}<figcaption>${eyebrow("In tutta Italia")}<p>Pensato per chi si sposa in Italia, una coppia e una planner alla volta.</p></figcaption></figure></div></div></section>
+<section class="cta-dark" id="lista" aria-labelledby="lst"><div class="wrap cta-in"><div><h2 id="lst">Entra in lista d'attesa.</h2><p>Lista gratuita, nessun pagamento. Ti scriviamo appena c'è posto per te.</p></div>
 <div class="cta-btns"><a class="choice light" href="richiesta-coppia.html">Sono una coppia ${ARROW}</a><a class="choice" href="richiesta-planner.html">Sono una wedding planner ${ARROW}</a><p>Gratis, in pochi minuti.</p></div></div></section>
 </main>` + foot);
 
@@ -175,7 +178,7 @@ ${eyebrow("Come si comincia")}<h2 id="prog">Tre passi per mettere ordine.</h2><p
 const PHASES = [["12+ mesi prima", "Data, budget e location"], ["9–11 mesi prima", "Fornitori principali e preventivi"], ["6–8 mesi prima", "Save the date e abiti"], ["3–5 mesi prima", "Dettagli, inviti e menù"], ["1–2 mesi prima", "Conferme finali e saldi"], ["Settimana del sì", "Scaletta e responsabili"]];
 write("coppie.html", head("Per le coppie | Nozze in Ordine", "Budget, preventivi, invitati e scadenze nello stesso posto condiviso, per organizzare il matrimonio con calma.") + top("coppie.html") + `
 <main id="main">
-${hero({ k: "coppie", tall: true, eb: eyebrow("Per le coppie", "light"), h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati e scadenze nello stesso posto condiviso. Pensato per le coppie che si sposano in Campania.",
+${hero({ k: "coppie", tall: true, eb: eyebrow("Per le coppie", "light"), h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati e scadenze nello stesso posto condiviso. Pensato per le coppie che si sposano in Italia.",
   a: btn("richiesta-coppia.html", "Iscrivetevi alla lista"), b: btn("#funzioni", "Cosa include", "ghost"), fine: "Piano gratuito · Completo a 49 €, una volta sola" })}
 <section class="journey" aria-labelledby="perc"><div class="wrap"><div class="journey-head"><div>${eyebrow("Dal primo pensiero al giorno del sì")}<h2 id="perc">Un posto per tenere tutto insieme.</h2></div><p class="small">Provate con la vostra data</p></div>
 <div class="planner-box" data-wedding="2027-06-12"><div class="calc"><label for="data-si">La data del sì</label><div class="date-in"><input type="date" id="data-si" value="2027-06-12">${CAL}</div>
@@ -198,8 +201,8 @@ ${ctaBand({ h: "Entrate in lista d'attesa.", p: "Tre brevi passaggi sul vostro m
 /* =========================================================== PLANNER */
 write("planner.html", head("Per le wedding planner | Nozze in Ordine", "Tutti i matrimoni che segui in un unico spazio, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi.") + top("planner.html") + `
 <main id="main">
-${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per più eventi, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi. Per le prime 10 planner in Campania la prova pilota è gratuita.",
-  a: btn("richiesta-planner.html", "Candidati alla prova pilota"), b: btn("#colpo", "Come funziona", "ghost"), fine: "Prova pilota gratuita · Per le prime 10 planner in Campania", corner: "01 / Il coordinamento" })}
+${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per più eventi, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi. Per le prime 10 planner la prova pilota è gratuita.",
+  a: btn("richiesta-planner.html", "Candidati alla prova pilota"), b: btn("#colpo", "Come funziona", "ghost"), fine: "Prova pilota gratuita · Per le prime 10 planner", corner: "01 / Il coordinamento" })}
 <section class="glance" id="colpo" aria-labelledby="gl"><div class="wrap">${eyebrow("Il lavoro a colpo d'occhio")}<h2 id="gl">Una dashboard pensata per più eventi.</h2><p class="lead narrow">Budget, fornitori, scadenze e documenti in un unico spazio. Non è un'agenzia: è uno strumento per chi coordina più matrimoni contemporaneamente.</p>
 <div class="glance-grid"><div class="glance-col">${img("scrivania")}${PLANNER_TABLE}</div><div class="glance-col">${img("coord")}${SCHEDULE}</div></div></div></section>
 <section class="split-list" aria-labelledby="cam"><div class="wrap">${eyebrow("Cosa cambia")}<h2 id="cam">Cosa cambia per la tua organizzazione.</h2>
@@ -210,10 +213,10 @@ ${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutt
 <div class="ui flush"><div class="tscroll"><table class="tbl roles"><thead><tr><th>Nello spazio condiviso</th><th>La planner</th><th>Gli sposi</th></tr></thead><tbody>
 <tr><th scope="row">Preventivi</th><td>Li carica e li gestisce</td><td>Li confrontano e approvano</td></tr><tr><th scope="row">Scadenze</th><td>Le assegna</td><td>Completano le loro</td></tr>
 <tr><th scope="row">Documenti</th><td>Li carica</td><td>Li leggono e scaricano</td></tr><tr><th scope="row">Note interne</th><td>Le scrive e le legge</td><td>Non le vedono</td></tr></tbody></table></div></div></div></section>
-<section class="aside-band" aria-labelledby="part"><div class="wrap aside-in"><div>${eyebrow("La prova pilota")}<h2 id="part">Costruito sul tuo metodo.</h2><p class="lead">Le prime 10 planner in Campania usano Nozze in Ordine sui loro matrimoni, gratis per tutta la prova pilota. Ogni mese ci dicono cosa serve, e lo strumento cresce intorno al loro lavoro.</p>${btn("richiesta-planner.html", "Raccontaci il tuo metodo", "line")}</div>
+<section class="aside-band" aria-labelledby="part"><div class="wrap aside-in"><div>${eyebrow("La prova pilota")}<h2 id="part">Costruito sul tuo metodo.</h2><p class="lead">Le prime 10 planner usano Nozze in Ordine sui loro matrimoni, gratis per tutta la prova pilota. Ogni mese ci dicono cosa serve, e lo strumento cresce intorno al loro lavoro.</p>${btn("richiesta-planner.html", "Raccontaci il tuo metodo", "line")}</div>
 <figure class="side-pic">${img("partiamo")}<figcaption>Immagine evocativa: preparazione, coordinamento e controllo di più eventi.</figcaption></figure></div></section>
-<section class="inset-pic" aria-label="Immagine"><div class="wrap"><figure>${img("dettaglio")}<figcaption><em>Ogni dettaglio al suo posto. Ogni momento da vivere.</em><span>Nozze in Ordine · Dalla Campania</span></figcaption></figure></div></section>
-${ctaBand({ h: "Candidati alla prova pilota.", p: "Cerchiamo le prime 10 wedding planner in Campania per costruire lo strumento insieme. È gratuita per tutta la sua durata: il prezzo dopo lo decidiamo insieme.", href: "richiesta-planner.html", label: "Invia la candidatura", fine: "Nessun pagamento, nessun impegno." })}
+<section class="inset-pic" aria-label="Immagine"><div class="wrap"><figure>${img("dettaglio")}<figcaption><em>Ogni dettaglio al suo posto. Ogni momento da vivere.</em><span>Nozze in Ordine · In tutta Italia</span></figcaption></figure></div></section>
+${ctaBand({ h: "Candidati alla prova pilota.", p: "Cerchiamo le prime 10 wedding planner per costruire lo strumento insieme. È gratuita per tutta la sua durata: il prezzo dopo lo decidiamo insieme.", href: "richiesta-planner.html", label: "Invia la candidatura", fine: "Nessun pagamento, nessun impegno." })}
 </main>` + foot);
 
 /* =========================================================== PREZZI */
@@ -222,19 +225,19 @@ const plan = ({ name, price, sub, items, dark, tag, href, cta = "Entra in lista"
 const faq = [["Devo pagare adesso?", "No. Iscriversi alla lista d'attesa è gratuito. Il piano Completo costa 49 €, una volta sola, e potete sempre restare sul piano gratuito."],
   ["Il piano Completo è un abbonamento?", "No. Sono 49 € una volta sola, per tutto il matrimonio: un matrimonio si organizza una volta."],
   ["Cosa resta gratis?", "Checklist con le scadenze, budget sintetico, fino a 50 invitati e 3 fornitori, e lo spazio condiviso con il partner. Senza limiti di tempo."],
-  ["Perché per le planner non c'è un prezzo?", "Perché vogliamo deciderlo con chi lo usa. Le prime 10 planner in Campania lo provano gratis durante la prova pilota; il prezzo dopo lo concordiamo insieme, e non parte nessun addebito senza il vostro consenso."],
+  ["Perché per le planner non c'è un prezzo?", "Perché vogliamo deciderlo con chi lo usa. Le prime 10 planner lo provano gratis durante la prova pilota; il prezzo dopo lo concordiamo insieme, e non parte nessun addebito senza il vostro consenso."],
   ["Cosa succede ai miei dati?", `Usiamo le risposte ai moduli per scrivervi e per capire cosa costruire. I dettagli sono nella <a href="privacy.html">pagina privacy</a>.`]];
 write("prezzi.html", head("Prezzi | Nozze in Ordine", "Per le coppie: gratis per iniziare, 49 € una volta sola per il piano Completo. Per le wedding planner: una prova pilota gratuita.") + top("prezzi.html") + `
 <main id="main">
 <section class="price-hero" aria-labelledby="h1"><div class="wrap price-hero-in"><div>${eyebrow("Prezzi")}<h1 id="h1">Gratis per iniziare.</h1><p class="lead">Per le coppie un prezzo solo, una volta per matrimonio. Per le wedding planner una prova pilota gratuita: il prezzo lo decidiamo insieme, dopo.</p>
-${defs([["Per le coppie", "Piano gratuito, oppure Completo a 49 € una volta sola."], ["Per le planner", "Prova pilota gratuita per le prime 10 planner in Campania."]])}<p class="small note">La lista d'attesa è gratuita e non richiede pagamenti.</p></div>
+${defs([["Per le coppie", "Piano gratuito, oppure Completo a 49 € una volta sola."], ["Per le planner", "Prova pilota gratuita per le prime 10 planner."]])}<p class="small note">La lista d'attesa è gratuita e non richiede pagamenti.</p></div>
 <figure class="side-pic">${img("prezzi", { lazy: false })}<figcaption>${EVOC}</figcaption></figure></div></section>
 <section class="plans-band sand" aria-labelledby="pc"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per le coppie")}<h2 id="pc">Per le coppie.</h2></div><p class="lead">Un pagamento unico per matrimonio, perché l'organizzazione dura il tempo che serve e poi finisce. Potete restare sul piano gratuito quanto volete.</p></div>
 <div class="plans">${plan({ href: "richiesta-coppia.html", name: "Gratis", price: "0 €", sub: "Per iniziare a mettere ordine, senza limiti di tempo", items: ["Checklist con scadenze", "Budget sintetico", "Fino a 50 invitati", "Fino a 3 fornitori", "Spazio condiviso con il partner"] })}
 ${plan({ href: "richiesta-coppia.html", name: "Completo", price: "49 €", sub: "Una volta sola, per tutto il matrimonio", items: ["Tutto il piano gratuito", "Invitati illimitati, risposte e tavoli", "Preventivi affiancati e pagamenti", "Documenti e contratti", "Scaletta del giorno ed esportazione dei dati"], dark: true })}</div></div></section>
 <section class="plans-band" aria-labelledby="pp"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per chi organizza")}<h2 id="pp">Per le wedding planner.</h2></div><p class="lead">Il prezzo per le planner lo decidiamo con chi partecipa alla prova pilota, sul lavoro vero e non su una tabella.</p></div>
 <div class="plans"><article class="plan"><div class="plan-top"><h3>Come funziona la prova pilota</h3></div><ol class="pilot-steps"><li><b>Ti candidi.</b><span>Tre passaggi su come lavori e quanti matrimoni segui.</span></li><li><b>Ci sentiamo.</b><span>Una chiamata di 25 minuti per capire il tuo metodo.</span></li><li><b>Lo usi sui tuoi matrimoni.</b><span>Gratis per tutta la prova pilota, con un confronto ogni mese su cosa migliorare.</span></li><li><b>Decidiamo il prezzo insieme.</b><span>Non parte nessun addebito senza il tuo consenso.</span></li></ol></article>
-${plan({ href: "richiesta-planner.html", name: "Prova pilota", price: "Gratuita", sub: "Per le prime 10 planner in Campania", items: ["Eventi illimitati durante la prova pilota", "Portale condiviso con gli sposi", "Template duplicabili", "Scadenze, acconti e saldi per evento", "Collaboratori con i loro permessi"], dark: true, tag: "10 posti", cta: "Candidati" })}</div></div></section>
+${plan({ href: "richiesta-planner.html", name: "Prova pilota", price: "Gratuita", sub: "Per le prime 10 planner", items: ["Eventi illimitati durante la prova pilota", "Portale condiviso con gli sposi", "Template duplicabili", "Scadenze, acconti e saldi per evento", "Collaboratori con i loro permessi"], dark: true, tag: "10 posti", cta: "Candidati" })}</div></div></section>
 <section class="faq-band mist" aria-labelledby="faq"><div class="wrap faq-in"><div>${eyebrow("Prima di iscriversi")}<h2 id="faq">Domande frequenti.</h2>
 <div class="faq">${faq.map(([q, a], i) => `<details${i === 0 ? " open" : ""}><summary>${q}</summary><p>${a}</p></details>`).join("")}</div></div>
 <figure class="side-pic">${img("pergolato")}<figcaption>${EVOC}</figcaption></figure></div></section>
@@ -247,8 +250,8 @@ requestPage({ file: "richiesta-coppia.html", title: "Lista d'attesa per le coppi
   h1: "Entrate in lista d'attesa.", lead: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Ci servono per prepararvi lo spazio giusto e per scrivervi appena c'è posto.",
   next: ["Vi scriviamo appena c'è posto per voi.", "Il piano gratuito resta gratuito. Il Completo costa 49 €, una volta sola.", "Iscriversi non costa nulla."],
   pic: "versione", form: FORM_COUPLE, done: ["Grazie, siete in lista.", "Vi scriviamo appena c'è posto per voi. Nel frattempo potete provare la demo, con dati di esempio."] });
-requestPage({ file: "richiesta-planner.html", title: "Prova pilota per le wedding planner | Nozze in Ordine", desc: "Candidati alla prova pilota gratuita di Nozze in Ordine per le prime 10 wedding planner in Campania.",
-  h1: "Candidati alla prova pilota.", lead: "Cerchiamo le prime 10 wedding planner in Campania per costruire lo strumento insieme. Tre passaggi su come lavori, circa cinque minuti.",
+requestPage({ file: "richiesta-planner.html", title: "Prova pilota per le wedding planner | Nozze in Ordine", desc: "Candidati alla prova pilota gratuita di Nozze in Ordine per le prime 10 wedding planner.",
+  h1: "Candidati alla prova pilota.", lead: "Cerchiamo le prime 10 wedding planner per costruire lo strumento insieme. Tre passaggi su come lavori, circa cinque minuti.",
   next: ["Leggiamo ogni candidatura e ti scriviamo per fissare una chiamata, se ti va.", "Durante la prova pilota non paghi nulla.", "Il prezzo dopo la prova pilota lo decidiamo insieme: niente addebiti senza il tuo consenso."],
   pic: "partiamo", form: FORM_PLANNER, done: ["Grazie, candidatura ricevuta.", "Ti scriviamo per raccontarti la prova pilota e, se ti va, fissare una chiamata. Nel frattempo puoi provare la demo, con dati di esempio."] });
 
@@ -257,11 +260,11 @@ write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati d
 <main id="main">
 <section class="price-hero" aria-labelledby="h1"><div class="wrap"><div class="legal">${eyebrow("Informativa")}<h1 id="h1">Privacy.</h1>
 <p class="lead">Cosa raccogliamo quando compili una richiesta o ti iscrivi alla lista d'attesa, a cosa serve e come puoi chiedere di cancellarlo.</p>
-<p class="small">Ultimo aggiornamento: 26 ottobre 2026</p>
+<p class="small">Ultimo aggiornamento: 14 novembre 2026</p>
 <h2>Chi tratta i dati</h2>
 <p>Il titolare del trattamento è Felice Mondo, persona fisica. Puoi scrivere a <a href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
 <h2>Quali dati raccogliamo</h2>
-<ul><li>Email, e se lo scrivi il vostro nome o quello dello studio</li><li>Se sei una coppia o una wedding planner, la provincia o la regione e la data della richiesta</li><li>Per le coppie: mese e anno del matrimonio, invitati e budget indicativi, se avete una planner, cosa avete già prenotato, cosa usate per organizzarvi, cosa vi pesa di più, se prendereste il piano Completo e se volete essere tra i primi a provarlo</li><li>Per le planner: sito o profilo Instagram, come lavori, matrimoni l'anno e in corso, strumenti e spesa in software, dove perdi più tempo, interesse per la prova pilota, se vuoi una chiamata e, se lo scrivi, il telefono</li><li>Le note che scegli di scriverci</li></ul>
+<ul><li>Email, e se lo scrivi il vostro nome o quello dello studio</li><li>Se sei una coppia o una wedding planner, la regione e la data della richiesta</li><li>Per le coppie: mese e anno del matrimonio, invitati e budget indicativi, se avete una planner, cosa avete già prenotato, cosa usate per organizzarvi, cosa vi pesa di più, se prendereste il piano Completo e se volete essere tra i primi a provarlo</li><li>Per le planner: sito o profilo Instagram, come lavori, matrimoni l'anno e in corso, strumenti e spesa in software, dove perdi più tempo, interesse per la prova pilota, se vuoi una chiamata e, se lo scrivi, il telefono</li><li>Le note che scegli di scriverci</li></ul>
 <p>Nella prima fase non raccogliamo dati su intolleranze alimentari o salute degli invitati. Per questo nel campo note degli invitati vi chiediamo di non scrivere dati sulla salute. Se in futuro li raccoglieremo, lo scriveremo qui e chiederemo un consenso specifico.</p>
 <h2>Perché li raccogliamo</h2>
 <p>Per risponderti, per scriverti quando c'è posto, per organizzare la prova pilota con le planner e per capire quali funzioni servono davvero. Le risposte le leggiamo noi e le contiamo in forma aggregata; non le vendiamo e non le cediamo. La base è il tuo consenso, che puoi revocare in qualsiasi momento.</p>
@@ -274,6 +277,8 @@ write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati d
 <p>Come ogni sito, i server che consegnano le pagine registrano per breve tempo dati tecnici come l'indirizzo IP. I caratteri tipografici sono ospitati sul nostro stesso sito. In questa fase non usiamo cookie di profilazione né strumenti di analisi.</p>
 <h2>Immagini</h2>
 <p>Le fotografie del sito sono evocative e non rappresentano eventi organizzati da Nozze in Ordine. La foto del chiostro di Santa Chiara nella pagina di accesso è di Sailko, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, da <a href="https://commons.wikimedia.org/wiki/File:Chiostro_maiolicato_delle_clarisse_di_s._chiara,_1739-42,_01.jpg">Wikimedia Commons</a>.</p>
+<p>Le altre fotografie vengono da <a href="https://unsplash.com/?utm_source=felice_mondo_progetti&amp;utm_medium=referral">Unsplash</a>, con la <a href="https://unsplash.com/license">licenza Unsplash</a>:</p>
+<ul class="credits">${PHOTO_CREDITS.map(([f, a, au, p]) => `<li><a href="${p}">${f.replace(/-/g, " ")}</a> di <a href="${au}">${a}</a></li>`).join("")}</ul>
 </div></div></section>
 </main>` + foot);
 

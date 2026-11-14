@@ -740,7 +740,7 @@
     } else if (s.step === 1) {
       title = "Parliamo della tua attività"; sub = "Uno spazio professionale per seguire più matrimoni, senza mescolare dati e persone.";
       body = [h("div", { class: "grid-form" }, input("full_name", "Nome e cognome", { req: true, auto: "name" }), input("business_name", "Nome studio", { opt: true, ph: "Come si chiama la tua attività?", auto: "organization" }),
-          input("city", "Area di lavoro", { ph: "Es. Campania", help: "Regione o città principali." }), input("weddings_per_year", "Matrimoni seguiti in un anno", { select: opts(LABEL.perYear), help: "Una fascia indicativa, modificabile in seguito." })),
+          input("city", "Area di lavoro", { ph: "Es. Toscana", help: "Regione o città principali." }), input("weddings_per_year", "Matrimoni seguiti in un anno", { select: opts(LABEL.perYear), help: "Una fascia indicativa, modificabile in seguito." })),
         h("fieldset", null, h("legend", null, "Come lavori?"), h("div", { class: "choices two" }, choice("work_mode", "autonomia", "Lavoro in autonomia"), choice("work_mode", "team", "Lavoro con un team"))),
         info("Uno spazio per il tuo lavoro", "Potrai gestire più eventi. Le note riservate al planner non saranno visibili alla coppia.")];
       foot = [h("span"), h("button", { class: "btn primary", type: "submit" }, "Continua")];
@@ -1991,7 +1991,9 @@
   /* ------------------------------------------------------------ lista d'attesa: richieste dai moduli del sito */
   var MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
   var WL = {
-    zona: { caserta: "Caserta", napoli: "Napoli", salerno: "Salerno", avellino: "Avellino", benevento: "Benevento", altra: "Altra regione" },
+    zona: { abruzzo: "Abruzzo", basilicata: "Basilicata", calabria: "Calabria", campania: "Campania", "emilia-romagna": "Emilia-Romagna", "friuli-venezia-giulia": "Friuli Venezia Giulia", lazio: "Lazio", liguria: "Liguria", lombardia: "Lombardia", marche: "Marche", molise: "Molise", piemonte: "Piemonte", puglia: "Puglia", sardegna: "Sardegna", sicilia: "Sicilia", toscana: "Toscana", "trentino-alto-adige": "Trentino-Alto Adige", umbria: "Umbria", "valle-d-aosta": "Valle d'Aosta", veneto: "Veneto", estero: "All'estero",
+      // valori delle iscrizioni arrivate quando il modulo chiedeva la provincia campana
+      caserta: "Caserta", napoli: "Napoli", salerno: "Salerno", avellino: "Avellino", benevento: "Benevento", altra: "Altra regione" },
     planner: { si: "ha una planner", cerchiamo: "cerca una planner", no: "senza planner" },
     prezzo49: { si: "Sì a 49 €", forse: "Forse a 49 €", no: "No a 49 €" },
     pilota: { si: "vuole la prova pilota", info: "vuole saperne di più", aggiornamenti: "solo aggiornamenti" }
