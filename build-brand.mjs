@@ -23,7 +23,7 @@ const TOKENS = `:root {
   --ground: ${C.avorio};      /* avorio caldo */
   --ink: ${C.inchiostro};
   --muted: ${C.muted};
-  --accent: ${C.bordeaux};      /* bordeaux: azione e campo pieno */
+  --accent: ${C.bordeaux};      /* bordeaux: marchio e campo pieno (l'azione principale è terracotta) */
   --accent-ink: ${C.bianco};
   --blu: ${C.blu};         /* blu ceramica: solo elementi grafici */
   --blu-ink: ${C.bluInk};     /* blu ceramica per testo, link e selezioni */
@@ -171,11 +171,11 @@ const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta n
 </div></div></section>
 
 <section class="section frame" id="colore" aria-labelledby="co-h"><div class="grid"><h2 class="g-head" id="co-h">Avorio, bordeaux e ceramica.</h2>
-<div class="g-text"><p class="lead">La palette viene dal brief creativo e dalla ceramica del chiostro: fondo caldo e neutro, un solo colore per l'azione, il blu per ciò che si può seguire o scegliere, terracotta e oliva per i dettagli. Il bordeaux resta quello del marchio e dei pulsanti.</p></div>
+<div class="g-text"><p class="lead">La palette viene dal brief creativo e dalla ceramica del chiostro: fondo caldo e neutro, un solo colore per l'azione, il blu per ciò che si può seguire o scegliere, l'oliva per i dettagli. Il terracotta è il colore dei pulsanti principali, su sito, dashboard ed email; il bordeaux è quello del marchio.</p></div>
 <ul class="swatches">
 ${sw("Avorio caldo", C.avorio, "Fondo della pagina")}
 ${sw("Inchiostro", C.inchiostro, "Testo", "#fff")}
-<li class="sw dark" style="--c:${C.bordeaux}"><b>Bordeaux</b><span>${C.bordeaux}</span><em>Azione, marchio, tessera in corso</em></li>
+<li class="sw dark" style="--c:${C.bordeaux}"><b>Bordeaux</b><span>${C.bordeaux}</span><em>Marchio, tessera in corso, criticità</em></li>
 <li class="sw dark" style="--c:${C.bluInk}"><b>Blu ceramica scuro</b><span>${C.bluInk}</span><em>Link e opzioni scelte</em></li>
 ${sw("Tessera", C.tessera, "Tessere non ancora posate")}
 ${sw("Tessera posata", C.posata, "Tessere passate, righe")}
@@ -255,7 +255,7 @@ ${pairs.map(([n, a, b, u]) => `<tr><td class="y">${n}</td><td class="n">${ratio(
 <section class="section frame" aria-labelledby="no-h"><div class="grid"><h2 data-rv class="g-head" id="no-h">Note e limiti.</h2>
 <ul class="notes">
 <li>Questa guida definisce l'aspetto, non il nome. La ricerca su UIBM e TMview non ha trovato risultati, ma non è un parere legale: prima del deposito serve un consulente in proprietà industriale, anche perché il nome è descrittivo.</li>
-<li>La palette e i caratteri seguono il brief creativo (avorio caldo, blu ceramica, terracotta, verde oliva, bordeaux per l'azione; DM Serif Display e DM Sans). I valori sono proposte: i contrasti sono verificati qui sopra.</li>
+<li>La palette e i caratteri seguono il brief creativo (avorio caldo, blu ceramica, terracotta per l'azione, verde oliva, bordeaux per il marchio; DM Serif Display e DM Sans). I valori sono proposte: i contrasti sono verificati qui sopra.</li>
 <li>Le reference del brief sono state aperte e lette solo per principi (numerazioni, tipografia, fotografia di luoghi veri): nessun asset, testo o layout è stato copiato.</li>
 <li>Non c'è un'area editoriale su ispirazioni e tradizioni: il brief la valuta solo se utile agli obiettivi, e per ora distrarrebbe dallo strumento.</li>
 <li>Le foto sono di Sailko (CC BY 3.0) e, per Villa Rufolo, Leandro Neumann Ciuffo (CC BY 2.0), da Wikimedia Commons: il credito è obbligatorio e compare in fondo alle pagine. Non sono immagini di Nozze in Ordine né di suoi clienti.</li>
