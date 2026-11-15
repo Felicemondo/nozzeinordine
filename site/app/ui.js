@@ -388,7 +388,8 @@
   var current = function () { var p = route(); return p[0] === "m" ? p[1] : null; };
   var wedding = function (id) { return state.weddings.filter(function (w) { return w.id === id; })[0]; };
   var isPlannerHere = function (w) { return state.me.role === "admin" || (w && w.my_role === "planner"); };
-  window.addEventListener("hashchange", function () { state.navOpen = false; render(); });
+  // Chiudere il menu toglie anche il blocco dello scorrimento dalla pagina (su telefono restava attivo dopo aver scelto una voce)
+  window.addEventListener("hashchange", function () { state.navOpen = false; document.body.classList.remove("nav-open"); render(); });
 
   /* ------------------------------------------------------------ pezzi comuni */
   function brand(tone) { return h("a", { class: "brand" + (tone ? " " + tone : ""), href: "#/", "aria-label": "Nozze in Ordine, torna all'inizio" }, h("span", { class: "mono", "aria-hidden": "true" }, "N"), h("span", null, "Nozze in Ordine")); }
@@ -2190,6 +2191,7 @@
   var renderId = 0;
   async function render() {
     var my = ++renderId;
+    if (!state.navOpen) document.body.classList.remove("nav-open");
     var p = route();
     try {
       var session = await api.session();
