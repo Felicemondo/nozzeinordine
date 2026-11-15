@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const OUT = dirname(fileURLToPath(import.meta.url));
 
 // Colori da brand/tokens.css
-const C = { ground: "#F5F0E7", tile: "#FBF8F2", laid: "#EBE4D6", grout: "#DCD2BF", ink: "#25241F", muted: "#514C45", accent: "#702F43", blu: "#5F8794", bluInk: "#386070", terra: "#B75F45", olive: "#465044" };
+const C = { ground: "#F5F0E7", tile: "#FBF8F2", laid: "#EBE4D6", grout: "#DCD2BF", ink: "#25241F", muted: "#514C45", accent: "#702F43", action: "#A9533B", blu: "#5F8794", bluInk: "#386070", terra: "#B75F45", olive: "#465044" };
 const SANS = "Arial,Helvetica,sans-serif", SERIF = "Georgia,'Times New Roman',serif";
 const SITE = "https://nozzeinordine.com";
 
@@ -15,7 +15,7 @@ const list = (items) => `<table role="presentation" cellpadding="0" cellspacing=
 <td valign="top" style="padding:0 12px 10px 0;font-family:${SERIF};font-size:15px;color:${C.terra};">0${n + 1}</td>
 <td valign="top" style="padding:0 0 10px;font-family:${SANS};font-size:15px;line-height:1.5;color:${C.ink};">${i}</td></tr>`).join("")}</table>`;
 const button = (label, url = "{{ .ConfirmationURL }}") => `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 28px;"><tr>
-<td bgcolor="${C.accent}" style="border-radius:3px;"><a href="${url}" style="display:inline-block;padding:15px 26px;font-family:${SANS};font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;">${label} &rarr;</a></td></tr></table>`;
+<td bgcolor="${C.action}" style="border-radius:3px;"><a href="${url}" style="display:inline-block;padding:15px 26px;font-family:${SANS};font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;">${label} &rarr;</a></td></tr></table>`;
 const code = () => `<p style="margin:8px 0 28px;font-family:${SERIF};font-size:34px;letter-spacing:6px;color:${C.accent};">{{ .Token }}</p>`;
 const fallback = p(`Se il pulsante non funziona, copia questo indirizzo nel browser:<br><span style="word-break:break-all;color:${C.bluInk};">{{ .ConfirmationURL }}</span>`, true);
 const hello = `Ciao{{ if .Data.full_name }} {{ .Data.full_name }}{{ end }},`;
