@@ -561,7 +561,7 @@
   }
   function authLayout(card, tone) {
     return h("div", { class: "auth" }, h("div", { class: "auth-card" }, brand(tone || "ceramica"), card),
-      h("figure", { class: "auth-pic" }, h("figcaption", null, "Chiostro di Santa Chiara, Napoli · foto Sailko, CC BY 3.0")));
+      h("figure", { class: "auth-pic", "aria-hidden": "true" }));
   }
   // La registrazione è aperta a tutti: chi ha un invito usa la stessa email a cui è arrivato
   function noAccount(invited) {

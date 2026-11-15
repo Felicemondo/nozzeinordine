@@ -578,3 +578,35 @@ picture { display: contents; }
   .brand { min-height: 44px; }
   .later a, .legal a, .faq a { padding-block: 4px; }
 }
+
+/* ---- Niente testo sulle foto e niente didascalie: testo su fondo pieno, foto a parte ---- */
+.hero, .hero.tall { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; min-height: 0; background: var(--avorio); color: var(--oliva); }
+.hero::after { content: none; }
+.hero-in { align-self: center; padding: clamp(56px, 7vw, 112px) clamp(24px, 4vw, 64px) clamp(56px, 7vw, 112px) var(--gut); }
+.hero h1, .hero.tall h1 { color: var(--ink); font-size: clamp(38px, 4.3vw, 66px); line-height: 1.04; max-width: 14ch; }
+.hero-p { color: var(--muted); max-width: 46ch; }
+.hero .fine { color: var(--muted); margin-top: 28px; }
+.hero-pic { position: relative; margin: 0; min-height: clamp(440px, 48vw, 700px); overflow: hidden; background: var(--sabbia); }
+.editorial { display: block; min-height: 0; padding: 0; background: var(--oliva); }
+.editorial::after { content: none; }
+.editorial figure { position: relative; margin: 0; aspect-ratio: 1440 / 420; overflow: hidden; }
+.editorial blockquote { position: static; width: auto; margin: 0; background: none; padding: clamp(28px, 3.6vw, 48px) var(--gut); text-align: center; }
+.project-pic, .side-pic, .inset-pic figure { margin: 0; }
+@media (max-width: 900px) {
+  .hero, .hero.tall { grid-template-columns: minmax(0, 1fr); }
+  .hero-in { padding: 36px var(--gut) 36px; }
+  .hero h1, .hero.tall h1 { max-width: none; }
+  .hero-pic { min-height: 0; aspect-ratio: 4 / 3; }
+  .hero .actions { margin-top: 28px; }
+}
+/* ---- Telefono: pagine più corte. Restano la foto d'apertura e una foto di respiro; le altre lasciano spazio al contenuto ---- */
+@media (max-width: 720px) {
+  .feat-pic, .split-grid .side-pic, .aside-in .side-pic, .faq-in .side-pic, .inset-pic, .glance-col > picture { display: none; }
+  .glance-col .ui { border-top: 1px solid var(--line); border-radius: 6px; }
+  .feat-text, .feat.right .feat-text { padding: 40px var(--gut) 44px; }
+  .feat .lead { margin-bottom: 24px; }
+  .editorial figure { aspect-ratio: 16 / 9; }
+  .editorial blockquote { padding: 24px var(--gut); }
+  .project, .split-list, .aside-band, .plans-band, .faq-band, .glance, .matrix, .journey, .closing, .cta-dark { padding-top: 48px; padding-bottom: 48px; }
+  h2 { margin-bottom: 12px; }
+}
