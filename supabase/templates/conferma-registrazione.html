@@ -1,0 +1,53 @@
+<!--
+  Email di conferma della registrazione (Supabase › Authentication › Email Templates › Confirm signup).
+  Oggetto: Conferma la tua email per entrare in Nozze in Ordine
+  Il testo cambia in base al ruolo scelto alla registrazione (coppia o wedding planner).
+-->
+<!doctype html>
+<html lang="it">
+<body style="margin:0;padding:0;background:#F5F0E7;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E7;">
+<tr><td align="center" style="padding:32px 16px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FBF8F2;border:1px solid #DCD2BF;">
+<tr><td style="padding:32px 32px 8px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#9B4A32;">Nozze in Ordine</td></tr>
+<tr><td style="padding:8px 32px 0;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">
+
+{{ if eq .Data.role "planner" }}
+<p style="margin:16px 0;">Ciao{{ if .Data.full_name }} {{ .Data.full_name }}{{ end }},</p>
+<p style="margin:16px 0;">grazie per la registrazione a Nozze in Ordine. Manca un solo passaggio: confermare che questa email è tua.</p>
+{{ else }}
+<p style="margin:16px 0;">Ciao{{ if .Data.full_name }} {{ .Data.full_name }}{{ end }},</p>
+<p style="margin:16px 0;">grazie per aver scelto Nozze in Ordine per il vostro matrimonio. Manca un solo passaggio: confermare che questa email è tua.</p>
+{{ end }}
+
+<p style="margin:28px 0;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#702F43;color:#FFFFFF;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:3px;">Conferma l'email ed entra</a></p>
+
+{{ if eq .Data.role "planner" }}
+<p style="margin:16px 0;">Al primo accesso crei il tuo spazio di lavoro. Poi puoi:</p>
+<ul style="margin:16px 0;padding-left:20px;">
+<li style="margin:6px 0;">aggiungere i matrimoni che segui, uno alla volta;</li>
+<li style="margin:6px 0;">invitare gli sposi nel loro portale;</li>
+<li style="margin:6px 0;">tenere budget, fornitori e scadenze di ogni evento nello stesso posto.</li>
+</ul>
+{{ else }}
+<p style="margin:16px 0;">Al primo accesso create il vostro spazio. Poi potete:</p>
+<ul style="margin:16px 0;padding-left:20px;">
+<li style="margin:6px 0;">inserire la data e trovare le scadenze già calcolate;</li>
+<li style="margin:6px 0;">impostare il budget e aggiungere i primi invitati;</li>
+<li style="margin:6px 0;">invitare il partner, così lavorate sulle stesse informazioni.</li>
+</ul>
+{{ end }}
+
+<p style="margin:16px 0;font-size:14px;color:#514C45;">Se il pulsante non funziona, copia questo indirizzo nel browser:<br><span style="word-break:break-all;">{{ .ConfirmationURL }}</span></p>
+<p style="margin:16px 0;font-size:14px;color:#514C45;">Se non hai chiesto tu questa registrazione, ignora questa email: senza conferma l'account non viene attivato.</p>
+</td></tr>
+<tr><td style="padding:24px 32px 32px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#514C45;border-top:1px solid #DCD2BF;">
+Felice, di Nozze in Ordine<br>
+Questa casella non riceve risposte. Per scriverci: <a href="mailto:info@nozzeinordine.com" style="color:#386070;">info@nozzeinordine.com</a><br>
+<a href="https://nozzeinordine.com/privacy" style="color:#386070;">Privacy</a> · <a href="https://nozzeinordine.com/termini" style="color:#386070;">Termini</a>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
