@@ -1,53 +1,43 @@
 <!--
-  Email di conferma della registrazione (Supabase › Authentication › Email Templates › Confirm signup).
+  Modello Supabase: Confirm signup
   Oggetto: Conferma la tua email per entrare in Nozze in Ordine
-  Il testo cambia in base al ruolo scelto alla registrazione (coppia o wedding planner).
+  File generato da build-email.mjs: le modifiche si fanno lì.
 -->
 <!doctype html>
 <html lang="it">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Conferma la tua email per entrare in Nozze in Ordine</title></head>
 <body style="margin:0;padding:0;background:#F5F0E7;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E7;">
-<tr><td align="center" style="padding:32px 16px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FBF8F2;border:1px solid #DCD2BF;">
-<tr><td style="padding:32px 32px 8px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#9B4A32;">Nozze in Ordine</td></tr>
-<tr><td style="padding:8px 32px 0;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">
-
-{{ if eq .Data.role "planner" }}
-<p style="margin:16px 0;">Ciao{{ if .Data.full_name }} {{ .Data.full_name }}{{ end }},</p>
-<p style="margin:16px 0;">grazie per la registrazione a Nozze in Ordine. Manca un solo passaggio: confermare che questa email è tua.</p>
-{{ else }}
-<p style="margin:16px 0;">Ciao{{ if .Data.full_name }} {{ .Data.full_name }}{{ end }},</p>
-<p style="margin:16px 0;">grazie per aver scelto Nozze in Ordine per il vostro matrimonio. Manca un solo passaggio: confermare che questa email è tua.</p>
-{{ end }}
-
-<p style="margin:28px 0;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#702F43;color:#FFFFFF;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:3px;">Conferma l'email ed entra</a></p>
-
-{{ if eq .Data.role "planner" }}
-<p style="margin:16px 0;">Al primo accesso crei il tuo spazio di lavoro. Poi puoi:</p>
-<ul style="margin:16px 0;padding-left:20px;">
-<li style="margin:6px 0;">aggiungere i matrimoni che segui, uno alla volta;</li>
-<li style="margin:6px 0;">invitare gli sposi nel loro portale;</li>
-<li style="margin:6px 0;">tenere budget, fornitori e scadenze di ogni evento nello stesso posto.</li>
-</ul>
-{{ else }}
-<p style="margin:16px 0;">Al primo accesso create il vostro spazio. Poi potete:</p>
-<ul style="margin:16px 0;padding-left:20px;">
-<li style="margin:6px 0;">inserire la data e trovare le scadenze già calcolate;</li>
-<li style="margin:6px 0;">impostare il budget e aggiungere i primi invitati;</li>
-<li style="margin:6px 0;">invitare il partner, così lavorate sulle stesse informazioni.</li>
-</ul>
-{{ end }}
-
-<p style="margin:16px 0;font-size:14px;color:#514C45;">Se il pulsante non funziona, copia questo indirizzo nel browser:<br><span style="word-break:break-all;">{{ .ConfirmationURL }}</span></p>
-<p style="margin:16px 0;font-size:14px;color:#514C45;">Se non hai chiesto tu questa registrazione, ignora questa email: senza conferma l'account non viene attivato.</p>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Un solo passaggio e il vostro spazio è pronto.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#F5F0E7"><tr><td align="center" style="padding:36px 16px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;">
+<tr><td style="padding:0 4px 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+<td valign="middle" width="44"><img src="https://nozzeinordine.com/apple-touch-icon.png" width="36" height="36" alt="" style="display:block;border:0;"></td>
+<td valign="middle" style="font-family:Georgia,'Times New Roman',serif;font-size:21px;color:#702F43;">Nozze in Ordine</td>
+<td valign="middle" align="right"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td width="14" height="14" bgcolor="#702F43" style="font-size:0;line-height:0;">&nbsp;</td><td width="4" style="font-size:0;line-height:0;">&nbsp;</td><td width="14" height="14" bgcolor="#5F8794" style="font-size:0;line-height:0;">&nbsp;</td><td width="4" style="font-size:0;line-height:0;">&nbsp;</td><td width="14" height="14" bgcolor="#B75F45" style="font-size:0;line-height:0;">&nbsp;</td><td width="4" style="font-size:0;line-height:0;">&nbsp;</td><td width="14" height="14" bgcolor="#465044" style="font-size:0;line-height:0;">&nbsp;</td><td width="4" style="font-size:0;line-height:0;">&nbsp;</td><td width="14" height="14" bgcolor="#EBE4D6" style="font-size:0;line-height:0;">&nbsp;</td><td width="4" style="font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr></table></td></tr>
+<tr><td bgcolor="#FBF8F2" style="border:1px solid #DCD2BF;border-top:3px solid #702F43;padding:36px 32px 20px;">
+<p style="margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#386070;">Benvenuti</p>
+<h1 style="margin:0 0 22px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:30px;line-height:1.15;color:#25241F;">Il primo tassello è confermare l'email.</h1>
+<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">Ciao{{ if .Data.full_name }} {{ .Data.full_name }}{{ end }},</p>{{ if eq .Data.role "planner" }}<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">grazie per la registrazione a Nozze in Ordine. Manca un solo passaggio: confermare che questa email è tua.</p><table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 28px;"><tr>
+<td bgcolor="#702F43" style="border-radius:3px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 26px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;">Conferma l'email ed entra &rarr;</a></td></tr></table><p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">Al primo accesso crei il tuo spazio di lavoro. Poi puoi:</p><table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;"><tr>
+<td valign="top" style="padding:0 12px 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#B75F45;">01</td>
+<td valign="top" style="padding:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#25241F;">Aggiungere i matrimoni che segui, uno alla volta.</td></tr><tr>
+<td valign="top" style="padding:0 12px 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#B75F45;">02</td>
+<td valign="top" style="padding:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#25241F;">Invitare gli sposi nel loro portale.</td></tr><tr>
+<td valign="top" style="padding:0 12px 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#B75F45;">03</td>
+<td valign="top" style="padding:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#25241F;">Tenere budget, fornitori e scadenze di ogni evento nello stesso posto.</td></tr></table>{{ else }}<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">grazie per aver scelto Nozze in Ordine per il vostro matrimonio. Manca un solo passaggio: confermare che questa email è tua.</p><table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 28px;"><tr>
+<td bgcolor="#702F43" style="border-radius:3px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 26px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;text-decoration:none;">Conferma l'email ed entra &rarr;</a></td></tr></table><p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#25241F;">Al primo accesso create il vostro spazio. Poi potete:</p><table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;"><tr>
+<td valign="top" style="padding:0 12px 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#B75F45;">01</td>
+<td valign="top" style="padding:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#25241F;">Inserire la data e trovare le scadenze già calcolate.</td></tr><tr>
+<td valign="top" style="padding:0 12px 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#B75F45;">02</td>
+<td valign="top" style="padding:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#25241F;">Impostare il budget e aggiungere i primi invitati.</td></tr><tr>
+<td valign="top" style="padding:0 12px 10px 0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#B75F45;">03</td>
+<td valign="top" style="padding:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#25241F;">Invitare il partner, così lavorate sulle stesse informazioni.</td></tr></table>{{ end }}<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#514C45;">Se il pulsante non funziona, copia questo indirizzo nel browser:<br><span style="word-break:break-all;color:#386070;">{{ .ConfirmationURL }}</span></p><p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#514C45;">Se non hai chiesto tu questa registrazione, ignora questa email: senza conferma l'account non viene attivato.</p>
 </td></tr>
-<tr><td style="padding:24px 32px 32px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#514C45;border-top:1px solid #DCD2BF;">
+<tr><td bgcolor="#465044" style="padding:22px 32px;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:17px;line-height:1.4;color:#E8E3DA;">Ogni dettaglio al suo posto. Ogni momento da vivere.</td></tr>
+<tr><td style="padding:22px 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.7;color:#514C45;">
 Felice, di Nozze in Ordine<br>
 Questa casella non riceve risposte. Per scriverci: <a href="mailto:info@nozzeinordine.com" style="color:#386070;">info@nozzeinordine.com</a><br>
-<a href="https://nozzeinordine.com/privacy" style="color:#386070;">Privacy</a> · <a href="https://nozzeinordine.com/termini" style="color:#386070;">Termini</a>
+<a href="https://nozzeinordine.com/privacy" style="color:#386070;">Privacy</a> &nbsp;·&nbsp; <a href="https://nozzeinordine.com/termini" style="color:#386070;">Termini</a> &nbsp;·&nbsp; <a href="https://nozzeinordine.com" style="color:#386070;">nozzeinordine.com</a>
 </td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>
+</table></td></tr></table>
+</body></html>
