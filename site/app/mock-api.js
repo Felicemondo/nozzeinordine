@@ -250,6 +250,11 @@
       if (table === "seating_tables") db.guests.forEach(function (g) { if (g.table_id === id) { g.table_id = null; g.seat_number = null; } });
     },
 
+    requestPlan: async function () {},
+    listPlanRequests: async function () { return []; },
+    setPlanRequestStatus: async function () {},
+    setWeddingPlan: async function (wid, plan) { db.weddings.forEach(function (w) { if (w.id === wid) w.plan = plan; }); },
+    setProfilePlan: async function (uid, plan) { db.profiles.forEach(function (p) { if (p.id === uid) p.plan = plan; }); },
     listProfiles: async function () { if (me.role !== "admin") throw new Error("Non hai i permessi per questa operazione."); return clone(db.profiles); },
     setRole: async function (u, role) {
       if (me.role !== "admin") throw new Error("Solo un amministratore può cambiare i ruoli");

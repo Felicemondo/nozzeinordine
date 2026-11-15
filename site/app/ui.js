@@ -447,6 +447,33 @@
   function navLink(href, label, ic, active) {
     return h("a", { href: "#/" + href, class: "nav-a" + (active ? " on" : ""), "aria-current": active ? "page" : null }, icon(ic), h("span", null, label));
   }
+  /* ---- piani: i limiti li applica il database, qui si spiegano e si chiede il passaggio ---- */
+  var PLAN = { gratis: "Gratis", completo: "Completo", planner: "Planner", prova: "Prova gratuita", team: "Team", studio: "Studio", libero: "Senza limiti" };
+  var PLAN_CAPS = { prova: [15, 3], planner: [5, 0], team: [15, 3] };
+  function isGratis(w) { return !!w && w.plan === "gratis"; }
+  function askPlan(plan, w) {
+    return attempt(function () { return api.requestPlan(plan, w ? w.id : null); }, "Richiesta inviata. Ti scriviamo per email con i prossimi passi.").catch(function () {});
+  }
+  function planLock(w, title, text) {
+    return [pageHead(title, null), panel("Incluso nel piano Completo", text, null, h("div", { class: "btn-row" },
+      canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary") : null, linkBtn("../prezzi.html", "Vedi i piani", "soft")))];
+  }
+  function gratisBanner(w) {
+    return h("div", { class: "alert info" }, icon("lock"), h("div", null,
+      h("p", null, h("b", null, "Piano Gratis"), " · fino a 50 invitati e 3 fornitori. Tavoli, programma del giorno, confronto dei preventivi e invito alla wedding planner sono nel piano Completo."),
+      h("div", { class: "btn-row" }, canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary sm") : null, linkBtn("../prezzi.html", "Vedi i piani", "soft sm"))));
+  }
+  function planPanel() {
+    var me = state.me, p = me.plan || "libero", caps = PLAN_CAPS[p], today = new Date().toISOString().slice(0, 10);
+    var days = me.trial_ends_at ? Math.ceil((new Date(me.trial_ends_at).getTime() - Date.now()) / 864e5) : 0;
+    var active = state.weddings.filter(function (w) { return w.my_role === "planner" && (!w.wedding_date || w.wedding_date >= today); }).length;
+    var line = p === "prova" ? (days > 0 ? "Prova gratuita: " + plural(days, "giorno rimasto", "giorni rimasti") + "." : "La prova gratuita è terminata. I matrimoni che segui restano disponibili; per crearne di nuovi serve un piano.")
+      : p === "libero" ? "Il tuo account non ha limiti di piano." : "Piano " + PLAN[p] + ".";
+    var asks = p === "prova" ? ["planner", "team"] : p === "planner" ? ["team"] : p === "team" ? ["studio"] : [];
+    return panel("Il tuo piano", line, null, h("div", { class: "stack-sm" },
+      caps ? h("p", { class: "small" }, h("b", null, "Matrimoni attivi"), h("br"), active + " su " + caps[0] + (caps[1] ? " · fino a " + caps[1] + " collaboratori" : " · i collaboratori sono nel piano Team")) : null,
+      asks.length ? h("div", { class: "btn-row" }, asks.map(function (k, i) { return btn("Chiedi il piano " + PLAN[k], function () { askPlan(k); }, i === 0 && p === "prova" ? "primary sm" : "soft sm"); }), linkBtn("../prezzi.html", "Vedi i piani", "soft sm")) : null), "compact");
+  }
   function weddingSections(w) {
     var items = [["panoramica", "Panoramica", "home"], ["scadenze", "Da fare", "todo"], ["budget", "Budget e pagamenti", "wallet"], ["fornitori", "Fornitori e preventivi", "briefcase"],
       ["invitati", "Invitati e tavoli", "users"], ["scaletta", "Programma del giorno", "calendar"], ["impostazioni", "Dati del matrimonio", "file"]];
@@ -1336,6 +1363,11 @@
 
   async function guestsView(w, sub) {
     if (sub === "importa") return importView(w);
+    if (isGratis(w) && sub !== "elenco") {
+      var lk = planLock(w, "Invitati e tavoli", "La sala in pianta, i tavoli da 8 a 12 posti e un nome su ogni posto. L'elenco degli invitati resta disponibile, fino a 50 persone.");
+      lk.splice(1, 0, subTabs("m/" + w.id + "/invitati", [["", "La sala"], ["elenco", "Elenco invitati"], ["tavoli", "Tavolo per tavolo"]], sub === "tavoli" ? "tavoli" : ""));
+      return lk;
+    }
     var res = await Promise.all([api.list("guests", w.id), api.list("seating_tables", w.id)]);
     var guests = res[0], tables = res[1], tab = sub === "elenco" || sub === "tavoli" ? sub : "";
     state.hc[w.id] = headcount(guests);
@@ -1636,6 +1668,7 @@
     setTimeout(function () { if (!matchMedia("print").matches) done(); }, 1000);
   }
   async function timelineView(w) {
+    if (isGratis(w)) return planLock(w, "Programma del giorno", "Orari, luoghi e responsabili della giornata, da esportare e stampare per fornitori e collaboratori.");
     var items = await api.list("timeline_items", w.id), ro = !canEdit(w), pf = store.get("nio-party") || "";
     var fields = timelineFields(w);
     var add = ro ? null : btn("Aggiungi momento", function () { editDialog("Nuovo momento", fields, { party: "comune" }, "Aggiungi", function (d) { d.wedding_id = w.id; return api.insert("timeline_items", d); }, "Aggiunto."); }, "primary", "plus");
@@ -1892,7 +1925,7 @@
     return [pageHead("Il mio profilo", "Dati personali, promemoria e sicurezza in un solo sguardo.", null, chipInfo(role === "admin" ? "Accesso amministrativo" : role === "planner" ? "Account globale" : ws[0] ? weddingMeta(ws[0]) : "Account", role === "coppia" && ws[0] ? "calendar" : "user")), errBox,
       h("div", { class: "split profile" },
         h("div", { class: "stack" }, panel(role === "coppia" ? "Dati personali" : "I tuoi dati", "Modifica i dati associati al tuo account.", null, f), role === "admin" ? null : roleCard),
-        h("div", { class: "stack" }, role === "admin" ? roleCard : null,
+        h("div", { class: "stack" }, role === "admin" ? roleCard : null, role === "planner" ? planPanel() : null,
           panel("Promemoria", "Ricevi avvisi prima delle scadenze.", role === "coppia" ? null : more("#/avvisi", "Vedi tutti"), h("div", { class: "stack-sm" }, nf, h("p", { class: "lbl" }, "Notifiche su questo dispositivo"), deviceBox(true)), "compact"),
           panel("Accesso e sicurezza", "Gestisci account e accessi.", btn("Esci", async function () { await attempt(api.signOut); }, "soft sm"), h("div", { class: "stack-sm" }, pw,
             h("p", { class: "small" }, h("b", null, "Account creato"), h("br"), me.created_at ? fmtDate(me.created_at, true) : "—"),
@@ -1945,10 +1978,10 @@
 
   /* ------------------------------------------------------------ amministrazione */
   async function adminView(sub) {
-    var res = await Promise.all([api.listProfiles(), api.listWaitlist()]);
+    var res = await Promise.all([api.listProfiles(), api.listWaitlist(), api.listPlanRequests()]);
     var profiles = res[0], wait = res[1], ws = state.weddings;
     var count2 = function (r) { return profiles.filter(function (p) { return p.role === r; }).length; };
-    var tabs = h("nav", { class: "seg pills", "aria-label": "Sezioni di amministrazione" }, [["", "Riepilogo"], ["utenti", "Utenti e ruoli"], ["lista", "Lista d'attesa"]].map(function (t) {
+    var tabs = h("nav", { class: "seg pills", "aria-label": "Sezioni di amministrazione" }, [["", "Riepilogo"], ["utenti", "Utenti e ruoli"], ["piani", "Piani"], ["lista", "Lista d'attesa"]].map(function (t) {
       return h("a", { href: "#/admin" + (t[0] ? "/" + t[0] : ""), class: (sub || "") === t[0] ? "on" : null, "aria-current": (sub || "") === t[0] ? "page" : null }, t[1]);
     }));
     var roleLine = count2("coppia") + " coppie · " + count2("planner") + " planner · " + count2("admin") + " amministratori";
@@ -1972,6 +2005,48 @@
               h("td", null, p.created_at ? fmtDate(p.created_at) : h("span", { class: "warn" }, "Non disponibile")),
               h("td", null, p.id === state.me.id ? h("span", { class: "muted small" }, "Il tuo account") : btn("Modifica ruolo", function () { editRole(p); }, "primary sm")));
           })))), h("p", { class: "muted small pad-t" }, "Ogni cambio di ruolo chiede una conferma. Non puoi togliere a te stesso il ruolo di amministratore."))];
+    }
+    if (sub === "piani") {
+      var reqs = res[2], byU = {}, byW = {};
+      profiles.forEach(function (p) { byU[p.id] = p; }); ws.forEach(function (w) { byW[w.id] = w; });
+      var pick = async function (title, who, options, cur, save) {
+        var r = await dialog(title, h("div", { class: "dlg-body" }, h("p", null, who),
+          field({ name: "plan", label: "Piano", type: "select", options: options }, cur),
+          h("p", { class: "muted small" }, "Il cambio vale subito. Assegna un piano a pagamento solo dopo aver ricevuto il pagamento.")),
+          [h("button", { class: "btn ghost", value: "no", formnovalidate: true }, "Annulla"), h("button", { class: "btn primary", value: "ok" }, "Applica il piano")],
+          async function (form) { await save(form.elements.plan.value); });
+        if (r.value === "ok") { toast("Piano aggiornato."); await loadBase(); render(); }
+      };
+      var W_OPTS = [["gratis", "Gratis"], ["completo", "Completo"], ["planner", "Planner (creato da una planner)"]];
+      var P_OPTS = [["prova", "Prova gratuita (riparte da 30 giorni)"], ["planner", "Planner"], ["team", "Team"], ["studio", "Studio"], ["libero", "Senza limiti"]];
+      var editW = function (w) { return pick("Piano del matrimonio", "Matrimonio: " + w.title, W_OPTS, w.plan, function (v) { return api.setWeddingPlan(w.id, v); }); };
+      var editP = function (p) { return pick("Piano della planner", "Planner: " + (p.full_name || p.email), P_OPTS, p.plan, function (v) { return api.setProfilePlan(p.id, v, v === "prova" ? 30 : null); }); };
+      var grant = async function (x) {
+        await attempt(async function () {
+          if (x.plan === "completo") { if (!x.wedding_id) throw new Error("La richiesta non indica un matrimonio."); await api.setWeddingPlan(x.wedding_id, "completo"); }
+          else await api.setProfilePlan(x.user_id, x.plan, null);
+          await api.setPlanRequestStatus(x.id, "attivata");
+        }, "Piano attivato.");
+        await loadBase(); render();
+      };
+      var close = async function (x) { await attempt(function () { return api.setPlanRequestStatus(x.id, "chiusa"); }, "Richiesta chiusa."); render(); };
+      var open = reqs.filter(function (x) { return x.stato === "nuova"; }), planners = profiles.filter(function (p) { return p.role === "planner"; });
+      var table = function (cap, heads, rows) { return h("div", { class: "tscroll" }, h("table", { class: "tbl" }, h("caption", { class: "sr" }, cap),
+        h("thead", null, h("tr", null, heads.map(function (x) { return h("th", { scope: "col" }, x); }))), h("tbody", null, rows))); };
+      return [pageHead("Piani", "Richieste di passaggio e piano di ogni matrimonio e di ogni planner.", null, chipInfo("Amministrazione", "lock")), tabs,
+        panel("Richieste da gestire", "Attiva il piano dopo aver ricevuto il pagamento.", badge(plural(open.length, "richiesta", "richieste"), ""), open.length ? table("Richieste", ["Utente", "Email", "Piano chiesto", "Matrimonio", "Data", "Azione"], open.map(function (x) {
+          var u = byU[x.user_id] || {}, w = byW[x.wedding_id];
+          return h("tr", null, h("th", { scope: "row" }, u.full_name || "—"), h("td", null, u.email || "—"), h("td", null, badge(PLAN[x.plan] || x.plan, "plain")), h("td", null, w ? w.title : "—"), h("td", null, fmtDate(x.created_at)),
+            h("td", null, h("div", { class: "btn-row" }, btn("Attiva", function () { grant(x); }, "primary sm"), btn("Chiudi", function () { close(x); }, "soft sm"))));
+        })) : empty("Nessuna richiesta", "Quando qualcuno chiede un piano lo trovi qui.", null, "table")),
+        panel("Matrimoni", null, badge(plural(ws.length, "matrimonio", "matrimoni"), ""), ws.length ? table("Matrimoni", ["Matrimonio", "Data", "Piano", "Azione"], ws.map(function (w) {
+          return h("tr", null, h("th", { scope: "row" }, w.title), h("td", null, w.wedding_date ? fmtDate(w.wedding_date) : "—"), h("td", null, badge(PLAN[w.plan] || "—", w.plan === "gratis" ? "plain" : "solid-bord")),
+            h("td", null, btn("Cambia piano", function () { editW(w); }, "soft sm")));
+        })) : empty("Nessun matrimonio", null, null, "table")),
+        panel("Wedding planner", null, badge(plural(planners.length, "planner", "planner"), ""), planners.length ? table("Wedding planner", ["Planner", "Email", "Piano", "Fine prova", "Azione"], planners.map(function (p) {
+          return h("tr", null, h("th", { scope: "row" }, p.full_name || "—"), h("td", null, p.email), h("td", null, badge(PLAN[p.plan] || "—", p.plan === "prova" ? "plain" : "solid-bord")),
+            h("td", null, p.plan === "prova" && p.trial_ends_at ? fmtDate(p.trial_ends_at) : "—"), h("td", null, btn("Cambia piano", function () { editP(p); }, "soft sm")));
+        })) : empty("Nessuna planner registrata", null, null, "table"))];
     }
     if (sub === "lista") return waitlistView(wait, tabs);
     var latest = wait.slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }).slice(0, 3);
@@ -2140,6 +2215,7 @@
           if ((sec === "note" || sec === "persone") && !isPlannerHere(w)) view = overview;
           if (!root.querySelector(".shell")) root.replaceChildren(shell(h("p", { class: "loading" }, "Carico…")));
           content = await view(w, p[3]);
+          if (view === overview && isGratis(w) && Array.isArray(content)) content.splice(1, 0, gratisBanner(w));
           if (!canEdit(w) && view !== guestsView && view !== overview && Array.isArray(content)) content.splice(1, 0, h("div", { class: "alert info ro-note" }, icon("eye"),
             h("div", null, h("b", null, "Sola lettura"), h("p", null, "Questo matrimonio è seguito da una wedding planner: potete consultare tutto e modificare invitati e tavoli."))));
         }

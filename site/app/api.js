@@ -60,7 +60,7 @@
     me: async function () {
       var u = ok(await sb.auth.getUser()).user;
       if (!u) return null;
-      var p = ok(await sb.from("profiles").select("id, role, full_name, email, phone, business_name, city, notify_days, weddings_per_year, work_mode, created_at").eq("id", u.id).maybeSingle());
+      var p = ok(await sb.from("profiles").select("id, role, full_name, email, phone, business_name, city, notify_days, weddings_per_year, work_mode, created_at, plan, trial_ends_at").eq("id", u.id).maybeSingle());
       return p || { id: u.id, role: "coppia", full_name: "", email: u.email, phone: "", business_name: "", city: "", notify_days: 3 };
     },
     updateMyProfile: async function (id, patch) {
@@ -126,6 +126,16 @@
     /* ---- amministrazione ---- */
     listProfiles: async function () { return ok(await sb.from("profiles").select("*").order("created_at", { ascending: false })); },
     setRole: async function (uid, role) { ok(await sb.rpc("admin_set_role", { target: uid, new_role: role })); },
+    /* ---- piani: gli utenti li chiedono, l'amministrazione li assegna ---- */
+    requestPlan: async function (plan, wid) {
+      var r = await sb.from("plan_requests").insert({ plan: plan, wedding_id: wid || null });
+      if (r.error && /duplicate key/i.test(r.error.message || "")) throw new Error("La richiesta è già stata inviata: ti scriviamo per email.");
+      ok(r);
+    },
+    listPlanRequests: async function () { return ok(await sb.from("plan_requests").select("*").order("created_at", { ascending: false })); },
+    setPlanRequestStatus: async function (id, stato) { ok(await sb.from("plan_requests").update({ stato: stato }).eq("id", id)); },
+    setWeddingPlan: async function (wid, plan) { ok(await sb.rpc("admin_set_wedding_plan", { target: wid, new_plan: plan })); },
+    setProfilePlan: async function (uid, plan, trialDays) { ok(await sb.rpc("admin_set_profile_plan", { target: uid, new_plan: plan, trial_days: trialDays || null })); },
     listWaitlist: async function () { return ok(await sb.from("waitlist").select("*").order("created_at", { ascending: false })); },
     setWaitlistStatus: async function (id, stato) { ok(await sb.from("waitlist").update({ stato: stato }).eq("id", id)); }
   };
