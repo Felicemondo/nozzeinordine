@@ -358,7 +358,7 @@ legalPage({ file: "privacy.html", title: "Informativa privacy | Nozze in Ordine"
 <h2>14. Modifiche</h2>
 <p>Se questa informativa cambia in modo sostanziale, lo scriviamo qui e avvisiamo per email chi ha un account.</p>
 <h2>Immagini</h2>
-<p>Le fotografie del sito sono evocative e non rappresentano eventi organizzati da Nozze in Ordine. La foto del chiostro di Santa Chiara nella pagina di accesso è di Sailko, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, da <a href="https://commons.wikimedia.org/wiki/File:Chiostro_maiolicato_delle_clarisse_di_s._chiara,_1739-42,_01.jpg">Wikimedia Commons</a>.</p>
+<p>Le fotografie del sito sono evocative e non rappresentano eventi organizzati da Nozze in Ordine.</p>
 <p>Le altre fotografie vengono da <a href="https://unsplash.com/?utm_source=felice_mondo_progetti&amp;utm_medium=referral">Unsplash</a>, con la <a href="https://unsplash.com/license">licenza Unsplash</a>:</p>
 <ul class="credits">${PHOTO_CREDITS.map(([f, a, au, p]) => `<li><a href="${p}">${f.replace(/-/g, " ")}</a> di <a href="${au}">${a}</a></li>`).join("")}</ul>` });
 
