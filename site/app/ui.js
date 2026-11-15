@@ -376,7 +376,7 @@
       { name: "household", label: "Nucleo familiare", max: 120, placeholder: "Es. Famiglia Russo", help: "Una partecipazione e una bomboniera per nucleo." },
       { name: "rsvp", label: "Risposta", type: "select", options: opts(LABEL.rsvp) },
       { name: "menu", label: "Menù", type: "select", options: opts(LABEL.menu) },
-      { name: "allergies", label: "Intolleranze e allergie", type: "chips", options: ALLERGIES, wide: true },
+      { name: "allergies", label: "Intolleranze e allergie", type: "chips", options: ALLERGIES, wide: true, help: "Solo ciò che l'invitato vi ha indicato, e solo per preparare il menù." },
       { name: "allergies_note", label: "Altre intolleranze o allergie", max: 200, wide: true, required: true, placeholder: "Es. kiwi, nichel" },
       { name: "notes", label: "Note", max: 500, wide: true, placeholder: "Es. arriva dopo la cerimonia" }
     ];
@@ -535,12 +535,13 @@
     return h("div", { class: "auth" }, h("div", { class: "auth-card" }, brand(tone || "ceramica"), card),
       h("figure", { class: "auth-pic" }, h("figcaption", null, "Chiostro di Santa Chiara, Napoli · foto Sailko, CC BY 3.0")));
   }
-  // Gli account si aprono dalla lista d'attesa: chi non ha un invito compila il modulo sul sito
+  // La registrazione è aperta a tutti: chi ha un invito usa la stessa email a cui è arrivato
   function noAccount(invited) {
-    return h("div", { class: "no-account" }, h("h2", null, invited ? "Non hai ricevuto un invito?" : "Non hai ancora un account?"),
-      h("p", null, "Gli accessi si aprono dalla lista d'attesa: compila il modulo sul sito e ti scriviamo noi."),
-      h("div", { class: "choices two" }, linkBtn("../richiesta-coppia.html", "Siamo una coppia", "soft"), linkBtn("../richiesta-planner.html", "Sono una planner", "soft")),
-      invited ? null : h("p", { class: "small" }, "Hai ricevuto un invito a un matrimonio? ", h("a", { href: "#/registrati" }, "Crea l'account con l'email invitata")));
+    if (invited) return h("p", { class: "small" }, "Registrandoti accetti i termini e confermi di avere almeno 18 anni.");
+    return h("div", { class: "no-account" }, h("h2", null, "Non hai ancora un account?"),
+      h("p", null, "Crearlo è gratuito e non serve la carta di credito."),
+      h("div", { class: "choices two" }, linkBtn("#/registrati", "Crea un account", "soft"), linkBtn("demo.html", "Guarda la demo", "soft")),
+      h("p", { class: "small" }, "Hai ricevuto un invito a un matrimonio? Registrati con la stessa email a cui è arrivato."));
   }
   function authScreen(kind) {
     var msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
@@ -554,20 +555,20 @@
         field({ name: "full_name", label: "Nome e cognome", required: true, max: 120, autocomplete: "name", placeholder: "Ad esempio: Anna Russo" }),
         field({ name: "email", label: "Email", type: "email", required: true, autocomplete: "email", placeholder: "nome@esempio.it" }),
         passwordField("password", "Password", "new-password", "Almeno 8 caratteri."),
-        h("label", { class: "check" }, h("input", { type: "checkbox", name: "privacy", required: true }), h("span", null, "Ho letto l'", h("a", { href: "../privacy.html", target: "_blank", rel: "noopener" }, "informativa privacy"), ".")),
+        h("label", { class: "check" }, h("input", { type: "checkbox", name: "privacy", required: true }), h("span", null, "Ho letto l'", h("a", { href: "../privacy.html", target: "_blank", rel: "noopener" }, "informativa privacy"), " e accetto i ", h("a", { href: "../termini.html", target: "_blank", rel: "noopener" }, "termini di servizio"), ".")),
         h("button", { class: "btn primary block", type: "submit" }, "Crea l'account"), msg);
       f.addEventListener("submit", async function (e) {
         e.preventDefault();
         var d = { full_name: f.elements.full_name.value.trim(), email: f.elements.email.value.trim(), password: f.elements.password.value, role: f.elements.role.value };
         if (!d.full_name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) return say("Controlla nome ed email: l'indirizzo sembra incompleto.", true);
         if (d.password.length < 8) return say("La password deve avere almeno 8 caratteri.", true);
-        if (!f.elements.privacy.checked) return say("Spunta la casella dell'informativa privacy.", true);
+        if (!f.elements.privacy.checked) return say("Per creare l'account serve spuntare la casella su privacy e termini.", true);
         busy(f, true);
         try { var r = await api.signUp(d); say(r.needsConfirmation ? "Fatto. Ti abbiamo mandato un'email: apri il link per confermare l'indirizzo, poi accedi. Al primo accesso configuri il tuo spazio." : "Account creato.", false); }
         catch (err) { say(err.message, true); }
         busy(f, false);
       });
-      card = [h("h1", null, "Accetta un invito"), h("p", { class: "sub" }, "Crea l'account con la stessa email a cui è arrivato l'invito: entrando troverai il matrimonio che ti aspetta."), f,
+      card = [h("h1", null, "Crea il tuo account"), h("p", { class: "sub" }, "Gratis, senza carta di credito. Se hai ricevuto un invito a un matrimonio, usa la stessa email: entrando lo troverai ad aspettarti."), f,
         h("p", { class: "alt-link" }, "Hai già un account? ", h("a", { href: "#/accedi" }, "Accedi")), noAccount(true)];
     } else if (kind === "password") {
       var fp = h("form", { class: "auth-form", novalidate: true }, field({ name: "email", label: "Email", type: "email", required: true, autocomplete: "email" }),

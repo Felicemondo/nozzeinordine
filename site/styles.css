@@ -330,6 +330,11 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .plans-band.sand { background: var(--sabbia); }
 .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .plans-band > .wrap > h2 { margin-bottom: 40px; }
+.plans.three { grid-template-columns: repeat(3, 1fr); }
+.plans.three .plan { padding: 30px; }
+.plan-price small { font: 500 14px/1 var(--sans); color: inherit; opacity: .7; }
+.plans + .note { margin-top: 24px; max-width: 68ch; }
+@media (max-width: 1040px) { .plans.three { grid-template-columns: 1fr; } }
 .plan { background: var(--carta); border: 1px solid var(--line); border-radius: 3px; padding: 36px; display: flex; flex-direction: column; }
 .plan.dark { background: var(--oliva); border-color: var(--oliva); color: #E8E3DA; }
 .plan-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 26px; }
@@ -550,3 +555,8 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   details[open] > p { animation: open-down .4s var(--ease-out); }
   .opt label { transition: background .18s; }
 }
+
+.foot-legal { display: flex; gap: 20px; flex-wrap: wrap; }
+.cmp { margin-top: 32px; }
+.legal strong { color: var(--ink); font-weight: 600; }
+.legal h2[id] { scroll-margin-top: 96px; }

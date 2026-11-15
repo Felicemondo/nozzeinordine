@@ -48,7 +48,7 @@
     signUp: async function (p) {
       var data = ok(await sb.auth.signUp({
         email: p.email, password: p.password,
-        options: { emailRedirectTo: appUrl(), data: { full_name: p.full_name, role: p.role === "planner" ? "planner" : "coppia" } }
+        options: { emailRedirectTo: appUrl(), data: { full_name: p.full_name, role: p.role === "planner" ? "planner" : "coppia", terms_version: "2026-11-15", terms_accepted_at: new Date().toISOString() } }
       }));
       return { needsConfirmation: !data.session };
     },

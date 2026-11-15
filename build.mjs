@@ -76,14 +76,14 @@ const SCHEDULE = `<div class="ui flush"><div class="ui-head"><b>Scaletta evento<
 /* ---------- struttura comune ---------- */
 const NAV = [["coppie.html", "Per le coppie"], ["planner.html", "Per le planner"], ["prezzi.html", "Prezzi"]];
 const head = (title, desc) => `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>${title}</title><meta name="description" content="${desc}"><meta name="theme-color" content="#F5F0E7"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:type" content="website"><meta property="og:image" content="https://nozzeinordine.com/og.png"><link rel="preload" href="fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="styles.css"></head><body>`;
-// Il pulsante in alto porta alla dashboard; le iscrizioni passano dai moduli richiesta-*.html
+// I pulsanti portano alla dashboard (app/): registrazione diretta. I moduli della lista d'attesa (richiesta-*.html) non vengono più generati.
 const top = (cur) => `<a class="skip" href="#main">Vai al contenuto</a><header class="top"><div class="wrap"><a class="brand" href="index.html" aria-label="Nozze in Ordine, pagina iniziale">${MARK}<span>Nozze in Ordine</span></a>
 <nav class="menu" id="menu" aria-label="Principale">${NAV.map(([h, l]) => `<a href="${h}"${h === cur ? ' aria-current="page"' : ""}>${l}</a>`).join("")}<a class="btn menu-cta" href="app/">Accedi ${ARROW}</a></nav>
 <a class="btn sm top-cta" href="app/">Accedi ${ARROW}</a><button class="burger" type="button" aria-expanded="false" aria-controls="menu"><span class="burger-icon" aria-hidden="true"><i></i><i></i></span><span class="burger-label">Menu</span></button></div></header>`;
 const foot = `<footer class="foot"><div class="wrap"><div class="foot-main"><div><p class="foot-brand">Nozze in Ordine</p><p>Per il vostro sì.</p></div>
 <nav aria-label="Pagine"><a href="coppie.html">Per le coppie</a><a href="planner.html">Per le planner</a><a href="prezzi.html">Prezzi</a></nav>
-<nav aria-label="Lista d'attesa e accesso"><a href="index.html#lista">Lista d'attesa</a><a href="app/">Accedi</a><a href="app/demo.html">Demo</a></nav></div>
-<div class="foot-line"><span>© 2026 Nozze in Ordine · Nato in Campania, per tutta Italia</span><a href="privacy.html">Privacy</a></div></div></footer><script src="app.js"></script></body></html>`;
+<nav aria-label="Accesso"><a href="app/#/registrati">Inizia gratis</a><a href="app/">Accedi</a><a href="app/demo.html">Demo</a></nav></div>
+<div class="foot-line"><span>© 2026 Nozze in Ordine · Nato in Campania, per tutta Italia</span><span class="foot-legal"><a href="privacy.html">Privacy</a><a href="cookie.html">Cookie</a><a href="termini.html">Termini</a></span></div></div></footer><script src="app.js"></script></body></html>`;
 const eyebrow = (t, cls = "") => `<p class="eyebrow${cls ? " " + cls : ""}">${t}</p>`;
 const btn = (href, label, cls = "") => `<a class="btn${cls ? " " + cls : ""}" href="${href}">${label} ${ARROW}</a>`;
 const hero = ({ k, eb, h1, p, a, b, fine, corner, tall }) => `<section class="hero${tall ? " tall" : ""}" aria-labelledby="h1">${img(k, { lazy: false, cls: "hero-img" })}<div class="wrap hero-in">
@@ -155,131 +155,243 @@ const ctaBand = ({ h, p, href, label, fine }) => `<section class="cta-dark" id="
 <div class="cta-btns"><a class="choice light" href="${href}">${label} ${ARROW}</a><p>${fine}</p></div></div></section>`;
 
 /* =========================================================== HOME */
-write("index.html", head("Nozze in Ordine | Il tuo sì, un tassello alla volta", "Budget, fornitori, invitati e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner, in tutta Italia.") + top("") + `
+const APP = "app/#/registrati";
+const DEMO = "app/demo.html";
+const MAIL = "mailto:info@nozzeinordine.com";
+write("index.html", head("Nozze in Ordine | Organizzare il matrimonio in un unico spazio", "Budget, fornitori, invitati, tavoli e scadenze del matrimonio in uno spazio condiviso. Per coppie e wedding planner, in tutta Italia. Gratis per iniziare.") + top("") + `
 <main id="main">
-${hero({ k: "home", eb: eyebrow("Il vostro matrimonio, con calma", "light"), h1: "Il tuo sì, un tassello alla volta.", p: "Budget, fornitori, invitati e scadenze in uno spazio condiviso. Per organizzare ogni dettaglio con maggiore tranquillità.",
-  a: btn("richiesta-coppia.html", "Sono una coppia"), b: btn("richiesta-planner.html", "Sono una wedding planner", "ghost"), fine: "Gratis per iniziare · Per coppie e wedding planner · In tutta Italia", corner: "01 / Il sì" })}
-${feat({ k: "budget", n: "01", h: "Il budget che torna sempre.", p: "Previsto, firmato, pagato e residuo per ogni voce. Senza rifare i conti ogni sera.", card: BUDGET_CARD, side: "left" })}
-${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a partire dal giorno del matrimonio.", card: PATH_CARD, side: "right", bg: "sand" })}
-${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Nuclei familiari, risposte e menù nello stesso elenco. Un invito, una riga.", card: RSVP_CARD(), side: "left", bg: "mist" })}
+${hero({ k: "home", eb: eyebrow("Per coppie e wedding planner", "light"), h1: "Il tuo sì, un tassello alla volta.", p: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Vi registrate e trovate le scadenze già calcolate sulla data del matrimonio.",
+  a: btn(APP, "Inizia gratis"), b: btn(DEMO, "Guarda la demo", "ghost"), fine: "Gratis per iniziare · Senza carta di credito · In tutta Italia", corner: "01 / Il sì" })}
+${feat({ k: "budget", n: "01", h: "Il budget che torna sempre.", p: "Previsto, firmato, pagato e residuo per ogni voce di spesa, viaggio di nozze compreso. Senza rifare i conti ogni sera.", card: BUDGET_CARD, side: "left" })}
+${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a ritroso dal giorno del matrimonio, e gli avvisi vi ricordano cosa sta per scadere.", card: PATH_CARD, side: "right", bg: "sand" })}
+${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Gruppi, risposte e menù nello stesso elenco, e la sala in pianta con un nome su ogni posto.", card: RSVP_CARD(), side: "left", bg: "mist" })}
 ${editorial("costiera", "Tante cose da tenere insieme. Un posto in cui ritrovarle.")}
 <section class="project" aria-labelledby="prog"><div class="wrap">
-${eyebrow("Come si comincia")}<h2 id="prog">Tre passi per mettere ordine.</h2><p class="lead narrow">Dalla lista d'attesa al vostro spazio condiviso, senza fogli sparsi e senza file da rincorrere.</p>
+${eyebrow("Come si comincia")}<h2 id="prog">Tre passi per mettere ordine.</h2><p class="lead narrow">Dalla registrazione al vostro spazio condiviso, senza fogli sparsi e senza file da rincorrere.</p>
 <div class="project-grid"><ol class="steps">
-<li><span>01</span><h3>Vi iscrivete.</h3><p>Ci raccontate il matrimonio in tre brevi passaggi: quando, quanti invitati, a che punto siete.</p></li>
-<li><span>02</span><h3>Vi apriamo lo spazio.</h3><p>Entrate con la vostra email e trovate le scadenze già calcolate sulla data del matrimonio.</p></li>
+<li><span>01</span><h3>Vi registrate.</h3><p>Email, password e la data del matrimonio. Non serve la carta di credito.</p></li>
+<li><span>02</span><h3>Trovate le scadenze già pronte.</h3><p>Le attività sono calcolate sul vostro giorno: sapete subito cosa viene prima e cosa può aspettare.</p></li>
 <li><span>03</span><h3>Lo condividete.</h3><p>Invitate il partner o la vostra planner: ognuno vede ciò che gli serve, e nessuno rifà il lavoro due volte.</p></li></ol>
-<figure class="project-pic">${img("fiori")}<figcaption>${eyebrow("In tutta Italia")}<p>Pensato per chi si sposa in Italia, una coppia e una planner alla volta.</p></figcaption></figure></div></div></section>
-<section class="cta-dark" id="lista" aria-labelledby="lst"><div class="wrap cta-in"><div><h2 id="lst">Entra in lista d'attesa.</h2><p>Lista gratuita, nessun pagamento. Ti scriviamo appena c'è posto per te.</p></div>
-<div class="cta-btns"><a class="choice light" href="richiesta-coppia.html">Sono una coppia ${ARROW}</a><a class="choice" href="richiesta-planner.html">Sono una wedding planner ${ARROW}</a><p>Gratis, in pochi minuti.</p></div></div></section>
+<figure class="project-pic">${img("fiori")}<figcaption>${eyebrow("In tutta Italia")}<p>Pensato per chi si sposa in Italia e per chi i matrimoni li organizza di mestiere.</p></figcaption></figure></div></div></section>
+<section class="split-list" aria-labelledby="fid"><div class="wrap">${eyebrow("Su cosa potete contare")}<h2 id="fid">Uno strumento, con regole chiare.</h2>
+<div class="split-grid"><div>${defs([["Nessuna pubblicità, nessun marketplace", "Non vendiamo spazi ai fornitori e non vi proponiamo nessuno. I fornitori li scegliete voi."], ["Ognuno vede ciò che gli spetta", "Sposi, planner e collaboratori entrano con il proprio accesso. Le note riservate della planner restano sue."], ["Prezzi scritti", "Per le coppie un pagamento unico per matrimonio. Per le planner un canone fisso. Nessun addebito senza il vostro consenso."], ["Anche dal telefono", "Si aggiunge alla schermata Home e vi avvisa di scadenze e pagamenti in arrivo."], ["Si prova prima di registrarsi", "La demo si apre senza account, con dati di esempio."]])}
+<p class="later">Nozze in Ordine è progettato e sviluppato in Campania da Felice Mondo, UX/UI designer. Per ogni domanda: <a href="${MAIL}">info@nozzeinordine.com</a>.</p></div>
+<figure class="side-pic">${img("versione")}<figcaption>I dettagli restano vostri. L'ordine diventa condiviso.</figcaption></figure></div></div></section>
+<section class="cta-dark" id="inizia" aria-labelledby="lst"><div class="wrap cta-in"><div><h2 id="lst">Cominciate oggi.</h2><p>Il piano gratuito non scade. Se preferite prima dare un'occhiata, la demo si apre senza account.</p></div>
+<div class="cta-btns"><a class="choice light" href="${APP}">Inizia gratis ${ARROW}</a><a class="choice" href="${DEMO}">Guarda la demo ${ARROW}</a><p>Senza carta di credito.</p></div></div></section>
 </main>` + foot);
 
 /* =========================================================== COPPIE */
 const PHASES = [["12+ mesi prima", "Data, budget e location"], ["9–11 mesi prima", "Fornitori principali e preventivi"], ["6–8 mesi prima", "Save the date e abiti"], ["3–5 mesi prima", "Dettagli, inviti e menù"], ["1–2 mesi prima", "Conferme finali e saldi"], ["Settimana del sì", "Scaletta e responsabili"]];
-write("coppie.html", head("Per le coppie | Nozze in Ordine", "Budget, preventivi, invitati e scadenze nello stesso posto condiviso, per organizzare il matrimonio con calma.") + top("coppie.html") + `
+write("coppie.html", head("Per le coppie | Nozze in Ordine", "Budget, preventivi, invitati, tavoli e scadenze del matrimonio nello stesso posto condiviso. Piano gratuito senza scadenza, Completo a 49 € una volta sola.") + top("coppie.html") + `
 <main id="main">
-${hero({ k: "coppie", tall: true, eb: eyebrow("Per le coppie", "light"), h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati e scadenze nello stesso posto condiviso. Pensato per le coppie che si sposano in Italia.",
-  a: btn("richiesta-coppia.html", "Iscrivetevi alla lista"), b: btn("#funzioni", "Cosa include", "ghost"), fine: "Piano gratuito · Completo a 49 €, una volta sola" })}
+${hero({ k: "coppie", tall: true, eb: eyebrow("Per le coppie", "light"), h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati, tavoli e scadenze nello stesso posto, condiviso tra voi due. Pensato per chi si sposa in Italia.",
+  a: btn(APP, "Iniziate gratis"), b: btn("#funzioni", "Cosa include", "ghost"), fine: "Piano gratuito senza scadenza · Completo a 49 €, una volta sola" })}
 <section class="journey" aria-labelledby="perc"><div class="wrap"><div class="journey-head"><div>${eyebrow("Dal primo pensiero al giorno del sì")}<h2 id="perc">Un posto per tenere tutto insieme.</h2></div><p class="small">Provate con la vostra data</p></div>
 <div class="planner-box" data-wedding="2027-06-12"><div class="calc"><label for="data-si">La data del sì</label><div class="date-in"><input type="date" id="data-si" value="2027-06-12">${CAL}</div>
 <div class="count big"><b data-weeks>32</b><i>/</i><b data-days>5</b><span>settimane</span><span>giorni</span></div><p class="small" id="cd-msg" role="status"></p></div>
 <ol class="phases">${PHASES.map(([t, d], i) => `<li data-step="${i}"><b>${t}</b><span>${d}</span><small>Da avviare</small></li>`).join("")}</ol></div>
 <p class="small note">Esempio con il 12 giugno 2027. Le date sono calcolate sul vostro giorno e non vengono salvate.</p></div></section>
-<section class="feat-photo" aria-labelledby="fb">${img("budget")}<div class="wrap feat-photo-in"><div><p class="num">01</p><h2 id="fb">Il budget che torna sempre.</h2><p class="lead">Previsto, firmato, pagato e residuo per ogni voce. Senza rifare i conti ogni sera.</p></div>${BUDGET_CARD}</div></section>
-${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a partire dal giorno del matrimonio, così sapete sempre cosa resta da fare.", card: PATH_CARD, side: "right" })}
-${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Un invito, una riga. Nuclei familiari, risposte e menù in un elenco condiviso con il partner e con chi vi aiuta.", card: RSVP_CARD(" · dati di esempio"), side: "left", bg: "mist" })}
+<section class="feat-photo" aria-labelledby="fb">${img("budget")}<div class="wrap feat-photo-in"><div><p class="num">01</p><h2 id="fb">Il budget che torna sempre.</h2><p class="lead">Previsto, firmato, pagato e residuo per ogni voce, viaggio di nozze compreso. Senza rifare i conti ogni sera.</p></div>${BUDGET_CARD}</div></section>
+${feat({ k: "scadenze", n: "02", h: "Scadenze che non si perdono.", p: "Acconti, saldi e conferme con la loro data. Le attività si calcolano a ritroso dal giorno del matrimonio, così sapete sempre cosa resta da fare.", card: PATH_CARD, side: "right" })}
+${feat({ k: "invitati", n: "03", h: "Chi viene e chi deve ancora rispondere.", p: "Famiglia e amici di ciascuno, risposte e menù in un elenco condiviso. Poi la sala in pianta, con un nome su ogni posto.", card: RSVP_CARD(" · dati di esempio"), side: "left", bg: "mist" })}
 ${editorial("viale", "Ogni dettaglio al suo posto. Ogni momento da vivere.")}
 <section class="split-list" id="funzioni" aria-labelledby="funz"><div class="wrap">${eyebrow("Uno spazio condiviso")}<h2 id="funz">Cosa trovate nel vostro spazio.</h2>
-<div class="split-grid"><div>${defs([["Budget e pagamenti", "Previsto, contrattualizzato, pagato e saldo residuo per ogni voce di spesa."], ["Fornitori e preventivi", "Scheda, contatti, allegati e stato della decisione, con i preventivi affiancati."], ["Checklist con scadenze", "Le attività si calcolano a partire dalla data del matrimonio."], ["Invitati e RSVP", "Nuclei familiari, risposte e menù, con esportazione."], ["Scaletta del giorno", "Orari, luoghi, responsabili e contatti per la giornata, da condividere."], ["Ruoli e documenti", "Sposi, planner e collaboratori con i loro permessi, e un archivio unico dei contratti."]])}
+<div class="split-grid"><div>${defs([["Budget e pagamenti", "Spesa totale, pagato e saldo residuo per ogni voce."], ["Fornitori e preventivi", "Scheda, contatti e stato della decisione, con i preventivi affiancati."], ["Scadenze e avvisi", "Le attività si calcolano dalla data del matrimonio; gli avvisi segnalano ciò che sta per scadere."], ["Invitati e risposte", "Gruppi, risposte e menù. L'elenco si importa anche da un file CSV."], ["Tavoli e sala", "La sala in pianta, tavoli da 8 a 12 posti e un nome su ogni posto."], ["Scaletta del giorno", "Orari e responsabili della giornata, da esportare e stampare."]])}
 <p class="later">Niente marketplace di fornitori e niente pubblicità: lo spazio è vostro, e i fornitori li scegliete voi.</p></div>
 <figure class="side-pic">${img("versione")}<figcaption>I dettagli restano vostri. L'ordine diventa condiviso.</figcaption></figure></div></div></section>
-<section class="aside-band sand" aria-labelledby="pl"><div class="wrap aside-in"><div>${eyebrow("Insieme, senza doppioni")}<h2 id="pl">C'è una wedding planner al vostro fianco?</h2><p class="lead">Potrà invitarvi nel suo spazio. Vedrete budget, scadenze e documenti condivisi, senza rifare nulla e senza scambiarvi file.</p>${btn("planner.html", "Scopri la parte per le planner", "line")}</div>
+<section class="aside-band sand" aria-labelledby="pl"><div class="wrap aside-in"><div>${eyebrow("Insieme, senza doppioni")}<h2 id="pl">C'è una wedding planner al vostro fianco?</h2><p class="lead">Potete invitarla nel vostro spazio, oppure può invitarvi lei nel suo. Vedete le stesse scadenze e lo stesso budget, senza scambiarvi file.</p>${btn("planner.html", "Scopri la parte per le planner", "line")}</div>
 <figure class="side-pic">${img("fiori")}<figcaption>Chi vi accompagna ha il suo ruolo. Voi avete il vostro spazio.</figcaption></figure></div></section>
-${ctaBand({ h: "Entrate in lista d'attesa.", p: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Il piano gratuito resta gratuito; il Completo costerà 49 €, una volta sola.", href: "richiesta-coppia.html", label: "Compilate la richiesta", fine: "Iscriversi è gratis." })}
+${ctaBand({ h: "Aprite il vostro spazio.", p: "Il piano gratuito non scade. Il Completo costa 49 €, una volta sola, e vale per il vostro matrimonio.", href: APP, label: "Iniziate gratis", fine: "Senza carta di credito." })}
 </main>` + foot);
 
 /* =========================================================== PLANNER */
-write("planner.html", head("Per le wedding planner | Nozze in Ordine", "Tutti i matrimoni che segui in un unico spazio, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi.") + top("planner.html") + `
+write("planner.html", head("Per le wedding planner | Nozze in Ordine", "Il gestionale per wedding planner: tutti i matrimoni che segui in un unico spazio, con budget, fornitori, acconti e saldi, scadenze e un portale per gli sposi. Da 29 € al mese.") + top("planner.html") + `
 <main id="main">
-${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per più eventi, con budget, fornitori, scadenze, documenti e un portale condiviso con gli sposi. Per le prime 10 planner la prova pilota è gratuita.",
-  a: btn("richiesta-planner.html", "Candidati alla prova pilota"), b: btn("#colpo", "Come funziona", "ghost"), fine: "Prova pilota gratuita · Per le prime 10 planner", corner: "01 / Il coordinamento" })}
-<section class="glance" id="colpo" aria-labelledby="gl"><div class="wrap">${eyebrow("Il lavoro a colpo d'occhio")}<h2 id="gl">Una dashboard pensata per più eventi.</h2><p class="lead narrow">Budget, fornitori, scadenze e documenti in un unico spazio. Non è un'agenzia: è uno strumento per chi coordina più matrimoni contemporaneamente.</p>
+${hero({ k: "planner", eb: eyebrow("Per le wedding planner", "light"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per seguire più eventi insieme: budget, fornitori, acconti e saldi, scadenze, tavoli e scaletta, con un portale condiviso con gli sposi.",
+  a: btn(APP, "Prova gratis 30 giorni"), b: btn(DEMO + "?ruolo=planner", "Guarda la demo", "ghost"), fine: "Da 29 € al mese · Prova gratuita di 30 giorni · Senza carta di credito", corner: "01 / Il coordinamento" })}
+<section class="glance" id="colpo" aria-labelledby="gl"><div class="wrap">${eyebrow("Il lavoro a colpo d'occhio")}<h2 id="gl">Una dashboard pensata per più eventi.</h2><p class="lead narrow">Per ogni matrimonio vedi la data, i fornitori confermati e quanto è già stato pagato. Non è un'agenzia: è uno strumento per chi coordina più matrimoni contemporaneamente.</p>
 <div class="glance-grid"><div class="glance-col">${img("scrivania")}${PLANNER_TABLE}</div><div class="glance-col">${img("coord")}${SCHEDULE}</div></div></div></section>
 <section class="split-list" aria-labelledby="cam"><div class="wrap">${eyebrow("Cosa cambia")}<h2 id="cam">Cosa cambia per la tua organizzazione.</h2>
-<div class="split-grid"><div>${defs([["Template duplicabili", "Checklist, budget e scaletta da riusare a ogni nuovo evento."], ["Portale per gli sposi", "Gli sposi vedono ciò che condividi, con budget, scadenze e documenti nello stesso spazio."], ["Acconti e saldi per evento", "Chi ha pagato cosa e cosa scade questa settimana, su tutti gli eventi."], ["Scaletta condivisa", "Orari e responsabili del giorno, da mandare a fornitori e collaboratori."], ["Collaboratori con ruoli", "Ognuno vede e modifica solo ciò che gli compete."]])}
+<div class="split-grid"><div>${defs([["Portale per gli sposi", "Inviti la coppia nel suo matrimonio: vede budget, scadenze e scaletta senza chiederti un file."], ["Acconti e saldi per evento", "Cosa è stato pagato e cosa scade, con gli avvisi sulle date in arrivo."], ["Note riservate", "I tuoi appunti di lavoro su ogni evento. Gli sposi non li vedono."], ["Tavoli e sala in pianta", "Tavoli da 8 a 12 posti, con un nome su ogni posto."], ["Scaletta condivisa", "Orari e responsabili del giorno, da esportare per fornitori e collaboratori."], ["Collaboratori", "Aggiungi chi lavora con te a un evento, con il suo accesso."]])}
 <p class="later">Nozze in Ordine comincia dove finisce la trattativa: dall'incarico firmato al giorno del sì.</p></div>
 <figure class="side-pic">${img("cambia")}<figcaption>Immagine evocativa: preparazione, coordinamento e controllo di più eventi.</figcaption></figure></div></div></section>
-<section class="matrix mist" aria-labelledby="chi"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Ruoli e collaborazione")}<h2 id="chi">Chi vede e modifica cosa.</h2></div><p class="lead">Ogni persona vede e modifica solo ciò che le compete. Le note interne restano tue.</p></div>
+<section class="matrix mist" aria-labelledby="chi"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Ruoli e collaborazione")}<h2 id="chi">Chi vede e modifica cosa.</h2></div><p class="lead">Ogni persona vede e modifica solo ciò che le compete. Le note riservate restano tue.</p></div>
 <div class="ui flush"><div class="tscroll"><table class="tbl roles"><thead><tr><th>Nello spazio condiviso</th><th>La planner</th><th>Gli sposi</th></tr></thead><tbody>
 <tr><th scope="row">Preventivi</th><td>Li carica e li gestisce</td><td>Li confrontano e approvano</td></tr><tr><th scope="row">Scadenze</th><td>Le assegna</td><td>Completano le loro</td></tr>
-<tr><th scope="row">Documenti</th><td>Li carica</td><td>Li leggono e scaricano</td></tr><tr><th scope="row">Note interne</th><td>Le scrive e le legge</td><td>Non le vedono</td></tr></tbody></table></div></div></div></section>
-<section class="aside-band" aria-labelledby="part"><div class="wrap aside-in"><div>${eyebrow("La prova pilota")}<h2 id="part">Costruito sul tuo metodo.</h2><p class="lead">Le prime 10 planner usano Nozze in Ordine sui loro matrimoni, gratis per tutta la prova pilota. Ogni mese ci dicono cosa serve, e lo strumento cresce intorno al loro lavoro.</p>${btn("richiesta-planner.html", "Raccontaci il tuo metodo", "line")}</div>
+<tr><th scope="row">Note riservate</th><td>Le scrive e le legge</td><td>Non le vedono</td></tr></tbody></table></div></div></div></section>
+<section class="aside-band" aria-labelledby="part"><div class="wrap aside-in"><div>${eyebrow("Chi c'è dietro")}<h2 id="part">Uno strumento, non un'agenzia.</h2><p class="lead">Nozze in Ordine non organizza matrimoni e non ti manda clienti: ti dà un posto ordinato in cui lavorare. È progettato in Campania da Felice Mondo, UX/UI designer, e cresce con le richieste di chi lo usa.</p>${btn(MAIL, "Scrivici cosa ti serve", "line")}</div>
 <figure class="side-pic">${img("partiamo")}<figcaption>Immagine evocativa: preparazione, coordinamento e controllo di più eventi.</figcaption></figure></div></section>
 <section class="inset-pic" aria-label="Immagine"><div class="wrap"><figure>${img("dettaglio")}<figcaption><em>Ogni dettaglio al suo posto. Ogni momento da vivere.</em><span>Nozze in Ordine · In tutta Italia</span></figcaption></figure></div></section>
-${ctaBand({ h: "Candidati alla prova pilota.", p: "Cerchiamo le prime 10 wedding planner per costruire lo strumento insieme. È gratuita per tutta la sua durata: il prezzo dopo lo decidiamo insieme.", href: "richiesta-planner.html", label: "Invia la candidatura", fine: "Nessun pagamento, nessun impegno." })}
+${ctaBand({ h: "Provalo sui tuoi matrimoni.", p: `30 giorni di prova, poi da 29 € al mese. Per gli studi con più persone c'è un piano su misura: i dettagli sono nella <a href="prezzi.html">pagina prezzi</a>.`, href: APP, label: "Inizia la prova", fine: "Senza carta di credito." })}
 </main>` + foot);
 
 /* =========================================================== PREZZI */
-const plan = ({ name, price, sub, items, dark, tag, href, cta = "Entra in lista" }) => `<article class="plan${dark ? " dark" : ""}"><div class="plan-top"><h3>${name}</h3>${tag ? `<span class="tag soft">${tag}</span>` : ""}</div><p class="plan-price">${price}</p><p class="small">${sub}</p><hr>
+// Prezzi e limiti dei piani: si cambiano qui. I limiti non sono ancora applicati dalla dashboard.
+const PREZZI = { completo: "49 €", planner: "29 €", team: "59 €", eventiPlanner: 5, eventiTeam: 15, collabTeam: 3, prova: 30 };
+const plan = ({ name, price, per = "", sub, items, dark, tag, href, cta = "Inizia gratis" }) => `<article class="plan${dark ? " dark" : ""}"><div class="plan-top"><h3>${name}</h3>${tag ? `<span class="tag soft">${tag}</span>` : ""}</div><p class="plan-price">${price}${per ? `<small> ${per}</small>` : ""}</p><p class="small">${sub}</p><hr>
 <ul>${items.map((i) => `<li>${CHECK}${i}</li>`).join("")}</ul><a class="btn ${dark ? "light" : "line"}" href="${href}">${cta} ${ARROW}</a></article>`;
-const faq = [["Devo pagare adesso?", "No. Iscriversi alla lista d'attesa è gratuito. Il piano Completo costa 49 €, una volta sola, e potete sempre restare sul piano gratuito."],
-  ["Il piano Completo è un abbonamento?", "No. Sono 49 € una volta sola, per tutto il matrimonio: un matrimonio si organizza una volta."],
-  ["Cosa resta gratis?", "Checklist con le scadenze, budget sintetico, fino a 50 invitati e 3 fornitori, e lo spazio condiviso con il partner. Senza limiti di tempo."],
-  ["Perché per le planner non c'è un prezzo?", "Perché vogliamo deciderlo con chi lo usa. Le prime 10 planner lo provano gratis durante la prova pilota; il prezzo dopo lo concordiamo insieme, e non parte nessun addebito senza il vostro consenso."],
-  ["Cosa succede ai miei dati?", `Usiamo le risposte ai moduli per scrivervi e per capire cosa costruire. I dettagli sono nella <a href="privacy.html">pagina privacy</a>.`]];
-write("prezzi.html", head("Prezzi | Nozze in Ordine", "Per le coppie: gratis per iniziare, 49 € una volta sola per il piano Completo. Per le wedding planner: una prova pilota gratuita.") + top("prezzi.html") + `
+const faq = [["Devo inserire una carta di credito per iniziare?", "No. Vi registrate con email e password. Il piano gratuito per le coppie non scade, e la prova per le planner non chiede la carta."],
+  ["Il piano Completo è un abbonamento?", `No. Sono ${PREZZI.completo} una volta sola, per tutto il matrimonio: un matrimonio si organizza una volta.`],
+  ["Posso usare il piano Completo per più matrimoni?", "No. Il Completo vale per un solo matrimonio e i nomi degli sposi si fissano all'attivazione, senza poterli cambiare. Chi organizza matrimoni per lavoro trova i piani per le wedding planner."],
+  ["Cosa conta come matrimonio attivo?", "Un matrimonio la cui data non è ancora passata. Quelli conclusi restano consultabili e non occupano posti nel piano."],
+  [`Cosa succede alla fine dei ${PREZZI.prova} giorni di prova?`, "Scegli un piano oppure ti fermi. Non parte nessun addebito senza il tuo consenso."],
+  ["I prezzi comprendono l'IVA?", `Per le coppie sì: ${PREZZI.completo} è il prezzo finale. Per le wedding planner i canoni sono IVA esclusa.`],
+  ["Come si paga?", "I pagamenti online non sono ancora attivi: in questa fase di lancio l'accesso è gratuito. Prima di attivarli vi scriviamo per email, e nessun piano a pagamento parte senza il vostro consenso."],
+  ["Cosa succede ai miei dati?", `Li usiamo per farvi funzionare lo spazio e per rispondervi. Non li vendiamo e non li cediamo. I dettagli sono nella <a href="privacy.html">pagina privacy</a>.`]];
+write("prezzi.html", head("Prezzi | Nozze in Ordine", `Per le coppie: gratis per iniziare, ${PREZZI.completo} una volta sola per il piano Completo. Per le wedding planner: da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.`) + top("prezzi.html") + `
 <main id="main">
-<section class="price-hero" aria-labelledby="h1"><div class="wrap price-hero-in"><div>${eyebrow("Prezzi")}<h1 id="h1">Gratis per iniziare.</h1><p class="lead">Per le coppie un prezzo solo, una volta per matrimonio. Per le wedding planner una prova pilota gratuita: il prezzo lo decidiamo insieme, dopo.</p>
-${defs([["Per le coppie", "Piano gratuito, oppure Completo a 49 € una volta sola."], ["Per le planner", "Prova pilota gratuita per le prime 10 planner."]])}<p class="small note">La lista d'attesa è gratuita e non richiede pagamenti.</p></div>
+<section class="price-hero" aria-labelledby="h1"><div class="wrap price-hero-in"><div>${eyebrow("Prezzi")}<h1 id="h1">Prezzi scritti, senza sorprese.</h1><p class="lead">Per le coppie un pagamento unico per matrimonio. Per le wedding planner un canone mensile fisso, in base a quanti matrimoni segui.</p>
+${defs([["Per le coppie", `Piano gratuito senza scadenza, oppure Completo a ${PREZZI.completo} una volta sola.`], ["Per le planner", `Da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova gratuita.`], ["Per gli studi", "Un piano su misura, con prezzo su contatto."]])}<p class="small note">In questa fase di lancio l'accesso è gratuito. Nessun piano a pagamento parte senza il vostro consenso.</p></div>
 <figure class="side-pic">${img("prezzi", { lazy: false })}<figcaption>${EVOC}</figcaption></figure></div></section>
-<section class="plans-band sand" aria-labelledby="pc"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per le coppie")}<h2 id="pc">Per le coppie.</h2></div><p class="lead">Un pagamento unico per matrimonio, perché l'organizzazione dura il tempo che serve e poi finisce. Potete restare sul piano gratuito quanto volete.</p></div>
-<div class="plans">${plan({ href: "richiesta-coppia.html", name: "Gratis", price: "0 €", sub: "Per iniziare a mettere ordine, senza limiti di tempo", items: ["Checklist con scadenze", "Budget sintetico", "Fino a 50 invitati", "Fino a 3 fornitori", "Spazio condiviso con il partner"] })}
-${plan({ href: "richiesta-coppia.html", name: "Completo", price: "49 €", sub: "Una volta sola, per tutto il matrimonio", items: ["Tutto il piano gratuito", "Invitati illimitati, risposte e tavoli", "Preventivi affiancati e pagamenti", "Documenti e contratti", "Scaletta del giorno ed esportazione dei dati"], dark: true })}</div></div></section>
-<section class="plans-band" aria-labelledby="pp"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per chi organizza")}<h2 id="pp">Per le wedding planner.</h2></div><p class="lead">Il prezzo per le planner lo decidiamo con chi partecipa alla prova pilota, sul lavoro vero e non su una tabella.</p></div>
-<div class="plans"><article class="plan"><div class="plan-top"><h3>Come funziona la prova pilota</h3></div><ol class="pilot-steps"><li><b>Ti candidi.</b><span>Tre passaggi su come lavori e quanti matrimoni segui.</span></li><li><b>Ci sentiamo.</b><span>Una chiamata di 25 minuti per capire il tuo metodo.</span></li><li><b>Lo usi sui tuoi matrimoni.</b><span>Gratis per tutta la prova pilota, con un confronto ogni mese su cosa migliorare.</span></li><li><b>Decidiamo il prezzo insieme.</b><span>Non parte nessun addebito senza il tuo consenso.</span></li></ol></article>
-${plan({ href: "richiesta-planner.html", name: "Prova pilota", price: "Gratuita", sub: "Per le prime 10 planner", items: ["Eventi illimitati durante la prova pilota", "Portale condiviso con gli sposi", "Template duplicabili", "Scadenze, acconti e saldi per evento", "Collaboratori con i loro permessi"], dark: true, tag: "10 posti", cta: "Candidati" })}</div></div></section>
-<section class="faq-band mist" aria-labelledby="faq"><div class="wrap faq-in"><div>${eyebrow("Prima di iscriversi")}<h2 id="faq">Domande frequenti.</h2>
+<section class="plans-band sand" aria-labelledby="pc"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per chi si sposa")}<h2 id="pc">Per le coppie.</h2></div><p class="lead">Un pagamento unico per matrimonio, perché l'organizzazione dura il tempo che serve e poi finisce. Potete restare sul piano gratuito quanto volete.</p></div>
+<div class="plans">${plan({ href: APP, name: "Gratis", price: "0 €", sub: "Per iniziare a mettere ordine, senza limiti di tempo", items: ["Scadenze calcolate sulla data", "Budget: totale previsto e pagato", "Fino a 50 invitati", "Fino a 3 fornitori", "Spazio condiviso con il partner"] })}
+${plan({ href: APP, name: "Completo", price: PREZZI.completo, sub: "Una volta sola, per un matrimonio · IVA inclusa", items: ["Tutto il piano gratuito", "Invitati illimitati, risposte e tavoli", "Fornitori illimitati e preventivi affiancati", "Budget completo, con acconti e saldi", "Scaletta del giorno, da esportare e stampare"], dark: true })}</div>
+<div class="ui flush cmp"><div class="tscroll"><table class="tbl roles"><thead><tr><th>Cosa include</th><th>Gratis</th><th>Completo</th></tr></thead><tbody><tr><th scope="row">Scadenze calcolate sulla data</th><td>Sì</td><td>Sì</td></tr><tr><th scope="row">Spazio condiviso con il partner</th><td>Sì</td><td>Sì</td></tr><tr><th scope="row">Invitati e risposte</th><td>Fino a 50</td><td>Illimitati</td></tr><tr><th scope="row">Fornitori</th><td>Fino a 3</td><td>Illimitati</td></tr><tr><th scope="row">Budget</th><td>Totale previsto e pagato</td><td>Voce per voce, con acconti e saldi</td></tr><tr><th scope="row">Preventivi affiancati</th><td>No</td><td>Sì</td></tr><tr><th scope="row">Tavoli e sala in pianta</th><td>No</td><td>Sì</td></tr><tr><th scope="row">Scaletta del giorno</th><td>No</td><td>Sì</td></tr><tr><th scope="row">Esportazione e stampa</th><td>No</td><td>Sì</td></tr><tr><th scope="row">Invito alla wedding planner</th><td>No</td><td>Sì</td></tr></tbody></table></div></div>
+<p class="small note">Il piano Completo è personale: vale per un solo matrimonio e i nomi degli sposi si fissano all'attivazione, senza poterli cambiare.</p></div></section>
+<section class="plans-band" aria-labelledby="pp"><div class="wrap"><div class="matrix-head"><div>${eyebrow("Per chi organizza")}<h2 id="pp">Per le wedding planner.</h2></div><p class="lead">Un canone fisso al mese, scelto in base ai matrimoni che segui. ${PREZZI.prova} giorni di prova su Planner e Team, senza carta di credito. I prezzi per le planner sono IVA esclusa.</p></div>
+<div class="plans three">${plan({ href: APP, name: "Planner", price: PREZZI.planner, per: "al mese + IVA", sub: `Fino a ${PREZZI.eventiPlanner} matrimoni attivi`, items: ["Dashboard con tutti gli eventi", "Portale condiviso con gli sposi", "Budget, acconti e saldi per evento", "Scadenze, tavoli e scaletta", "Note riservate"], cta: "Inizia la prova" })}
+${plan({ href: APP, name: "Team", price: PREZZI.team, per: "al mese + IVA", sub: `Fino a ${PREZZI.eventiTeam} matrimoni attivi`, items: ["Tutto il piano Planner", `Fino a ${PREZZI.collabTeam} collaboratori con il proprio accesso`, "Assistenza prioritaria via email"], dark: true, tag: "Più persone", cta: "Inizia la prova" })}
+${plan({ href: MAIL + "?subject=Piano%20Studio", name: "Studio", price: "Su misura", sub: "Prezzo su contatto", items: ["Matrimoni e collaboratori concordati insieme", "Configurazione sul metodo del vostro studio", "Avvio assistito per il team"], cta: "Parliamone" })}</div></div></section>
+<section class="faq-band mist" aria-labelledby="faq"><div class="wrap faq-in"><div>${eyebrow("Prima di iniziare")}<h2 id="faq">Domande frequenti.</h2>
 <div class="faq">${faq.map(([q, a], i) => `<details${i === 0 ? " open" : ""}><summary>${q}</summary><p>${a}</p></details>`).join("")}</div></div>
 <figure class="side-pic">${img("pergolato")}<figcaption>${EVOC}</figcaption></figure></div></section>
-<section class="closing" aria-labelledby="fine"><div class="wrap closing-in"><div>${eyebrow("Il prossimo tassello")}<h2 id="fine">Scegliete da dove partire.</h2><p class="lead">Un modulo per le coppie, uno per le planner: poche domande, circa quattro minuti, senza pagare nulla.</p></div>
-<div class="closing-btns">${btn("richiesta-coppia.html", "Sono una coppia")}${btn("richiesta-planner.html", "Sono una wedding planner", "line")}</div></div></section>
+<section class="closing" aria-labelledby="fine"><div class="wrap closing-in"><div>${eyebrow("Il prossimo tassello")}<h2 id="fine">Scegliete da dove partire.</h2><p class="lead">Aprite il vostro spazio adesso, oppure guardate prima la demo: si apre senza account, con dati di esempio.</p></div>
+<div class="closing-btns">${btn(APP, "Inizia gratis")}${btn(DEMO, "Guarda la demo", "line")}</div></div></section>
 </main>` + foot);
 
-/* =========================================================== RICHIESTE */
-requestPage({ file: "richiesta-coppia.html", title: "Lista d'attesa per le coppie | Nozze in Ordine", desc: "Tre brevi passaggi sul vostro matrimonio per entrare in lista d'attesa. Piano gratuito, Completo a 49 € una volta sola.",
-  h1: "Entrate in lista d'attesa.", lead: "Tre brevi passaggi sul vostro matrimonio, circa quattro minuti. Ci servono per prepararvi lo spazio giusto e per scrivervi appena c'è posto.",
-  next: ["Vi scriviamo appena c'è posto per voi.", "Il piano gratuito resta gratuito. Il Completo costa 49 €, una volta sola.", "Iscriversi non costa nulla."],
-  pic: "versione", form: FORM_COUPLE, done: ["Grazie, siete in lista.", "Vi scriviamo appena c'è posto per voi. Nel frattempo potete provare la demo, con dati di esempio."] });
-requestPage({ file: "richiesta-planner.html", title: "Prova pilota per le wedding planner | Nozze in Ordine", desc: "Candidati alla prova pilota gratuita di Nozze in Ordine per le prime 10 wedding planner.",
-  h1: "Candidati alla prova pilota.", lead: "Cerchiamo le prime 10 wedding planner per costruire lo strumento insieme. Tre passaggi su come lavori, circa cinque minuti.",
-  next: ["Leggiamo ogni candidatura e ti scriviamo per fissare una chiamata, se ti va.", "Durante la prova pilota non paghi nulla.", "Il prezzo dopo la prova pilota lo decidiamo insieme: niente addebiti senza il tuo consenso."],
-  pic: "partiamo", form: FORM_PLANNER, done: ["Grazie, candidatura ricevuta.", "Ti scriviamo per raccontarti la prova pilota e, se ti va, fissare una chiamata. Nel frattempo puoi provare la demo, con dati di esempio."] });
-
-/* =========================================================== PRIVACY */
-write("privacy.html", head("Privacy | Nozze in Ordine", "Come trattiamo i dati delle richieste e della lista d'attesa di Nozze in Ordine.") + top("") + `
+/* =========================================================== PAGINE LEGALI */
+// Dati del titolare: completare indirizzo e partita IVA prima di attivare i pagamenti.
+const TITOLARE = { nome: "Felice Mondo", sede: "Marcianise (CE), Italia", piva: "", email: "info@nozzeinordine.com" };
+const AGGIORNATO = "15 novembre 2026";
+const MAILTO = `<a href="mailto:${TITOLARE.email}">${TITOLARE.email}</a>`;
+const legalPage = ({ file, title, desc, eb, h1, lead, body }) => write(file, head(title, desc) + top("") + `
 <main id="main">
-<section class="price-hero" aria-labelledby="h1"><div class="wrap"><div class="legal">${eyebrow("Informativa")}<h1 id="h1">Privacy.</h1>
-<p class="lead">Cosa raccogliamo quando compili una richiesta o ti iscrivi alla lista d'attesa, a cosa serve e come puoi chiedere di cancellarlo.</p>
-<p class="small">Ultimo aggiornamento: 14 novembre 2026</p>
-<h2>Chi tratta i dati</h2>
-<p>Il titolare del trattamento è Felice Mondo, persona fisica. Puoi scrivere a <a href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
-<h2>Quali dati raccogliamo</h2>
-<ul><li>Email, e se lo scrivi il vostro nome o quello dello studio</li><li>Se sei una coppia o una wedding planner, la regione e la data della richiesta</li><li>Per le coppie: mese e anno del matrimonio, invitati e budget indicativi, se avete una planner, cosa avete già prenotato, cosa usate per organizzarvi, cosa vi pesa di più, se prendereste il piano Completo e se volete essere tra i primi a provarlo</li><li>Per le planner: sito o profilo Instagram, come lavori, matrimoni l'anno e in corso, strumenti e spesa in software, dove perdi più tempo, interesse per la prova pilota, se vuoi una chiamata e, se lo scrivi, il telefono</li><li>Le note che scegli di scriverci</li></ul>
-<p>Nella prima fase non raccogliamo dati su intolleranze alimentari o salute degli invitati. Per questo nel campo note degli invitati vi chiediamo di non scrivere dati sulla salute. Se in futuro li raccoglieremo, lo scriveremo qui e chiederemo un consenso specifico.</p>
-<h2>Perché li raccogliamo</h2>
-<p>Per risponderti, per scriverti quando c'è posto, per organizzare la prova pilota con le planner e per capire quali funzioni servono davvero. Le risposte le leggiamo noi e le contiamo in forma aggregata; non le vendiamo e non le cediamo. La base è il tuo consenso, che puoi revocare in qualsiasi momento.</p>
-<h2>Per quanto tempo</h2>
-<p>Conserviamo i dati per 12 mesi dall'iscrizione, oppure fino a quando revochi il consenso se succede prima. Alla scadenza ti chiediamo se vuoi restare in lista; se non rispondi, li cancelliamo.</p>
-<h2>I tuoi diritti</h2>
-<p>Puoi chiedere accesso, correzione o cancellazione dei dati e revocare il consenso scrivendo a <a href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>. Puoi anche rivolgerti al Garante per la protezione dei dati personali.</p>
-<h2>Dove sono conservati e chi li gestisce</h2>
-<p>Le iscrizioni sono salvate su Supabase, in un data center situato in Europa. Il sito è consegnato tramite Cloudflare, che gestisce anche l'inoltro delle email che arrivano a info@nozzeinordine.com. Alcuni di questi fornitori sono società con sede fuori dall'Unione Europea.</p>
-<p>Come ogni sito, i server che consegnano le pagine registrano per breve tempo dati tecnici come l'indirizzo IP. I caratteri tipografici sono ospitati sul nostro stesso sito. In questa fase non usiamo cookie di profilazione né strumenti di analisi.</p>
+<section class="price-hero" aria-labelledby="h1"><div class="wrap"><div class="legal">${eyebrow(eb)}<h1 id="h1">${h1}</h1>
+<p class="lead">${lead}</p>
+<p class="small">Ultimo aggiornamento: ${AGGIORNATO}</p>
+${body}
+</div></div></section>
+</main>` + foot);
+
+legalPage({ file: "privacy.html", title: "Privacy | Nozze in Ordine", desc: "Come Nozze in Ordine tratta i dati personali sul sito e nella dashboard, ai sensi del Regolamento (UE) 2016/679.", eb: "Informativa", h1: "Privacy.",
+  lead: "Quali dati trattiamo sul sito e nella dashboard, perché, per quanto tempo e come esercitare i vostri diritti. Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (GDPR).",
+  body: `
+<h2>1. Chi tratta i dati</h2>
+<p>Il titolare del trattamento è ${TITOLARE.nome}, ${TITOLARE.sede}${TITOLARE.piva ? `, partita IVA ${TITOLARE.piva}` : ""}. Per qualsiasi richiesta sui dati: ${MAILTO}. Non è stato nominato un responsabile della protezione dei dati, perché non è obbligatorio per questa attività.</p>
+<h2>2. I due ruoli di Nozze in Ordine</h2>
+<p>Per i dati del vostro account e per l'uso del sito, Nozze in Ordine è <strong>titolare</strong> del trattamento.</p>
+<p>Per i dati che inserite nella dashboard su altre persone (invitati, fornitori, collaboratori), Nozze in Ordine li conserva per vostro conto. Quando a inserirli è una wedding planner o un altro professionista, il professionista è titolare e Nozze in Ordine è <strong>responsabile del trattamento</strong> ai sensi dell'articolo 28 del GDPR, alle condizioni scritte nei <a href="termini.html#responsabile">Termini di servizio</a>. Le coppie che organizzano il proprio matrimonio lo fanno per un'attività personale; a quei dati applichiamo comunque le stesse garanzie.</p>
+<h2>3. Quali dati trattiamo</h2>
+<ul><li><strong>Account:</strong> nome e cognome, email, ruolo (coppia o wedding planner), data di registrazione e di accesso. La password è conservata in forma cifrata dal servizio di autenticazione e non è leggibile da noi.</li>
+<li><strong>Matrimonio:</strong> nomi degli sposi, data, luogo, tipo di rito, budget e voci di spesa, pagamenti, fornitori con i loro contatti, preventivi, scadenze, scaletta della giornata, tavoli e disposizione della sala.</li>
+<li><strong>Invitati:</strong> nome, nucleo familiare, gruppo, risposta all'invito, menù, tavolo e posto, note e, se le indicate, intolleranze e allergie alimentari.</li>
+<li><strong>Note riservate</strong> delle wedding planner e inviti inviati a partner, sposi e collaboratori (email della persona invitata).</li>
+<li><strong>Dati tecnici:</strong> indirizzo IP, tipo di browser e orari delle richieste, registrati per breve tempo dai server che consegnano il sito e la dashboard.</li>
+<li><strong>Messaggi:</strong> ciò che ci scrivete per email.</li>
+<li><strong>Lista d'attesa:</strong> le risposte di chi ha compilato i moduli quando il servizio era in lista d'attesa. I moduli non sono più attivi.</li></ul>
+<h2>4. Intolleranze e allergie</h2>
+<p>Le intolleranze e le allergie alimentari sono dati relativi alla salute (articolo 9 del GDPR). Le inserisce chi organizza il matrimonio, su indicazione dell'invitato, e servono soltanto a preparare i menù. Chi le inserisce garantisce di averle ricevute dall'interessato e di poterle comunicare a chi cura la ristorazione. Nozze in Ordine si limita a conservarle: non le legge, non le analizza e non le usa per altri scopi. Vi chiediamo di non scrivere altri dati sulla salute nei campi di testo libero.</p>
+<h2>5. Perché li trattiamo e su quale base</h2>
+<ul><li><strong>Per fornire il servizio</strong> che avete chiesto registrandovi: creare l'account, far funzionare la dashboard, mandarvi le email di servizio (conferma dell'indirizzo, recupero della password, inviti). Base: esecuzione del contratto (articolo 6, paragrafo 1, lettera b).</li>
+<li><strong>Per la sicurezza</strong> del servizio, per prevenire abusi e per contare in forma aggregata come viene usato. Base: legittimo interesse (lettera f).</li>
+<li><strong>Per gli obblighi di legge</strong>, per esempio fiscali e contabili quando saranno attivi i pagamenti. Base: obbligo legale (lettera c).</li>
+<li><strong>Per rispondervi</strong> quando ci scrivete. Base: misure precontrattuali o legittimo interesse.</li>
+<li><strong>Per la lista d'attesa</strong> già raccolta. Base: il consenso dato allora, che potete revocare in qualsiasi momento (lettera a).</li></ul>
+<p>Non usiamo i dati per pubblicità, non li vendiamo e non li cediamo a terzi per loro scopi. Non facciamo profilazione né prendiamo decisioni automatizzate che producono effetti su di voi. Non inviamo newsletter: se in futuro lo faremo, sarà solo con un consenso separato.</p>
+<h2>6. Per quanto tempo</h2>
+<ul><li>I dati dell'account e dei matrimoni restano finché l'account è attivo.</li>
+<li>Se chiedete la cancellazione, li eliminiamo entro 30 giorni dalla richiesta.</li>
+<li>Dopo 24 mesi senza accessi possiamo chiudere l'account, avvisandovi prima per email con almeno 30 giorni di anticipo.</li>
+<li>Le risposte alla lista d'attesa si conservano per 12 mesi dall'iscrizione, o fino alla revoca del consenso.</li>
+<li>I documenti fiscali, quando ci saranno, si conservano per 10 anni come richiede la legge.</li></ul>
+<h2>7. Chi riceve i dati</h2>
+<p>I dati sono trattati da noi e dai fornitori che ci permettono di offrire il servizio, nominati responsabili del trattamento:</p>
+<ul><li><strong>Supabase</strong> (Supabase, Inc.): database e autenticazione. I dati della dashboard sono conservati in un data center a Londra (Regno Unito).</li>
+<li><strong>Cloudflare</strong> (Cloudflare, Inc.): consegna del sito e della dashboard, protezione dagli attacchi, inoltro delle email inviate a ${TITOLARE.email}.</li>
+<li><strong>Google</strong> (Google Ireland Limited): casella di posta in cui leggiamo i vostri messaggi.</li></ul>
+<p>Chi invitate nel vostro matrimonio (partner, wedding planner, collaboratori) vede i dati di quel matrimonio secondo il proprio ruolo.</p>
+<h2>8. Trasferimenti fuori dall'Unione Europea</h2>
+<p>Il Regno Unito è coperto da una decisione di adeguatezza della Commissione europea. Alcuni fornitori hanno sede negli Stati Uniti: in quel caso il trasferimento avviene sulla base del Data Privacy Framework UE-USA, quando il fornitore vi aderisce, oppure delle clausole contrattuali standard approvate dalla Commissione europea. Potete chiederci copia delle garanzie adottate.</p>
+<h2>9. I vostri diritti</h2>
+<p>Potete chiedere in qualsiasi momento l'accesso ai vostri dati, la correzione, la cancellazione, la limitazione del trattamento, la portabilità in un formato leggibile, e potete opporvi ai trattamenti basati sul legittimo interesse o revocare un consenso. Basta scrivere a ${MAILTO}: rispondiamo entro 30 giorni.</p>
+<p>Potete anche presentare reclamo al <a href="https://www.garanteprivacy.it">Garante per la protezione dei dati personali</a> o all'autorità di controllo del paese dell'Unione Europea in cui vivete o lavorate.</p>
+<h2>10. Se siete tra gli invitati</h2>
+<p>Se i vostri dati sono stati inseriti da una coppia o da una wedding planner, li abbiamo ricevuti da loro (articolo 14 del GDPR). Per sapere quali sono, correggerli o farli cancellare potete rivolgervi a chi organizza il matrimonio oppure scrivere a noi: inoltreremo la richiesta e vi aiuteremo a ottenerne riscontro.</p>
+<h2>11. Sicurezza</h2>
+<p>Sito e dashboard sono raggiungibili solo con connessione cifrata. Ogni persona accede con le proprie credenziali e vede soltanto i matrimoni a cui partecipa: la regola è applicata direttamente nel database, non solo nell'interfaccia. In caso di violazione dei dati che comporti un rischio per le persone, avvisiamo il Garante e gli interessati nei tempi previsti dalla legge.</p>
+<h2>12. Età minima</h2>
+<p>Il servizio è riservato a chi ha compiuto 18 anni.</p>
+<h2>13. Cookie</h2>
+<p>Non usiamo cookie di profilazione né strumenti di analisi. I dettagli sono nella <a href="cookie.html">pagina cookie</a>.</p>
+<h2>14. Modifiche</h2>
+<p>Se questa informativa cambia in modo sostanziale, lo scriviamo qui e avvisiamo per email chi ha un account.</p>
 <h2>Immagini</h2>
 <p>Le fotografie del sito sono evocative e non rappresentano eventi organizzati da Nozze in Ordine. La foto del chiostro di Santa Chiara nella pagina di accesso è di Sailko, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>, da <a href="https://commons.wikimedia.org/wiki/File:Chiostro_maiolicato_delle_clarisse_di_s._chiara,_1739-42,_01.jpg">Wikimedia Commons</a>.</p>
 <p>Le altre fotografie vengono da <a href="https://unsplash.com/?utm_source=felice_mondo_progetti&amp;utm_medium=referral">Unsplash</a>, con la <a href="https://unsplash.com/license">licenza Unsplash</a>:</p>
-<ul class="credits">${PHOTO_CREDITS.map(([f, a, au, p]) => `<li><a href="${p}">${f.replace(/-/g, " ")}</a> di <a href="${au}">${a}</a></li>`).join("")}</ul>
-</div></div></section>
-</main>` + foot);
+<ul class="credits">${PHOTO_CREDITS.map(([f, a, au, p]) => `<li><a href="${p}">${f.replace(/-/g, " ")}</a> di <a href="${au}">${a}</a></li>`).join("")}</ul>` });
+
+legalPage({ file: "cookie.html", title: "Cookie | Nozze in Ordine", desc: "Quali cookie e strumenti simili usano il sito e la dashboard di Nozze in Ordine: solo quelli tecnici, necessari al funzionamento.", eb: "Informativa", h1: "Cookie.",
+  lead: "Il sito e la dashboard usano soltanto strumenti tecnici, necessari al funzionamento. Per questo non compare un banner di consenso: la legge lo richiede solo per cookie di profilazione e strumenti di analisi non anonimi, che qui non ci sono.",
+  body: `
+<h2>Sul sito</h2>
+<p>Le pagine del sito non impostano cookie nostri, non caricano contenuti da altri siti e non usano strumenti di analisi o pixel pubblicitari. I caratteri tipografici e le immagini sono ospitati sul nostro stesso dominio.</p>
+<p>Cloudflare, che consegna il sito, può impostare cookie tecnici di sicurezza per distinguere le visite reali dal traffico automatico. Sono strettamente necessari e non servono a riconoscervi tra siti diversi.</p>
+<h2>Nella dashboard</h2>
+<p>Quando accedete, il browser conserva nella propria memoria locale (<em>localStorage</em> e <em>sessionStorage</em>):</p>
+<ul><li><strong>La sessione di accesso</strong>, che vi mantiene collegati senza reinserire la password a ogni pagina. Si cancella quando uscite dall'account.</li>
+<li><strong>Le preferenze dell'interfaccia</strong>, per esempio l'ultima sezione aperta.</li></ul>
+<p>Se lo consentite, la dashboard mostra le notifiche di scadenze e pagamenti sul vostro dispositivo. Il permesso si concede e si revoca dalle impostazioni del browser.</p>
+<h2>Come cancellarli</h2>
+<p>Potete cancellare in ogni momento cookie e dati dei siti dalle impostazioni del browser. Senza la sessione di accesso la dashboard vi chiederà di nuovo email e password.</p>
+<h2>Se qualcosa cambia</h2>
+<p>Se in futuro useremo strumenti di analisi o di altro tipo che richiedono il consenso, li attiveremo solo dopo avervelo chiesto, e aggiorneremo questa pagina.</p>
+<p>Per il resto vale l'<a href="privacy.html">informativa privacy</a>. Domande: ${MAILTO}.</p>` });
+
+legalPage({ file: "termini.html", title: "Termini di servizio | Nozze in Ordine", desc: "Le condizioni d'uso di Nozze in Ordine per coppie e wedding planner: account, piani, prezzi, recesso, dati e responsabilità.", eb: "Condizioni", h1: "Termini di servizio.",
+  lead: "Le regole con cui usate Nozze in Ordine. Registrandovi le accettate. Abbiamo cercato di scriverle in modo che si leggano dall'inizio alla fine.",
+  body: `
+<h2>1. Chi siamo</h2>
+<p>Nozze in Ordine è un servizio di ${TITOLARE.nome}, ${TITOLARE.sede}${TITOLARE.piva ? `, partita IVA ${TITOLARE.piva}` : ""}. Contatto: ${MAILTO}.</p>
+<h2>2. Il servizio</h2>
+<p>Nozze in Ordine è uno strumento online per organizzare matrimoni: budget, fornitori, invitati, tavoli, scadenze e scaletta. Non è un'agenzia, non organizza eventi e non seleziona né raccomanda fornitori. Il servizio è in fase di lancio: le funzioni possono cambiare e migliorare nel tempo.</p>
+<h2>3. Account</h2>
+<p>Per registrarvi dovete avere almeno 18 anni e indicare dati veri. L'account è personale: custodite le credenziali e avvisateci se pensate che qualcun altro le stia usando. Chi invitate in un matrimonio vede e modifica ciò che il suo ruolo prevede.</p>
+<h2>4. Piani e prezzi</h2>
+<ul><li><strong>Gratis</strong> (coppie): senza limiti di tempo, con i limiti di funzioni indicati nella <a href="prezzi.html">pagina prezzi</a>.</li>
+<li><strong>Completo</strong> (coppie): ${PREZZI.completo}, IVA inclusa, una volta sola. Vale per un solo matrimonio. I nomi degli sposi si fissano all'attivazione e non possono essere cambiati. È riservato all'uso personale: non può essere usato da chi organizza matrimoni per lavoro.</li>
+<li><strong>Planner</strong> e <strong>Team</strong> (professionisti): canone mensile di ${PREZZI.planner} e ${PREZZI.team}, IVA esclusa, con i limiti di matrimoni attivi e collaboratori indicati nella pagina prezzi. Un matrimonio è attivo finché la sua data non è passata. La prova gratuita dura ${PREZZI.prova} giorni.</li>
+<li><strong>Studio</strong>: condizioni e prezzo concordati per iscritto.</li></ul>
+<p>In questa fase di lancio i pagamenti non sono attivi e l'accesso è gratuito. Nessun piano a pagamento parte senza il vostro consenso espresso. Prima di attivare i pagamenti vi scriviamo per email; per i canoni mensili, ogni variazione di prezzo è comunicata con almeno 30 giorni di anticipo e potete disdire prima che si applichi.</p>
+<h2>5. Recesso e disdetta</h2>
+<p><strong>Coppie (consumatori).</strong> Avete 14 giorni dall'acquisto del piano Completo per ripensarci, senza dare spiegazioni: scrivete a ${MAILTO} e rimborsiamo l'importo pagato entro 14 giorni, con lo stesso mezzo di pagamento. Restano fermi tutti i diritti che il Codice del consumo riconosce, compresa la garanzia legale di conformità.</p>
+<p><strong>Wedding planner (professionisti).</strong> Potete disdire il canone in qualsiasi momento: la disdetta ha effetto alla fine del mese già pagato, senza rimborso della parte restante.</p>
+<h2>6. Uso corretto</h2>
+<p>Non è consentito usare il servizio per scopi illeciti, inserire dati che non avete il diritto di trattare, tentare di accedere a matrimoni o account altrui, aggirare i limiti dei piani o rivendere l'accesso. In caso di violazione possiamo sospendere l'account, avvisandovi e dandovi modo di rimediare quando la situazione lo consente.</p>
+<h2>7. I vostri contenuti</h2>
+<p>Ciò che inserite resta vostro. Ci autorizzate a conservarlo ed elaborarlo solo per farvi funzionare il servizio. Vi consigliamo di tenere una copia delle informazioni più importanti.</p>
+<h2>8. Dati di altre persone</h2>
+<p>Inserendo dati di invitati, fornitori e collaboratori garantite di poterlo fare e di averli informati quando la legge lo richiede. Intolleranze e allergie vanno inserite solo su indicazione dell'interessato e solo per la preparazione dei menù. I dettagli sono nell'<a href="privacy.html">informativa privacy</a>.</p>
+<h2 id="responsabile">9. Wedding planner: nomina a responsabile del trattamento</h2>
+<p>Quando usate Nozze in Ordine per la vostra attività, siete titolari del trattamento dei dati dei vostri clienti e dei loro invitati, e ci nominate responsabili ai sensi dell'articolo 28 del GDPR, a queste condizioni:</p>
+<ul><li><strong>Oggetto e durata:</strong> conservazione e messa a disposizione dei dati che inserite, per tutta la durata dell'account.</li>
+<li><strong>Dati e interessati:</strong> dati anagrafici e di contatto, dati sull'evento e, se li inserite, intolleranze e allergie alimentari; riguardano sposi, invitati, fornitori e collaboratori.</li>
+<li><strong>Istruzioni:</strong> trattiamo i dati solo secondo le vostre istruzioni, che coincidono con l'uso che fate della dashboard e con questi termini.</li>
+<li><strong>Riservatezza e sicurezza:</strong> chi accede ai dati per nostro conto è tenuto alla riservatezza; applichiamo le misure descritte nell'informativa privacy.</li>
+<li><strong>Altri responsabili:</strong> ci autorizzate a servirci dei fornitori elencati nell'informativa privacy, vincolati agli stessi obblighi. Vi informiamo prima di aggiungerne o sostituirne uno, e potete opporvi disdicendo il servizio.</li>
+<li><strong>Diritti degli interessati:</strong> vi aiutiamo a rispondere alle richieste delle persone a cui i dati si riferiscono.</li>
+<li><strong>Violazioni:</strong> vi avvisiamo senza ritardo, e comunque entro 48 ore da quando ne veniamo a conoscenza.</li>
+<li><strong>Fine del rapporto:</strong> alla chiusura dell'account cancelliamo i dati entro 30 giorni, salvo obblighi di legge. Prima della chiusura potete chiederci una copia.</li>
+<li><strong>Verifiche:</strong> su richiesta vi forniamo le informazioni necessarie a dimostrare il rispetto di questi obblighi.</li></ul>
+<h2>10. Disponibilità e responsabilità</h2>
+<p>Lavoriamo perché il servizio sia sempre raggiungibile, ma non possiamo garantire che non ci siano interruzioni o errori. Nozze in Ordine è uno strumento di organizzazione: le decisioni, i contratti con i fornitori e i pagamenti restano vostri. Nei limiti consentiti dalla legge, non rispondiamo dei danni indiretti né delle conseguenze di dati inseriti in modo errato. Queste limitazioni non valgono in caso di dolo o colpa grave e non riducono i diritti che la legge riconosce ai consumatori.</p>
+<h2>11. Chiusura dell'account</h2>
+<p>Potete chiudere l'account quando volete scrivendo a ${MAILTO}: cancelliamo i dati entro 30 giorni. Possiamo chiudere un account che viola questi termini, o cessare il servizio, con un preavviso di almeno 30 giorni che vi permetta di recuperare le vostre informazioni.</p>
+<h2>12. Modifiche ai termini</h2>
+<p>Se cambiamo questi termini in modo sostanziale vi avvisiamo per email con almeno 30 giorni di anticipo. Se non siete d'accordo potete chiudere l'account prima che le modifiche si applichino.</p>
+<h2>13. Legge applicabile e controversie</h2>
+<p>Si applica la legge italiana. Se siete consumatori, è competente il giudice del luogo in cui risiedete o avete domicilio e potete rivolgervi a un organismo di risoluzione alternativa delle controversie. Se usate il servizio per la vostra attività professionale, è competente in via esclusiva il Foro di Santa Maria Capua Vetere.</p>
+<h2>14. Contatti</h2>
+<p>Per qualsiasi domanda su questi termini: ${MAILTO}.</p>` });
 
 console.log("pagine scritte in", OUT);
