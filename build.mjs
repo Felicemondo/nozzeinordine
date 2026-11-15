@@ -5,7 +5,23 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "site");
-const write = (name, html) => writeFileSync(join(OUT, name), html);
+// ---- SEO: ogni pagina esce con indirizzo canonico, dati per i social, dati strutturati e collegamenti senza ".html"
+const SITE = "https://nozzeinordine.com";
+const LD = {}; // dati strutturati per pagina, riempiti più sotto dove nascono i contenuti
+const ORG = { "@type": "Organization", "@id": SITE + "/#org", name: "Nozze in Ordine", url: SITE + "/", logo: SITE + "/apple-touch-icon.png", email: "info@nozzeinordine.com", areaServed: "IT" };
+const crumbs = (name, slug) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Nozze in Ordine", item: SITE + "/" }, { "@type": "ListItem", position: 2, name, item: SITE + "/" + slug }] });
+const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
+const cleanLinks = (html) => html
+  .replace(/href="index\.html(#[^"]*)?"/g, (m, a) => `href="/${a || ""}"`)
+  .replace(/href="(coppie|planner|prezzi|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
+  .replace(/href="app\/demo\.html/g, 'href="/app/demo').replace(/href="app\//g, 'href="/app/');
+const write = (name, html) => {
+  const slug = name === "index.html" ? "" : name.replace(/\.html$/, ""), url = SITE + "/" + slug;
+  const h1 = (html.match(/<h1[^>]*>(.*?)<\/h1>/) || [])[1] || "";
+  const blocks = (LD[name] || []).concat(slug ? [crumbs(h1.replace(/<[^>]+>/g, "").replace(/\.$/, ""), slug)] : []);
+  const seo = `<link rel="canonical" href="${url}"><meta property="og:url" content="${url}"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="${SITE}/og.png">${blocks.map(ld).join("")}`;
+  writeFileSync(join(OUT, name), cleanLinks(html).replace("</head>", seo + "</head>"));
+};
 
 /* ---------- il marchio, in linea ---------- */
 const outer = (sx, sy) => {
@@ -161,6 +177,11 @@ const ctaBand = ({ h, p, href, label, fine }) => `<section class="cta-dark" id="
 const APP = "app/#/registrati";
 const DEMO = "app/demo.html";
 const MAIL = "mailto:info@nozzeinordine.com";
+LD["index.html"] = [{ "@context": "https://schema.org", "@graph": [ORG,
+  { "@type": "WebSite", "@id": SITE + "/#site", url: SITE + "/", name: "Nozze in Ordine", inLanguage: "it-IT", publisher: { "@id": SITE + "/#org" } },
+  { "@type": "SoftwareApplication", name: "Nozze in Ordine", applicationCategory: "BusinessApplication", operatingSystem: "Web", inLanguage: "it-IT", url: SITE + "/",
+    description: "Dashboard per organizzare il matrimonio: budget, fornitori, invitati, tavoli e scadenze in uno spazio condiviso, per coppie e wedding planner.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "EUR", description: "Piano gratuito per le coppie" }, publisher: { "@id": SITE + "/#org" } }] }];
 write("index.html", head("Nozze in Ordine | Organizzare il matrimonio in un unico spazio", "Budget, fornitori, invitati, tavoli e scadenze del matrimonio in uno spazio condiviso. Per coppie e wedding planner, in tutta Italia. Gratis per iniziare.") + top("") + `
 <main id="main">
 ${hero({ k: "home", eb: eyebrow("Per coppie e wedding planner"), h1: "Il tuo sì, un tassello alla volta.", p: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Vi registrate e trovate le scadenze già calcolate sulla data del matrimonio.",
@@ -186,7 +207,7 @@ ${eyebrow("Come si comincia")}<h2 id="prog">Tre passi per mettere ordine.</h2><p
 
 /* =========================================================== COPPIE */
 const PHASES = [["12+ mesi prima", "Data, budget e location"], ["9–11 mesi prima", "Fornitori principali e preventivi"], ["6–8 mesi prima", "Save the date e abiti"], ["3–5 mesi prima", "Dettagli, inviti e menù"], ["1–2 mesi prima", "Conferme finali e saldi"], ["Settimana del sì", "Scaletta e responsabili"]];
-write("coppie.html", head("Per le coppie | Nozze in Ordine", "Budget, preventivi, invitati, tavoli e scadenze del matrimonio nello stesso posto condiviso. Piano gratuito senza scadenza, Completo a 49 € una volta sola.") + top("coppie.html") + `
+write("coppie.html", head("Organizzare il matrimonio con calma | Nozze in Ordine", "Budget, preventivi, invitati, tavoli e scadenze del matrimonio nello stesso posto condiviso. Piano gratuito senza scadenza, Completo a 49 € una volta sola.") + top("coppie.html") + `
 <main id="main">
 ${hero({ k: "coppie", tall: true, eb: eyebrow("Per le coppie"), h1: "Il matrimonio, con calma.", p: "Budget, preventivi, invitati, tavoli e scadenze nello stesso posto, condiviso tra voi due. Pensato per chi si sposa in Italia.",
   a: btn(APP, "Iniziate gratis"), b: btn("#funzioni", "Cosa include", "line"), fine: "Piano gratuito senza scadenza · Completo a 49 €, una volta sola" })}
@@ -209,7 +230,7 @@ ${ctaBand({ h: "Aprite il vostro spazio.", p: "Il piano gratuito non scade. Il C
 </main>` + foot);
 
 /* =========================================================== PLANNER */
-write("planner.html", head("Per le wedding planner | Nozze in Ordine", "Il gestionale per wedding planner: tutti i matrimoni che segui in un unico spazio, con budget, fornitori, acconti e saldi, scadenze e un portale per gli sposi. Da 29 € al mese.") + top("planner.html") + `
+write("planner.html", head("Gestionale per wedding planner | Nozze in Ordine", "Il gestionale per wedding planner: tutti i matrimoni in un unico spazio, con budget, fornitori, acconti, scadenze e portale per gli sposi. Da 29 € al mese.") + top("planner.html") + `
 <main id="main">
 ${hero({ k: "planner", eb: eyebrow("Per le wedding planner"), h1: "Tutti i matrimoni, in un unico spazio.", p: "Una dashboard per seguire più eventi insieme: budget, fornitori, acconti e saldi, scadenze, tavoli e scaletta, con un portale condiviso con gli sposi.",
   a: btn(APP, "Prova gratis 30 giorni"), b: btn(DEMO + "?ruolo=planner", "Guarda la demo", "line"), fine: "Da 29 € al mese · Prova gratuita di 30 giorni · Senza carta di credito", corner: "01 / Il coordinamento" })}
@@ -242,7 +263,14 @@ const faq = [["Devo inserire una carta di credito per iniziare?", "No. Vi regist
   ["I prezzi comprendono l'IVA?", `Per le coppie sì: ${PREZZI.completo} è il prezzo finale. Per le wedding planner i canoni sono IVA esclusa.`],
   ["Come si paga?", "I pagamenti online non sono ancora attivi: in questa fase di lancio l'accesso è gratuito. Prima di attivarli vi scriviamo per email, e nessun piano a pagamento parte senza il vostro consenso."],
   ["Cosa succede ai miei dati?", `Li usiamo per farvi funzionare lo spazio e per rispondervi. Non li vendiamo e non li cediamo. I dettagli sono nella <a href="privacy.html">pagina privacy</a>.`]];
-write("prezzi.html", head("Prezzi | Nozze in Ordine", `Per le coppie: gratis per iniziare, ${PREZZI.completo} una volta sola per il piano Completo. Per le wedding planner: da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.`) + top("prezzi.html") + `
+const euro = (s) => s.replace(/[^0-9,]/g, "").replace(",", ".");
+LD["prezzi.html"] = [{ "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Nozze in Ordine", applicationCategory: "BusinessApplication", operatingSystem: "Web", url: SITE + "/prezzi",
+  offers: [{ "@type": "Offer", name: "Gratis", price: "0", priceCurrency: "EUR", description: "Per le coppie, senza limiti di tempo" },
+    { "@type": "Offer", name: "Completo", price: euro(PREZZI.completo), priceCurrency: "EUR", description: "Per le coppie: una volta sola, per un matrimonio, IVA inclusa" },
+    { "@type": "Offer", name: "Planner", price: euro(PREZZI.planner), priceCurrency: "EUR", description: `Per wedding planner: canone mensile IVA esclusa, fino a ${PREZZI.eventiPlanner} matrimoni attivi` },
+    { "@type": "Offer", name: "Team", price: euro(PREZZI.team), priceCurrency: "EUR", description: `Per wedding planner: canone mensile IVA esclusa, fino a ${PREZZI.eventiTeam} matrimoni attivi e ${PREZZI.collabTeam} collaboratori` }] },
+  { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }];
+write("prezzi.html", head("Prezzi per coppie e wedding planner | Nozze in Ordine", `Per le coppie: gratis per iniziare, ${PREZZI.completo} una volta sola per il piano Completo. Per le wedding planner: da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.`) + top("prezzi.html") + `
 <main id="main">
 <section class="price-hero" aria-labelledby="h1"><div class="wrap price-hero-in"><div>${eyebrow("Prezzi")}<h1 id="h1">Prezzi scritti, senza sorprese.</h1><p class="lead">Per le coppie un pagamento unico per matrimonio. Per le wedding planner un canone mensile fisso, in base a quanti matrimoni segui.</p>
 ${defs([["Per le coppie", `Piano gratuito senza scadenza, oppure Completo a ${PREZZI.completo} una volta sola.`], ["Per le planner", `Da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova gratuita.`], ["Per gli studi", "Un piano su misura, con prezzo su contatto."]])}<p class="small note">In questa fase di lancio l'accesso è gratuito. Nessun piano a pagamento parte senza il vostro consenso.</p></div>
@@ -277,7 +305,7 @@ ${body}
 </div></div></section>
 </main>` + foot);
 
-legalPage({ file: "privacy.html", title: "Privacy | Nozze in Ordine", desc: "Come Nozze in Ordine tratta i dati personali sul sito e nella dashboard, ai sensi del Regolamento (UE) 2016/679.", eb: "Informativa", h1: "Privacy.",
+legalPage({ file: "privacy.html", title: "Informativa privacy | Nozze in Ordine", desc: "Come Nozze in Ordine tratta i dati personali sul sito e nella dashboard, ai sensi del Regolamento (UE) 2016/679.", eb: "Informativa", h1: "Privacy.",
   lead: "Quali dati trattiamo sul sito e nella dashboard, perché, per quanto tempo e come esercitare i vostri diritti. Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (GDPR).",
   body: `
 <h2>1. Chi tratta i dati</h2>
@@ -334,7 +362,7 @@ legalPage({ file: "privacy.html", title: "Privacy | Nozze in Ordine", desc: "Com
 <p>Le altre fotografie vengono da <a href="https://unsplash.com/?utm_source=felice_mondo_progetti&amp;utm_medium=referral">Unsplash</a>, con la <a href="https://unsplash.com/license">licenza Unsplash</a>:</p>
 <ul class="credits">${PHOTO_CREDITS.map(([f, a, au, p]) => `<li><a href="${p}">${f.replace(/-/g, " ")}</a> di <a href="${au}">${a}</a></li>`).join("")}</ul>` });
 
-legalPage({ file: "cookie.html", title: "Cookie | Nozze in Ordine", desc: "Quali cookie e strumenti simili usano il sito e la dashboard di Nozze in Ordine: solo quelli tecnici, necessari al funzionamento.", eb: "Informativa", h1: "Cookie.",
+legalPage({ file: "cookie.html", title: "Informativa sui cookie | Nozze in Ordine", desc: "Quali cookie e strumenti simili usano il sito e la dashboard di Nozze in Ordine: solo quelli tecnici, necessari al funzionamento.", eb: "Informativa", h1: "Cookie.",
   lead: "Il sito e la dashboard usano soltanto strumenti tecnici, necessari al funzionamento. Per questo non compare un banner di consenso: la legge lo richiede solo per cookie di profilazione e strumenti di analisi non anonimi, che qui non ci sono.",
   body: `
 <h2>Sul sito</h2>

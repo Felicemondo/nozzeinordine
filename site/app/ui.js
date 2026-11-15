@@ -457,12 +457,12 @@
   }
   function planLock(w, title, text) {
     return [pageHead(title, null), panel("Incluso nel piano Completo", text, null, h("div", { class: "btn-row" },
-      canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary") : null, linkBtn("../prezzi.html", "Vedi i piani", "soft")))];
+      canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary") : null, linkBtn("/prezzi", "Vedi i piani", "soft")))];
   }
   function gratisBanner(w) {
     return h("div", { class: "alert info" }, icon("lock"), h("div", null,
       h("p", null, h("b", null, "Piano Gratis"), " · fino a 50 invitati e 3 fornitori. Tavoli, programma del giorno, confronto dei preventivi e invito alla wedding planner sono nel piano Completo."),
-      h("div", { class: "btn-row" }, canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary sm") : null, linkBtn("../prezzi.html", "Vedi i piani", "soft sm"))));
+      h("div", { class: "btn-row" }, canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary sm") : null, linkBtn("/prezzi", "Vedi i piani", "soft sm"))));
   }
   function planPanel() {
     var me = state.me, p = me.plan || "libero", caps = PLAN_CAPS[p], today = new Date().toISOString().slice(0, 10);
@@ -473,7 +473,7 @@
     var asks = p === "prova" ? ["planner", "team"] : p === "planner" ? ["team"] : p === "team" ? ["studio"] : [];
     return panel("Il tuo piano", line, null, h("div", { class: "stack-sm" },
       caps ? h("p", { class: "small" }, h("b", null, "Matrimoni attivi"), h("br"), active + " su " + caps[0] + (caps[1] ? " · fino a " + caps[1] + " collaboratori" : " · i collaboratori sono nel piano Team")) : null,
-      asks.length ? h("div", { class: "btn-row" }, asks.map(function (k, i) { return btn("Chiedi il piano " + PLAN[k], function () { askPlan(k); }, i === 0 && p === "prova" ? "primary sm" : "soft sm"); }), linkBtn("../prezzi.html", "Vedi i piani", "soft sm")) : null), "compact");
+      asks.length ? h("div", { class: "btn-row" }, asks.map(function (k, i) { return btn("Chiedi il piano " + PLAN[k], function () { askPlan(k); }, i === 0 && p === "prova" ? "primary sm" : "soft sm"); }), linkBtn("/prezzi", "Vedi i piani", "soft sm")) : null), "compact");
   }
   function weddingSections(w) {
     var items = [["panoramica", "Panoramica", "home"], ["scadenze", "Da fare", "todo"], ["budget", "Budget e pagamenti", "wallet"], ["fornitori", "Fornitori e preventivi", "briefcase"],
@@ -583,7 +583,7 @@
         field({ name: "full_name", label: "Nome e cognome", required: true, max: 120, autocomplete: "name", placeholder: "Ad esempio: Anna Russo" }),
         field({ name: "email", label: "Email", type: "email", required: true, autocomplete: "email", placeholder: "nome@esempio.it" }),
         passwordField("password", "Password", "new-password", "Almeno 8 caratteri."),
-        h("label", { class: "check" }, h("input", { type: "checkbox", name: "privacy", required: true }), h("span", null, "Ho letto l'", h("a", { href: "../privacy.html", target: "_blank", rel: "noopener" }, "informativa privacy"), " e accetto i ", h("a", { href: "../termini.html", target: "_blank", rel: "noopener" }, "termini di servizio"), ".")),
+        h("label", { class: "check" }, h("input", { type: "checkbox", name: "privacy", required: true }), h("span", null, "Ho letto l'", h("a", { href: "/privacy", target: "_blank", rel: "noopener" }, "informativa privacy"), " e accetto i ", h("a", { href: "/termini", target: "_blank", rel: "noopener" }, "termini di servizio"), ".")),
         h("button", { class: "btn primary block", type: "submit" }, "Crea l'account"), msg);
       f.addEventListener("submit", async function (e) {
         e.preventDefault();
