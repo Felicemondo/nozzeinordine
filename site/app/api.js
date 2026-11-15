@@ -60,7 +60,10 @@
     me: async function () {
       var u = ok(await sb.auth.getUser()).user;
       if (!u) return null;
-      var p = ok(await sb.from("profiles").select("id, role, full_name, email, phone, business_name, city, notify_days, weddings_per_year, work_mode, created_at, plan, trial_ends_at").eq("id", u.id).maybeSingle());
+      var COLS = "id, role, full_name, email, phone, business_name, city, notify_days, weddings_per_year, work_mode, created_at, plan, trial_ends_at";
+      var p = ok(await sb.from("profiles").select(COLS).eq("id", u.id).maybeSingle());
+      // Profilo mancante (riga cancellata per errore): il database lo ricrea dai dati della registrazione.
+      if (!p) { try { ok(await sb.rpc("ensure_profile")); p = ok(await sb.from("profiles").select(COLS).eq("id", u.id).maybeSingle()); } catch (e) {} }
       return p || { id: u.id, role: "coppia", full_name: "", email: u.email, phone: "", business_name: "", city: "", notify_days: 3 };
     },
     updateMyProfile: async function (id, patch) {
