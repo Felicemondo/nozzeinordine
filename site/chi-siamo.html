@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="it" data-type="service" data-radius="soft" data-buttons="block" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chi siamo: Nozze in Ordine, app per organizzare il matrimonio</title>
+<meta name="description" content="Nozze in Ordine è un'app per organizzare il matrimonio, progettata in Campania da Felice Mondo, UX/UI designer. Uno strumento, non un'agenzia: niente pubblicità e niente marketplace.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chi siamo: Nozze in Ordine, app per organizzare il matrimonio">
+<meta property="og:description" content="Nozze in Ordine è un'app per organizzare il matrimonio, progettata in Campania da Felice Mondo, UX/UI designer. Uno strumento, non un'agenzia: niente pubblicità e niente marketplace.">
+<meta property="og:image" content="https://nozzeinordine.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#f5f0e7">
+<meta name="site-kind" content="other">
+<meta name="page-type" content="service">
+<link rel="preload" href="/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/system.css">
+<link rel="stylesheet" href="/assets/ui/cards.css">
+<link rel="stylesheet" href="/assets/motion/motion.css">
+<link rel="stylesheet" href="/assets/layout/layout.css">
+
+<style>
+@font-face { font-family: "DM Serif Display"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-600-normal.woff2") format("woff2"); }
+:root {
+  --p-bg: #f5f0e7; --p-surface: #ebe4d7; --p-ink: #2b2a24; --p-muted: #5a5650;
+  --p-accent: #a85339; --p-accent-ink: #f5f0e7; --p-action: #a85339; --p-action-ink: #f5f0e7;
+  --p-inv-bg: #2b2a24; --p-inv-surface: #37362f; --p-inv-ink: #f5f0e7; --p-inv-muted: #a8a49c;
+  --p-inv-accent: #f5f0e7; --p-inv-accent-ink: #2b2a24; --p-inv-action: #f5f0e7; --p-inv-action-ink: #2b2a24;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-text: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.012em;
+  --display-tracking-xl: -0.018em;
+}
+.nav__logo svg { width: 26px; height: 26px; fill: #702f43; flex: none; }
+.nav__logo { color: #702f43; }
+.nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
+.nav__toggle svg { width: 22px; height: 22px; }
+.app-shot { object-position: left top; }
+/* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
+@media (max-width: 639px) {
+  :root { --padt: 56px; --padb: 32px; }
+  main > :is(section, .section):not(.hero, .section--hero), footer.closing { min-height: 0 !important; }
+  main > :is(section, .section).g2 > .wrap, main > :is(section, .section).g2m > .wrap, footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-7); }
+  footer.closing > .wrap { row-gap: var(--s-8); }
+  main > :is(section, .section):not(.hero) > .wrap { height: auto; min-height: 0; }
+  main > :is(section, .section):not(.hero, .section--hero) { padding-bottom: var(--padb) !important; }
+  main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto !important; height: auto !important; min-height: 0; }
+  .mo-pc__step { min-height: 0 !important; height: auto !important; padding-block: var(--s-2); }
+  .mo-pc__grid, .mo-pc__text, .mo-pc__steps { min-height: 0 !important; height: auto !important; }
+  .frame, .develop { height: auto !important; min-height: 0 !important; }
+  .frame--photo:has(> .frame__img), .develop { aspect-ratio: 4 / 3; }
+  .frame--photo:has(> .app-shot) { aspect-ratio: 1600 / 1074; }
+}
+/* un solo raggio per tutte le foto e le schermate (scelta di Felice): quello delle card */
+.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel, .menu-card .panel { border-radius: var(--r-lg); overflow: hidden; }
+:is(.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel) img { border-radius: inherit; }
+.rows__name small { display: block; margin-top: var(--s-1); font: 400 var(--t-small)/1.5 var(--font-text); color: var(--muted); }
+.rows__value { text-align: right; }
+.panel:has(> .app-shot) { --p-h: 340px; }
+@media (max-width: 1279px) { .panel:has(> .app-shot) { --p-h: 280px; } }
+.develop { aspect-ratio: 1; }
+.frame--photo:has(> .frame__img) { aspect-ratio: 1; }
+#prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+@media (min-width: 640px) and (max-width: 1023px) { #prezzi .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) {
+  #prezzi .section-head p, #prezzi .rows > li:nth-child(n+3), #domande .faq__item:nth-child(n+3) { display: none; }
+  #prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 3 / 2; }
+}
+#eventi .frame--photo { aspect-ratio: 1600 / 1074; }
+#portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
+#spazio .panel:has(> .app-shot) { --p-h: 440px; }
+@media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
+#piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: stretch; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
+.card--plan .checks li { font-size: 15px; line-height: 1.5; }
+.cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+.pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
+@media (max-width: 1023px) { .pricing-pic { display: none; } }
+@media (max-width: 639px) { .section.is-pricing:has(.card--plan:nth-child(3)):not(#prezzi) { --hm: 2; } }
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
+
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
+</style>
+<script src="/assets/boot.js"></script>
+
+
+<link rel="canonical" href="https://nozzeinordine.com/chi-siamo"><meta property="og:url" content="https://nozzeinordine.com/chi-siamo"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nozze in Ordine","item":"https://nozzeinordine.com/"},{"@type":"ListItem","position":2,"name":"Chi c'è dietro Nozze in Ordine","item":"https://nozzeinordine.com/chi-siamo"}]}</script></head>
+<body>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Vai al contenuto</a>
+    <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+    <nav class="nav__links" aria-label="Principale">
+      <div class="nav__item"><a class="nav__link" href="/coppie">Coppie</a></div>
+      <div class="nav__item"><a class="nav__link" href="/planner">Planner</a></div>
+      <div class="nav__item"><a class="nav__link" href="/prezzi">Prezzi</a></div>
+      <div class="nav__item"><a class="nav__link" href="/chi-siamo" aria-current="page">Chi siamo</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" href="/app/">Accedi</a>
+      <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main id="top">
+  <section class="hero hero--photo" data-enter data-calm="right" aria-labelledby="hero-h">
+    <img class="hero__bg" src="/img/sposi-prato-bacio-l.avif" width="1620" height="1280" alt="Due sposi si baciano in un prato di erba alta, nella luce del pomeriggio." style="--ly-pos: 0% 55%; --ly-pos-phone: 30% 55%" fetchpriority="high">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__text">
+        <h1 id="hero-h">Chi c'è dietro Nozze in Ordine</h1>
+        <p class="hero__lead">Un'app per organizzare il matrimonio, progettata in Campania per coppie e wedding planner di tutta Italia.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="mailto:info@nozzeinordine.com">Scrivici</a></div>
+      </div>
+      <dl class="hero__facts"><div><dt>Dove</dt><dd>Marcianise, Caserta</dd></div><div><dt>Per chi</dt><dd>Coppie e planner</dd></div><div><dt>Coppie</dt><dd>Gratis per iniziare</dd></div><div><dt>Contatto</dt><dd>info@nozzeinordine.com</dd></div></dl>
+    </div></div>
+  </section>
+
+  <section class="section" id="perche" aria-labelledby="perche-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="perche-h">Perché esiste Nozze in Ordine</h2>
+          <p>Organizzare un matrimonio vuol dire tenere insieme budget, fornitori, invitati e scadenze per molti mesi, spesso tra fogli di calcolo, chat e appunti sparsi.</p>
+          <p>Nozze in Ordine mette tutto in un unico spazio, condiviso tra la coppia e chi la aiuta, con le scadenze calcolate sulla data del matrimonio.</p>
+        </div>
+        <div class="frame frame--photo span-6 start-7"><img class="frame__img app-shot" src="/img/app-panoramica-l.avif" srcset="/img/app-panoramica-m.avif 800w, /img/app-panoramica-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1074" alt="La dashboard di Nozze in Ordine: la panoramica del matrimonio con data, budget, pagamenti e invitati." loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="regole" aria-labelledby="regole-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="regole-h">Come lavora Nozze in Ordine</h2>
+          <ul class="rows"><li><span class="rows__name">Uno strumento, non un'agenzia<small>Non organizza matrimoni e non vende spazi ai fornitori: i fornitori li scegliete voi.</small></span><span class="rows__value"></span></li><li><span class="rows__name">Nessuna pubblicità<small>Lo spazio è vostro. I dati servono a far funzionare l'app, non vengono venduti né ceduti.</small></span><span class="rows__value"></span></li><li><span class="rows__name">Prezzi scritti<small>Coppie: gratis o 49 € una volta sola. Planner: un canone fisso, con una prova gratuita.</small></span><span class="rows__value"></span></li><li><span class="rows__name">Ognuno vede ciò che gli spetta<small>Coppia, planner e collaboratori entrano con il proprio accesso. Le note della planner restano sue.</small></span><span class="rows__value"></span></li></ul>
+        </div>
+        <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/sposi-bosco-l.avif" srcset="/img/sposi-bosco-m.avif 800w, /img/sposi-bosco-l.avif 1000w" sizes="(min-width: 1024px) 50vw, 100vw" width="1000" height="1332" alt="Due sposi camminano di spalle su un sentiero in un bosco." loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="felice" aria-labelledby="felice-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="felice-h">Felice Mondo, UX/UI designer</h2>
+          <p>Nozze in Ordine è progettata e sviluppata da Felice Mondo, designer di interfacce a Marcianise, in provincia di Caserta. Ogni schermata nasce dalle domande di chi organizza un matrimonio, e lo strumento cresce con le richieste di coppie e planner.</p>
+          <p>Per domande, idee o problemi scrivi a <a class="link" href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
+        </div>
+        <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/cortile-fiori-l.avif" srcset="/img/cortile-fiori-m.avif 800w, /img/cortile-fiori-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="1200" alt="Un cortile di pietra con un tavolo, sedie bianche, vasi di fiori e piante." loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Organizzate il matrimonio</h2>
+        <p>Il piano gratuito non scade. Il Completo costa 49 €, una volta sola.</p>
+      </div>
+      <a class="btn btn--primary btn--xl btn--wide" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+          <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="/app/#/registrati">Crea un account</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Nozze in Ordine</span>
+        <div class="socials"></div>
+        <a class="credits" href="/privacy#crediti">Fotografie via Unsplash</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<nav class="actionbar" aria-label="Azioni rapide">
+  <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+</nav>
+<script type="module" src="/assets/system.js"></script>
+<script type="module" src="/assets/motion/motion.js"></script>
+<script type="module" src="/assets/layout/layout.js"></script>
+</body>
+</html>

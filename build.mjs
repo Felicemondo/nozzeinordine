@@ -13,7 +13,7 @@ const crumbs = (name, slug) => ({ "@context": "https://schema.org", "@type": "Br
 const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
 const cleanLinks = (html) => html
   .replace(/href="index\.html(#[^"]*)?"/g, (m, a) => `href="/${a || ""}"`)
-  .replace(/href="(coppie|planner|prezzi|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
+  .replace(/href="(coppie|planner|prezzi|chi-siamo|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
   .replace(/href="app\//g, 'href="/app/');
 const write = (name, html) => {
   const slug = name === "index.html" ? "" : name.replace(/\.html$/, ""), url = SITE + "/" + slug;
@@ -35,6 +35,8 @@ const MARK = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">` +
   `<path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>`;
 
 const IMG = {
+  heroChi: ["sposi-prato-bacio", 1620, 1280, "Due sposi si baciano in un prato di erba alta, nella luce del pomeriggio."],
+  bosco: ["sposi-bosco", 1000, 1332, "Due sposi camminano di spalle su un sentiero in un bosco."],
   heroCoppie: ["sposi-valle", 1920, 1280, "Due sposi camminano mano nella mano su un'altura, con una valle di boschi alle spalle."],
   heroPlanner: ["cerimonia-prato", 1920, 1280, "Sedie bianche e un arco di legno pronti per una cerimonia su un prato, davanti agli alberi."],
   heroPrezzi: ["sposi-collina-sera", 1920, 1280, "Due sposi camminano su una collina al tramonto, piccoli contro il cielo."],
@@ -48,7 +50,7 @@ const IMG = {
   prezzi: ["mani-fedi", 1440, 2156, "Le mani della sposa e dello sposo, con anello e fede."],
 };
 
-const PHOTO_CREDITS = [["cortile-fiori", "George Karelitsky", "https://unsplash.com/@georgekar?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-outside-6V7eOl67DM0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["navata-cerimonia", "Jonathan Borba", "https://unsplash.com/@jonathanborba?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-floral-arch-and-green-arch-_a4OJrB5Q4A?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["arco-mare", "Karwin Luo", "https://unsplash.com/@karw1n?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/archway-view-to-a-spiral-staircase-and-ocean-zNOgrItIMiE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-campo-sole", "Phakphoom Srinorajan", "https://unsplash.com/@phakphoom?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-walking-on-brown-grass-field-during-daytime-hN_kGla8yQU?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cerimonia-lago", "Matthew Essman", "https://unsplash.com/@thetruth23?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/white-folding-chair-in-front-of-body-of-water-jTnipV64uLo?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-libro", "Sandy Millar", "https://unsplash.com/@sandym10?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/two-gold-colored-rings-on-paper-YeJWDWeIZho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-viale", "Martin Baron", "https://unsplash.com/@elmartinbaron?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-down-a-path-in-the-woods-ukpAsFhGrxY?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["mani-fedi", "CHUTTERSNAP", "https://unsplash.com/@chuttersnap?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/woman-wearing-gold-colored-and-silver-colored-rings-NYqEk7a42yc?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-bosco", "Jaakko Perälä | Norway Elopement Photographer", "https://unsplash.com/@jaakkoperala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-through-the-woods-AZLuNOtsU8U?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-valle", "adrianna geo", "https://unsplash.com/@adrigeo_?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-holding-hands-while-walking-on-brown-grass-field-during-daytime-c7M01ytrah8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cerimonia-prato", "Jose Marroquin", "https://unsplash.com/@josemarroquin?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-white-chairs-and-arch-_ObILA1XpSQ?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-collina-sera", "Foto Pettine", "https://unsplash.com/@fotopettine?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-on-a-hill-IfjHaIoAoqE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"]];
+const PHOTO_CREDITS = [["cortile-fiori", "George Karelitsky", "https://unsplash.com/@georgekar?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-outside-6V7eOl67DM0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["navata-cerimonia", "Jonathan Borba", "https://unsplash.com/@jonathanborba?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-floral-arch-and-green-arch-_a4OJrB5Q4A?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["arco-mare", "Karwin Luo", "https://unsplash.com/@karw1n?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/archway-view-to-a-spiral-staircase-and-ocean-zNOgrItIMiE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-campo-sole", "Phakphoom Srinorajan", "https://unsplash.com/@phakphoom?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-walking-on-brown-grass-field-during-daytime-hN_kGla8yQU?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cerimonia-lago", "Matthew Essman", "https://unsplash.com/@thetruth23?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/white-folding-chair-in-front-of-body-of-water-jTnipV64uLo?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-libro", "Sandy Millar", "https://unsplash.com/@sandym10?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/two-gold-colored-rings-on-paper-YeJWDWeIZho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-viale", "Martin Baron", "https://unsplash.com/@elmartinbaron?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-down-a-path-in-the-woods-ukpAsFhGrxY?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["mani-fedi", "CHUTTERSNAP", "https://unsplash.com/@chuttersnap?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/woman-wearing-gold-colored-and-silver-colored-rings-NYqEk7a42yc?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-bosco", "Jaakko Perälä | Norway Elopement Photographer", "https://unsplash.com/@jaakkoperala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-through-the-woods-AZLuNOtsU8U?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-valle", "adrianna geo", "https://unsplash.com/@adrigeo_?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-holding-hands-while-walking-on-brown-grass-field-during-daytime-c7M01ytrah8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cerimonia-prato", "Jose Marroquin", "https://unsplash.com/@josemarroquin?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-white-chairs-and-arch-_ObILA1XpSQ?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-collina-sera", "Foto Pettine", "https://unsplash.com/@fotopettine?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-on-a-hill-IfjHaIoAoqE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-prato-bacio", "Dallin Thueson", "https://unsplash.com/@dal_ly?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-man-and-a-woman-are-standing-in-a-field-bMzdtwiCCkE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"]];
 
 /* =========================================================== SISTEMA (tasteskill 2.5)
    type: service (site-kind other: foto, colore piatto, tipografia; nessun effetto)
@@ -192,38 +194,14 @@ ${extra}
 </head>
 <body>`;
 
-const NAV = [["coppie", "Coppie"], ["planner", "Planner"], ["prezzi", "Prezzi"]];
+const NAV = [["coppie", "Coppie"], ["planner", "Planner"], ["prezzi", "Prezzi"], ["chi-siamo", "Chi siamo"]];
 const top = (cur) => `
 <header class="nav nav--centre">
   <div class="wrap nav__bar">
     <a class="skip-link" href="#top">Vai al contenuto</a>
     <a class="nav__logo" href="/">${MARK}Nozze in Ordine</a>
     <nav class="nav__links" aria-label="Principale">
-      <div class="nav__item">
-        <a class="nav__link" href="/coppie"${cur === "coppie" ? ' aria-current="page"' : ""}>Coppie <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <div class="nav__menu">
-          <div class="wrap grid">
-            <div class="menu-col span-3">
-              <p class="t-label">Per le coppie</p>
-              <a href="/coppie#scadenze">Scadenze<span>Calcolate sulla data del sì</span></a>
-              <a href="/coppie#spazio">Budget e invitati<span>Un elenco condiviso in due</span></a>
-              <a href="/coppie#piani">Gratis o Completo<span>Cosa cambia tra i due piani</span></a>
-            </div>
-            <div class="menu-col span-3">
-              <p class="t-label">Per le planner</p>
-              <a href="/planner#eventi">Più matrimoni<span>Tutti gli eventi in una vista</span></a>
-              <a href="/planner#portale">Portale sposi<span>La coppia vede ciò che condividi</span></a>
-              <a href="/planner#piani">Planner, Team e Studio<span>Canoni per numero di matrimoni</span></a>
-            </div>
-            <a class="menu-card span-3 start-10" href="/prezzi">
-              <div class="panel">${shot("panoramica")}</div>
-              <span class="t-card">Prezzi e piani</span>
-              <span class="t-small muted">Gratis per iniziare, senza carta</span>
-            </a>
-          </div>
-        </div>
-      </div>
-      ${NAV.slice(1).map(([h, l]) => `<div class="nav__item"><a class="nav__link" href="/${h}"${cur === h ? ' aria-current="page"' : ""}>${l}</a></div>`).join("\n      ")}
+      ${NAV.map(([h, l]) => `<div class="nav__item"><a class="nav__link" href="/${h}"${cur === h ? ' aria-current="page"' : ""}>${l}</a></div>`).join("\n      ")}
     </nav>
     <div class="nav__actions">
       <a class="nav__link" href="/app/">Accedi</a>
@@ -253,7 +231,7 @@ const foot = (close = closeType()) => `
           <a class="nav__logo" href="/">${MARK}Nozze in Ordine</a>
           <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
         </div>
-        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="${SIGNUP}">Crea un account</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
@@ -598,6 +576,57 @@ write("prezzi.html", head("Prezzi di Nozze in Ordine per coppie e wedding planne
 const TITOLARE = { nome: "Felice Mondo", sede: "Marcianise (CE), Italia", piva: "", email: "info@nozzeinordine.com" };
 const AGGIORNATO = "15 novembre 2026";
 const MAILTO = `<a href="mailto:${TITOLARE.email}">${TITOLARE.email}</a>`;
+/* =========================================================== CHI SIAMO */
+write("chi-siamo.html", head("Chi siamo: Nozze in Ordine, app per organizzare il matrimonio", "Nozze in Ordine è un'app per organizzare il matrimonio, progettata in Campania da Felice Mondo, UX/UI designer. Uno strumento, non un'agenzia: niente pubblicità e niente marketplace.") + top("chi-siamo") + `
+<main id="top">${heroPhoto({ k: "heroChi", pos: "0% 55%", posPhone: "30% 55%", calm: "right",
+  h1: "Chi c'è dietro Nozze in Ordine",
+  lead: "Un'app per organizzare il matrimonio, progettata in Campania per coppie e wedding planner di tutta Italia.",
+  a: primary(), b: secondary("Scrivici", "mailto:info@nozzeinordine.com"),
+  facts: [["Dove", "Marcianise, Caserta"], ["Per chi", "Coppie e planner"], ["Coppie", "Gratis per iniziare"], ["Contatto", "info@nozzeinordine.com"]] })}
+
+  <section class="section" id="perche" aria-labelledby="perche-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="perche-h">Perché esiste Nozze in Ordine</h2>
+          <p>Organizzare un matrimonio vuol dire tenere insieme budget, fornitori, invitati e scadenze per molti mesi, spesso tra fogli di calcolo, chat e appunti sparsi.</p>
+          <p>Nozze in Ordine mette tutto in un unico spazio, condiviso tra la coppia e chi la aiuta, con le scadenze calcolate sulla data del matrimonio.</p>
+        </div>
+        <div class="frame frame--photo span-6 start-7">${shot("panoramica")}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="regole" aria-labelledby="regole-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="regole-h">Come lavora Nozze in Ordine</h2>
+          ${rows([
+            ["Uno strumento, non un'agenzia", "Non organizza matrimoni e non vende spazi ai fornitori: i fornitori li scegliete voi.", ""],
+            ["Nessuna pubblicità", "Lo spazio è vostro. I dati servono a far funzionare l'app, non vengono venduti né ceduti.", ""],
+            ["Prezzi scritti", "Coppie: gratis o 49 € una volta sola. Planner: un canone fisso, con una prova gratuita.", ""],
+            ["Ognuno vede ciò che gli spetta", "Coppia, planner e collaboratori entrano con il proprio accesso. Le note della planner restano sue.", ""]])}
+        </div>
+        <div class="frame frame--photo span-6 start-7">${pic("bosco")}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="felice" aria-labelledby="felice-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="felice-h">Felice Mondo, UX/UI designer</h2>
+          <p>Nozze in Ordine è progettata e sviluppata da Felice Mondo, designer di interfacce a Marcianise, in provincia di Caserta. Ogni schermata nasce dalle domande di chi organizza un matrimonio, e lo strumento cresce con le richieste di coppie e planner.</p>
+          <p>Per domande, idee o problemi scrivi a <a class="link" href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
+        </div>
+        <div class="frame frame--photo span-6 start-7">${pic("fiori")}</div>
+      </div>
+    </div>
+  </section>
+</main>` + foot());
+
 /* =========================================================== PAGINE LEGALI */
 const legalPage = ({ file, title, desc, eb, h1, lead, body }) => write(file, head(title, desc, { extra: `<style>
 .legal { max-width: 68ch; display: grid; gap: var(--s-4); padding-block: calc(var(--nav) + var(--s-8)) var(--s-9); }

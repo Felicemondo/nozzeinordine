@@ -1,5 +1,5 @@
 {
- "url": "http://127.0.0.1:5300/prezzi.html",
+ "url": "http://127.0.0.1:5300/chi-siamo.html",
  "views": {
   "desktop": {
    "width": 1440,
@@ -27,8 +27,8 @@
     {
      "n": 2,
      "tag": "section",
-     "id": "coppie",
-     "cls": "section is-pricing",
+     "id": "perche",
+     "cls": "section",
      "top": 900,
      "h": 900,
      "hScreens": 1,
@@ -43,8 +43,8 @@
     {
      "n": 3,
      "tag": "section",
-     "id": "planner",
-     "cls": "section is-pricing",
+     "id": "regole",
+     "cls": "section",
      "top": 1800,
      "h": 900,
      "hScreens": 1,
@@ -59,7 +59,7 @@
     {
      "n": 4,
      "tag": "section",
-     "id": "domande",
+     "id": "felice",
      "cls": "section",
      "top": 2700,
      "h": 900,
@@ -92,5 +92,5 @@
    "consoleErrors": []
   }
  },
- "at": "2026-11-17T12:49:19.424Z"
+ "at": "2026-11-17T16:29:34.667Z"
 }
