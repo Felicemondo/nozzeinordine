@@ -12,7 +12,7 @@
 
   var USERS = {
     coppia: { id: "u-anna", role: "coppia", full_name: "Anna Russo", email: "anna@esempio.it", phone: "", business_name: "", city: "Caserta", notify_days: 3, created_at: new Date(Date.now() - 86400000 * 20).toISOString() },
-    planner: { id: "u-bea", role: "planner", full_name: "Beatrice Esposito", email: "bea@esempio.it", phone: "333 000 0000", business_name: "Esposito Wedding Studio", city: "Napoli", notify_days: 7, weddings_per_year: "1-5", work_mode: "autonomia", created_at: new Date(Date.now() - 86400000 * 40).toISOString() },
+    planner: { id: "u-bea", role: "planner", plan: "prova", trial_ends_at: new Date(Date.now() + 86400000 * 21).toISOString(), full_name: "Beatrice Esposito", email: "bea@esempio.it", phone: "333 000 0000", business_name: "Esposito Wedding Studio", city: "Napoli", notify_days: 7, weddings_per_year: "1-5", work_mode: "autonomia", created_at: new Date(Date.now() - 86400000 * 40).toISOString() },
     admin: { id: "u-admin", role: "admin", full_name: "Amministrazione", email: "info@nozzeinordine.com", phone: "", business_name: "", city: "", notify_days: 3, created_at: new Date(Date.now() - 86400000 * 60).toISOString() }
   };
   var TEMPLATE = [
@@ -57,6 +57,7 @@
   function wedding(id, title, date, city, budget, guests, members) {
     var names = title.split(" e ");
     var w = { id: id, title: title, partner_a: names[0] || "", partner_b: names[1] || "", wedding_date: date, city: city, ceremony: "religioso", budget_total: budget, guests_expected: guests, priorities: ["spese", "invitati"], stage: "qualcosa", vendor_categories: [], created_by: members[0][0], created_at: new Date().toISOString() };
+    w.plan = members.some(function (m) { return m[1] === "planner"; }) ? "planner" : "completo";
     db.weddings.push(w);
     members.forEach(function (m) { db.wedding_members.push({ wedding_id: id, user_id: m[0], member_role: m[1], created_at: w.created_at }); });
     seedTasks(w);
@@ -170,6 +171,7 @@
     createWedding: async function (data) {
       await wait();
       var w = Object.assign({ id: uid(), city: "", partner_a: "", partner_b: "", ceremony: "da_decidere", budget_total: 0, guests_expected: 0, priorities: [], stage: null, vendor_categories: [], created_by: me.id, created_at: new Date().toISOString() }, data);
+      w.plan = me.role === "planner" ? "planner" : "gratis";
       db.weddings.push(w);
       db.wedding_members.push({ wedding_id: w.id, user_id: me.id, member_role: me.role === "planner" ? "planner" : "sposi", created_at: w.created_at });
       seedTasks(w, true);
