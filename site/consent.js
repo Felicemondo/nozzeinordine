@@ -4,7 +4,7 @@
    e si cambia dal link "Preferenze cookie" nel piè di pagina. GA4 usa Consent Mode v2, negato di partenza. */
 (function () {
   var T = window.NIO_TRACKING || {};
-  var hasStats = !!(T.ga4 || T.clarity), hasAds = !!T.pixel;
+  var hasStats = !!(T.gtm || T.ga4 || T.clarity), hasAds = !!T.pixel;
   window.nioTrack = function () {};
   if (!hasStats && !hasAds) return;
 
@@ -20,8 +20,9 @@
 
   var loaded = {};
   function apply(c) {
-    if (T.ga4) gtag("consent", "update", { analytics_storage: c.stats ? "granted" : "denied", ad_storage: c.ads ? "granted" : "denied", ad_user_data: c.ads ? "granted" : "denied", ad_personalization: c.ads ? "granted" : "denied" });
+    if (T.ga4 || T.gtm) gtag("consent", "update", { analytics_storage: c.stats ? "granted" : "denied", ad_storage: c.ads ? "granted" : "denied", ad_user_data: c.ads ? "granted" : "denied", ad_personalization: c.ads ? "granted" : "denied" });
     if (c.stats && T.ga4 && !loaded.ga4) { loaded.ga4 = 1; add("https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(T.ga4)); gtag("js", new Date()); gtag("config", T.ga4, { anonymize_ip: true }); }
+    if (c.stats && T.gtm && !loaded.gtm) { loaded.gtm = 1; window.dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" }); add("https://www.googletagmanager.com/gtm.js?id=" + encodeURIComponent(T.gtm)); }
     if (c.stats && T.clarity && !loaded.clarity) {
       loaded.clarity = 1;
       window.clarity = window.clarity || function () { (window.clarity.q = window.clarity.q || []).push(arguments); };
@@ -39,7 +40,7 @@
   // Eventi di conversione (es. registrazione): partono solo verso gli strumenti consentiti
   window.nioTrack = function (name, params) {
     var c = read(); if (!c) return;
-    if (c.stats && T.ga4 && window.gtag) gtag("event", name, params || {});
+    if (c.stats && (T.ga4 || T.gtm) && window.gtag) { gtag("event", name, params || {}); window.dataLayer.push(Object.assign({ event: name }, params || {})); }
     if (c.ads && T.pixel && window.fbq) fbq("track", name === "sign_up" ? "CompleteRegistration" : name, params || {});
   };
 
@@ -54,7 +55,7 @@
     if (document.querySelector(".nio-cc")) return;
     var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
     var box = document.createElement("div"); box.className = "nio-cc"; box.setAttribute("role", "dialog"); box.setAttribute("aria-labelledby", "nio-cc-h");
-    var opts = (hasStats ? '<label><input type="checkbox" id="nio-cc-s"' + (prefill && prefill.stats ? " checked" : "") + '><span>Statistiche<small>Capire come viene usato il sito (' + [T.ga4 ? "Google Analytics" : "", T.clarity ? "Microsoft Clarity" : ""].filter(Boolean).join(", ") + ').</small></span></label>' : "") +
+    var opts = (hasStats ? '<label><input type="checkbox" id="nio-cc-s"' + (prefill && prefill.stats ? " checked" : "") + '><span>Statistiche<small>Capire come viene usato il sito (' + [T.ga4 || T.gtm ? "Google Analytics" : "", T.clarity ? "Microsoft Clarity" : ""].filter(Boolean).join(", ") + ').</small></span></label>' : "") +
       (hasAds ? '<label><input type="checkbox" id="nio-cc-a"' + (prefill && prefill.ads ? " checked" : "") + '><span>Marketing<small>Misurare le campagne su Facebook e Instagram (Meta Pixel).</small></span></label>' : "");
     box.innerHTML = '<h2 id="nio-cc-h">Cookie e misurazioni</h2><p>Usiamo strumenti di terze parti per misurare le visite' + (hasAds ? " e le campagne pubblicitarie" : "") +
       ' solo se acconsenti. I cookie tecnici, necessari al funzionamento, sono sempre attivi. <a href="/cookie">Informativa cookie</a>.</p>' +

@@ -85,12 +85,12 @@ const APPSHOT = {
 const shot = (k, lazy = true) => `<img class="frame__img app-shot" src="/img/app-${k}-l.avif" srcset="/img/app-${k}-m.avif 800w, /img/app-${k}-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1074" alt="${APPSHOT[k]}"${lazy ? ' loading="lazy" decoding="async"' : ""}>`;
 
 // ---- Strumenti di misura: incollare qui gli ID. Vuoti = nessun banner, nessuno script, testi legali senza questi strumenti.
-const TRACKING = { ga4: "", clarity: "", pixel: "" }; // es. ga4: "G-XXXXXXX", clarity: "abcd1234", pixel: "1234567890"
-const TRK_ON = !!(TRACKING.ga4 || TRACKING.clarity || TRACKING.pixel);
+const TRACKING = { gtm: "GTM-PMMT44NV", ga4: "", clarity: "", pixel: "" }; // es. ga4: "G-XXXXXXX", clarity: "abcd1234", pixel: "1234567890"
+const TRK_ON = !!(TRACKING.gtm || TRACKING.ga4 || TRACKING.clarity || TRACKING.pixel);
 writeFileSync(join(OUT, "tracking.js"), "window.NIO_TRACKING = " + JSON.stringify(TRACKING) + ";\n");
 { // la Content Security Policy si allarga solo per gli strumenti attivi
   const extra = { script: [], connect: [], img: [] };
-  if (TRACKING.ga4) { extra.script.push("https://www.googletagmanager.com"); extra.connect.push("https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"); extra.img.push("https://*.google-analytics.com", "https://www.googletagmanager.com"); }
+  if (TRACKING.ga4 || TRACKING.gtm) { extra.script.push("https://www.googletagmanager.com"); extra.connect.push("https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"); extra.img.push("https://*.google-analytics.com", "https://www.googletagmanager.com"); }
   if (TRACKING.clarity) { extra.script.push("https://www.clarity.ms", "https://*.clarity.ms"); extra.connect.push("https://*.clarity.ms"); extra.img.push("https://*.clarity.ms", "https://c.bing.com"); }
   if (TRACKING.pixel) { extra.script.push("https://connect.facebook.net"); extra.connect.push("https://www.facebook.com", "https://connect.facebook.net"); extra.img.push("https://www.facebook.com"); }
   const csp = `  Content-Security-Policy: default-src 'self'; img-src 'self' data:${extra.img.map((x) => " " + x).join("")}; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'${extra.script.map((x) => " " + x).join("")}; connect-src 'self' https://msokhiezfsmkqsvzgmmi.supabase.co${extra.connect.map((x) => " " + x).join("")}; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`;
@@ -692,7 +692,7 @@ legalPage({ file: "privacy.html", title: "Informativa privacy | Nozze in Ordine"
 <p>I dati sono trattati da noi e dai fornitori che ci permettono di offrire il servizio, nominati responsabili del trattamento:</p>
 <ul><li><strong>Supabase</strong> (Supabase, Inc.): database e autenticazione. I dati della dashboard sono conservati in un data center a Londra (Regno Unito).</li>
 <li><strong>Cloudflare</strong> (Cloudflare, Inc.): consegna del sito e della dashboard, protezione dagli attacchi, inoltro delle email inviate a ${TITOLARE.email}.</li>
-<li><strong>Google</strong> (Google Ireland Limited): casella di posta in cui leggiamo i vostri messaggi${TRACKING.ga4 ? " e, solo con il vostro consenso, Google Analytics per contare le visite al sito" : ""}.</li>${TRACKING.clarity ? `
+<li><strong>Google</strong> (Google Ireland Limited): casella di posta in cui leggiamo i vostri messaggi${TRACKING.ga4 || TRACKING.gtm ? " e, solo con il vostro consenso, Google Tag Manager e Google Analytics per contare le visite al sito" : ""}.</li>${TRACKING.clarity ? `
 <li><strong>Microsoft</strong> (Microsoft Ireland Operations Limited): Microsoft Clarity, solo con il vostro consenso, per capire come viene usato il sito.</li>` : ""}${TRACKING.pixel ? `
 <li><strong>Meta</strong> (Meta Platforms Ireland Limited): Meta Pixel, solo con il vostro consenso, per misurare le campagne su Facebook e Instagram.</li>` : ""}</ul>
 <p>Chi invitate nel vostro matrimonio (partner, wedding planner, collaboratori) vede i dati di quel matrimonio secondo il proprio ruolo.</p>
@@ -721,7 +721,7 @@ legalPage({ file: "cookie.html", title: "Informativa sui cookie | Nozze in Ordin
   body: `
 <h2>Sul sito</h2>
 ${TRK_ON ? `<p>Con il vostro consenso, dato o negato dal banner e modificabile da <a href="/cookie" data-cookie-prefs>Preferenze cookie</a>, il sito usa:</p>
-<ul>${TRACKING.ga4 ? `<li><strong>Google Analytics 4</strong> (statistiche): conta visite e pagine viste in forma aggregata. Cookie <em>_ga</em> e <em>_ga_*</em>, durata fino a 13 mesi. Fornitore: Google Ireland Limited.</li>` : ""}${TRACKING.clarity ? `<li><strong>Microsoft Clarity</strong> (statistiche): mostra come viene usata la pagina, con mappe dei clic e registrazioni anonime delle sessioni; i campi dei moduli sono oscurati. Cookie <em>_clck</em> e <em>_clsk</em>, durata fino a 12 mesi. Fornitore: Microsoft Ireland Operations Limited.</li>` : ""}${TRACKING.pixel ? `<li><strong>Meta Pixel</strong> (marketing): misura le campagne su Facebook e Instagram e le registrazioni che ne derivano. Cookie <em>_fbp</em>, durata fino a 3 mesi. Fornitore: Meta Platforms Ireland Limited.</li>` : ""}</ul>
+<ul>${TRACKING.ga4 || TRACKING.gtm ? `<li><strong>Google Analytics 4</strong>${TRACKING.gtm ? ", tramite Google Tag Manager," : ""} (statistiche): conta visite e pagine viste in forma aggregata. Cookie <em>_ga</em> e <em>_ga_*</em>, durata fino a 13 mesi. Fornitore: Google Ireland Limited.</li>` : ""}${TRACKING.clarity ? `<li><strong>Microsoft Clarity</strong> (statistiche): mostra come viene usata la pagina, con mappe dei clic e registrazioni anonime delle sessioni; i campi dei moduli sono oscurati. Cookie <em>_clck</em> e <em>_clsk</em>, durata fino a 12 mesi. Fornitore: Microsoft Ireland Operations Limited.</li>` : ""}${TRACKING.pixel ? `<li><strong>Meta Pixel</strong> (marketing): misura le campagne su Facebook e Instagram e le registrazioni che ne derivano. Cookie <em>_fbp</em>, durata fino a 3 mesi. Fornitore: Meta Platforms Ireland Limited.</li>` : ""}</ul>
 <p>Se rifiutate, nessuno di questi strumenti viene caricato. La vostra scelta si conserva nel browser per 6 mesi.</p>` : ""}
 <p>${TRK_ON ? "Oltre a questi, le pagine del sito non impostano cookie nostri." : "Le pagine del sito non impostano cookie nostri, non caricano contenuti da altri siti e non usano strumenti di analisi o pixel pubblicitari."} I caratteri tipografici e le immagini sono ospitati sul nostro stesso dominio.</p>
 <p>Cloudflare, che consegna il sito, può impostare cookie tecnici di sicurezza per distinguere le visite reali dal traffico automatico. Sono strettamente necessari e non servono a riconoscervi tra siti diversi.</p>
