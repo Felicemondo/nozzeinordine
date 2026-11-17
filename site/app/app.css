@@ -742,3 +742,22 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   .wiz-foot { position: sticky; bottom: 0; margin: 0 -16px -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--card); border-radius: 0 0 var(--r-card) var(--r-card); z-index: 2; }
   .wiz-foot .btn { flex: 1 1 auto; }
 }
+
+/* invitati su telefono: i sei numeri diventano una striscia di 3x2 compatta, l'elenco arriva subito */
+@media (max-width: 720px) {
+  .kpis.six { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .kpis.six > :last-child:nth-child(odd) { grid-column: auto; }
+  .kpis.six .kpi { padding: 10px; gap: 2px; border-radius: 12px; }
+  .kpis.six .kpi-l { font-size: 12px; font-weight: 500; }
+  .kpis.six .kpi-v { font-size: 20px; }
+  .head-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .head-actions .btn.primary { grid-column: 1 / -1; order: -1; }
+  .head-actions .btn { min-height: 44px; padding: 8px 10px; font-size: 14px; }
+}
+@media (max-width: 720px) {
+  .info-chip { white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+  .kpis.four .kpi { padding: 12px; gap: 2px; }
+  .kpis.four .kpi-v { font-size: 22px; }
+  .kpis.four .kpi-m { font-size: 12px; }
+}
+@media (max-width: 720px) { .head-actions > :not(.btn) { grid-column: 1 / -1; justify-self: start; } }
