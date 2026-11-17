@@ -108,6 +108,9 @@ const pageCss = `<style>
 .nav__logo svg { width: 26px; height: 26px; fill: #702f43; flex: none; }
 .nav__logo { color: #702f43; }
 .app-shot { object-position: left top; }
+/* un solo raggio per tutte le foto e le schermate (scelta di Felice): quello delle card */
+.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel, .menu-card .panel { border-radius: var(--r-lg); overflow: hidden; }
+:is(.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel) img { border-radius: inherit; }
 .rows__name small { display: block; margin-top: var(--s-1); font: 400 var(--t-small)/1.5 var(--font-text); color: var(--muted); }
 .rows__value { text-align: right; }
 .panel:has(> .app-shot) { --p-h: 340px; }
