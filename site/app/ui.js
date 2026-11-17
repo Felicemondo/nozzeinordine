@@ -536,7 +536,7 @@
       var sd = document.getElementById("side"); if (sd) sd.classList.toggle("open", open);
       document.body.classList.toggle("nav-open", open);
       toggle.setAttribute("aria-expanded", String(open));
-      if (open) { var a = sd && sd.querySelector("a, button, select"); if (a) a.focus(); } else toggle.focus();
+      if (open) { var a = sd && (sd.querySelector(".close-nav") || sd.querySelector("a, button, select")); if (a) a.focus({ preventScroll: true }); } else toggle.focus();
     }
     var toggle = h("button", { class: "menu-btn", type: "button", "aria-expanded": state.navOpen ? "true" : "false", "aria-controls": "side", onclick: function () { setNav(!state.navOpen); } }, icon("menu"), "Menu");
     document.onkeydown = function (e) { if (e.key === "Escape" && state.navOpen) setNav(false); };
@@ -552,7 +552,7 @@
       return h("a", { href: "#/" + t[0], class: t[3] ? "on" : null, "aria-current": t[3] ? "page" : null }, icon(t[2]), h("span", null, t[1]));
     }));
     return h("div", { class: "shell" + (w ? " in-wedding" : "") },
-      h("header", { class: "topbar" }, brand(tone), h("div", { class: "top-actions" }, toggle, bellLink("bell"))),
+      h("header", { class: "topbar" }, brand(tone), h("div", { class: "top-actions" }, bellLink("bell"), toggle)),
       side, h("div", { class: "scrim", onclick: function () { setNav(false); } }),
       h("main", { class: "main", id: "main", tabindex: "-1" }, banner, content), tabbar);
   }
