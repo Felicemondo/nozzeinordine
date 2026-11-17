@@ -886,6 +886,55 @@
     })) : h("p", { class: "muted" }, "Nessun pagamento con una data. Aggiungila nelle voci del budget.");
   }
 
+  /* ---- Grafico "pagamenti mese per mese": quanto c'è da pagare in ogni mese, scaduti a parte ----
+     items: [{ date: "2027-03-15", amount: 1500, label: "Catering", sub: "Anna e Marco" }] */
+  var MESI_BREVI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+  function payChart(items, opts) {
+    opts = opts || {};
+    var today = todayIso().slice(0, 7), buckets = {}, overdue = { key: "late", items: [], total: 0 };
+    items.forEach(function (x) {
+      if (!x.date || !(x.amount > 0)) return;
+      if (x.date < todayIso()) { overdue.items.push(x); overdue.total += x.amount; return; }
+      var k = x.date.slice(0, 7); (buckets[k] = buckets[k] || { key: k, items: [], total: 0 }); buckets[k].items.push(x); buckets[k].total += x.amount;
+    });
+    var keys = Object.keys(buckets).sort();
+    if (!keys.length && !overdue.items.length) return null;
+    var cols = [], cur = today, last = keys.length ? keys[keys.length - 1] : today;
+    if (opts.until && opts.until.slice(0, 7) > last) last = opts.until.slice(0, 7);
+    while (cur <= last && cols.length < 24) {
+      cols.push(buckets[cur] || { key: cur, items: [], total: 0 });
+      var y = +cur.slice(0, 4), m = +cur.slice(5, 7) + 1; if (m > 12) { m = 1; y++; } cur = y + "-" + String(m).padStart(2, "0");
+    }
+    if (overdue.items.length) cols.unshift(overdue);
+    var max = Math.max.apply(null, cols.map(function (c) { return c.total; })) || 1;
+    var peak = cols.filter(function (c) { return c.key !== "late"; }).reduce(function (a, c) { return c.total > (a ? a.total : 0) ? c : a; }, null);
+    var firstKey = null;
+    var name = function (c) { if (c.key === "late") return "Scaduti"; var m = MESI_BREVI[+c.key.slice(5, 7) - 1], show = firstKey === null || c.key.slice(5, 7) === "01"; if (firstKey === null) firstKey = c.key; return show ? m + " " + c.key.slice(2, 4) : m; };
+    var longName = function (c) { return c.key === "late" ? "Pagamenti scaduti" : fmtDate(c.key + "-01", true).replace(/^1 /, ""); };
+    var detail = h("p", { class: "pc-detail", role: "status", "aria-live": "polite" });
+    var show = function (c) {
+      detail.replaceChildren(h("b", null, longName(c) + ": " + eur(c.total)), c.items.length ? " · " + c.items.slice().sort(function (a, b) { return b.amount - a.amount; }).map(function (x) { return x.label + (x.sub ? " (" + x.sub + ")" : "") + " " + eur(x.amount); }).join(", ") : " · nessun pagamento");
+    };
+    var bars = cols.map(function (c) {
+      var b = h("button", { type: "button", class: "pc-col" + (c.key === "late" ? " late" : "") + (c === peak ? " peak" : "") + (c.total ? "" : " empty"), "aria-label": longName(c) + ", " + eur(c.total) },
+        h("span", { class: "pc-val" }, c === peak || c.key === "late" ? eur(c.total) : ""),
+        h("span", { class: "pc-bar", style: "height:" + (c.total ? Math.max(3, c.total / max * 100) : 0) + "%" }),
+        h("span", { class: "pc-x" }, name(c)));
+      ["mouseenter", "focus", "click"].forEach(function (ev) { b.addEventListener(ev, function () { show(c); }); });
+      return b;
+    });
+    show(peak || overdue);
+    var table = h("table", { class: "sr" }, h("caption", null, opts.title || "Pagamenti mese per mese"),
+      h("thead", null, h("tr", null, h("th", { scope: "col" }, "Mese"), h("th", { scope: "col" }, "Da pagare"))),
+      h("tbody", null, cols.map(function (c) { return h("tr", null, h("th", { scope: "row" }, longName(c)), h("td", null, eur(c.total))); })));
+    var undated = opts.undated ? h("p", { class: "muted small" }, plural(opts.undated, "voce da pagare non ha", "voci da pagare non hanno") + " una data: non " + (opts.undated === 1 ? "compare" : "compaiono") + " nel grafico.") : null;
+    return panel(opts.title || "Pagamenti mese per mese", opts.sub || "Quanto c'è da pagare in ogni mese. Tocca una colonna per vedere le voci.", opts.action || null,
+      h("div", { class: "pc" }, h("div", { class: "pc-scroll" }, h("div", { class: "pc-cols", style: "--n:" + cols.length, "aria-hidden": "true" }, bars)), detail, undated, table), "compact pc-panel");
+  }
+  function budgetPayItems(bud, sub) {
+    return bud.map(function (b) { return { date: b.due_date, amount: cost(b) - num(b.paid), label: b.category, sub: sub }; }).filter(function (x) { return x.amount > 0; });
+  }
+
   async function overview(w) {
     var planner = isPlannerHere(w);
     var res = await Promise.all([api.list("budget_items", w.id), api.list("guests", w.id), api.list("tasks", w.id), api.list("vendors", w.id), planner ? api.list("internal_notes", w.id) : Promise.resolve([])]);
@@ -917,6 +966,7 @@
         kpi("Budget totale", eur(t.total), cap ? "Tetto di spesa " + eur(cap) + " · " + (t.total > cap ? "sopra di " + eur(t.total - cap) : "margine " + eur(cap - t.total)) : "Tetto di spesa da impostare"),
         kpi("Pagamenti", eur(t.paid), "Da pagare " + eur(t.total - t.paid)),
         kpi("Invitati", plural(guests.length, "persona", "totali").replace(/^1 persona$/, "1 persona"), g.si + " confermati · " + g.in_attesa + " in attesa · " + g.no + " declinati" + (w.guests_expected ? " · obiettivo " + w.guests_expected : ""))], "four"),
+      (function () { var it = budgetPayItems(bud); return payChart(it, { until: w.wedding_date, undated: it.filter(function (x) { return !x.date; }).length, action: more("#/m/" + w.id + "/budget", "Vedi il budget") }); })(),
       h("div", { class: "split" }, tasksPanel, h("div", { class: "stack" }, side))];
   }
   function firstDay(w, tasks) {
@@ -1981,7 +2031,17 @@
       kpis([kpi("Matrimoni attivi", String(ws.filter(function (w) { var n = daysTo(w.wedding_date); return n == null || n >= 0; }).length), plural(ws.length, "matrimonio in gestione", "matrimoni in gestione")),
         kpi("Attività completate", sum("done") + " / " + sum("all"), stat.map(function (s) { return s.done + "/" + s.all + " per " + s.w.title; }).join(" · ")),
         kpi("Priorità in ritardo", String(sum("late")), stat.map(function (s) { return s.w.title + " " + s.late.length; }).join(" · "), "", sum("late") ? "terra" : "")], "three"),
-      h("div", { class: "events" }, cards)];
+      h("div", { class: "events" }, cards), await plannerPayChart(ws)];
+  }
+  // Somma dei pagamenti di tutti i matrimoni seguiti, mese per mese (ogni voce dice di quale matrimonio è)
+  async function plannerPayChart(ws) {
+    var active = ws.filter(function (w) { var n = daysTo(w.wedding_date); return n == null || n >= 0; });
+    if (!active.length) return null;
+    var lists = await Promise.all(active.map(function (w) { return api.list("budget_items", w.id).catch(function () { return []; }); }));
+    var items = [], until = null;
+    lists.forEach(function (bud, i) { items = items.concat(budgetPayItems(bud, active[i].title)); if (active[i].wedding_date && (!until || active[i].wedding_date > until)) until = active[i].wedding_date; });
+    return payChart(items, { title: "Pagamenti dei tuoi matrimoni, mese per mese", sub: "Quanto devono pagare le tue coppie ai fornitori in ogni mese, tutti gli eventi insieme. Tocca una colonna per le voci.", until: until,
+      undated: items.filter(function (x) { return !x.date; }).length });
   }
 
   /* ------------------------------------------------------------ amministrazione */

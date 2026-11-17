@@ -793,3 +793,22 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   pre, .msg, textarea[readonly], [class*="invite"] p { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 .box p { overflow-wrap: anywhere; }
+
+/* grafico pagamenti mese per mese: colonne sottili, una sola tinta, scaduti in terracotta con etichetta */
+.pc { display: grid; gap: 12px; }
+.pc-scroll { overflow-x: auto; scrollbar-width: thin; }
+.pc-cols { display: grid; grid-template-columns: repeat(var(--n), minmax(36px, 1fr)); gap: 2px; height: 200px; align-items: stretch; min-width: calc(var(--n) * 38px); border-bottom: 1px solid var(--line-2); }
+.pc-col { display: grid; grid-template-rows: 18px 1fr 22px; align-items: end; justify-items: center; gap: 4px; padding: 0 2px; border: 0; background: none; cursor: pointer; font: inherit; color: var(--muted); border-radius: 6px; min-width: 0; }
+.pc-col:hover, .pc-col:focus-visible { background: var(--row); }
+.pc-col:focus-visible { outline: 2px solid var(--ceramica-ink); outline-offset: 0; }
+.pc-bar { width: min(100%, 28px); background: #18709A; border-radius: 4px 4px 0 0; align-self: end; }
+.pc-col.late .pc-bar { background: #A9533B; }
+.pc-col.empty .pc-bar { background: none; }
+.pc-val { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; align-self: end; }
+.pc-x { font-size: 12px; white-space: nowrap; align-self: start; padding-top: 4px; }
+.pc-col.late .pc-x { color: var(--terra-ink); font-weight: 600; }
+.pc-detail { font-size: 14px; color: var(--muted); min-height: 2.8em; }
+.pc-detail b { color: var(--ink); font-weight: 600; }
+@media (max-width: 720px) { .pc-cols { height: 170px; } }
+.pc-cols { grid-template-columns: repeat(var(--n), minmax(40px, 1fr)); min-width: calc(var(--n) * 42px); }
+@media (max-width: 720px) { .pc-panel { order: 1; } }
