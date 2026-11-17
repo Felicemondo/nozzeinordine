@@ -57,16 +57,20 @@
 #portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
 #spazio .panel:has(> .app-shot) { --p-h: 440px; }
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
-.hero--split h1 { font-size: clamp(40px, 4.2vw, 60px); }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
-.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
 .card--plan .price .t-stat { font-family: var(--font-display); }
-.card--plan .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 0; display: grid; gap: 6px; }
 .card--plan .checks li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.5; }
 .card--plan .checks li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 10px; height: 6px; border: solid var(--action); border-width: 0 0 1.6px 1.6px; transform: rotate(-45deg); }
 .cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
 .section.is-pricing { --hm: 2; }
-@media (max-width: 1279px) { .section.is-pricing { --h: 2; } }
+@media (max-width: 1279px), (max-height: 860px) { .section.is-pricing { --h: 2; } }
 @media (max-width: 639px) {
   .card--plan { gap: var(--s-3); padding: var(--s-5); }
   .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
@@ -128,20 +132,15 @@
 <!-- type: service · deal: hero split, nav nav-centre, close close-type, footer footer-columns, rhythm space, buttons block, mark logo del cliente
      moments: pinned-chapters (#come), picture-develops (#planner) -->
 <main id="top">
-  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
-    <div class="wrap"><div class="hero-text grid hero__grid">
-      <div class="hero__text span-5">
+  <section class="hero hero--photo" data-enter data-calm="left" aria-labelledby="hero-h">
+    <img class="hero__bg" src="/img/sposi-campo-sole-l.avif" width="1920" height="1280" alt="Due sposi in piedi in un campo di erba alta al tramonto, con le colline sullo sfondo." style="--ly-pos: 70% 60%; --ly-pos-phone: 70% 60%" fetchpriority="high">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__text">
         <h1 id="hero-h">L'app per organizzare il matrimonio</h1>
-        <p class="hero__lead">Budget, fornitori, invitati, tavoli e scadenze in un unico spazio, condiviso con il partner o con la wedding planner. Il piano gratuito non scade.</p>
+        <p class="hero__lead">Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Gratis per iniziare, Completo a 49 € una volta sola.</p>
         <div class="btn-row"><a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="/app/demo">Guarda la demo</a></div>
       </div>
-      <div class="hero__media span-6 start-7">
-        <picture><source type="image/avif" srcset="/img/sposi-sentiero-m.avif 800w, /img/sposi-sentiero-l.avif 1440w" sizes="(min-width: 1024px) 45vw, 100vw"><img src="/img/sposi-sentiero.jpg" width="1440" height="1854" alt="Due sposi camminano di spalle su un sentiero di campagna tra gli alberi." style="--ly-pos: 50% 62%" fetchpriority="high"></picture>
-        <div class="ly-float">
-          <div class="ly-float__row"><span class="ly-live">Prossima scadenza</span><span>tra 12 giorni</span></div>
-          <div class="ly-float__title">Saldo del fotografo</div>
-        </div>
-      </div>
+      <dl class="hero__facts"><div><dt>Coppie</dt><dd>Gratis, senza scadenza</dd></div><div><dt>Completo</dt><dd>49 € una volta sola</dd></div><div><dt>Planner</dt><dd>Da 29 € al mese</dd></div><div><dt>Dove</dt><dd>In tutta Italia</dd></div></dl>
     </div></div>
   </section>
 
@@ -205,7 +204,7 @@
 
   <section class="section is-pricing" id="prezzi" aria-labelledby="prezzi-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Per le coppie un pagamento unico, IVA inclusa. Per le planner un canone mensile, con 30 giorni di prova.</p></div>
+      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Coppie: un pagamento unico, IVA inclusa. Planner: un canone mensile, con 30 giorni di prova.</p></div>
       <div class="grid grid--top fill">
           <article class="card card--plan span-4">
             <h3>Gratis</h3>
@@ -215,7 +214,7 @@
             <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
           </article>
           <article class="card card--plan span-4 is-featured">
-            <h3>Completo<span class="badge">Coppie</span></h3>
+            <h3>Completo</h3>
             <p class="muted">Per un matrimonio, IVA inclusa</p>
             <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
             <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
@@ -229,7 +228,6 @@
             <ul class="checks"><li>5 matrimoni attivi</li><li>Portale per gli sposi</li><li>Acconti e saldi per evento</li><li>Note riservate</li></ul>
           </article>
       </div>
-      <p class="cards-foot"><a class="link" href="/prezzi">Confronta tutti i piani</a></p>
     </div>
   </section>
 
@@ -239,7 +237,6 @@
         <div class="span-5 stack-6">
           <h2 id="planner-h">Per le wedding planner. <span class="muted">Tutti i matrimoni in una dashboard.</span></h2>
           <p>Acconti e saldi per evento, un portale per gli sposi e note che restano tue. Da 29 € al mese, con 30 giorni di prova.</p>
-          <p><a class="link" href="/planner">Vedi la pagina per le planner</a></p>
         </div>
         <figure class="develop span-6 start-7" data-moment="picture-develops"><img class="" src="/img/cerimonia-lago-l.avif" srcset="/img/cerimonia-lago-m.avif 800w, /img/cerimonia-lago-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1064" alt="Sedie bianche allineate lungo una navata all'aperto, davanti a un lago e alle montagne." loading="lazy" decoding="async"></figure>
       </div>

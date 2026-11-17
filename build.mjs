@@ -35,7 +35,7 @@ const MARK = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">` +
   `<path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>`;
 
 const IMG = {
-  home: ["sposi-sentiero", 1440, 1854, "Due sposi camminano di spalle su un sentiero di campagna tra gli alberi."],
+  home: ["sposi-campo-sole", 1920, 1280, "Due sposi in piedi in un campo di erba alta al tramonto, con le colline sullo sfondo."],
   budget: ["fedi-rose", 1440, 2160, "Le mani degli sposi con le fedi, appoggiate su un bouquet di rose bianche."],
   scadenze: ["fedi-libro", 1440, 960, "Due fedi d'oro appoggiate su un libro aperto."],
   invitati: ["sposi-viale", 1440, 2160, "Due sposi di spalle su un viale alberato."],
@@ -54,7 +54,7 @@ const IMG = {
   pergolato: ["fedi-bouquet", 1440, 2160, "Due fedi in primo piano, con un bouquet di rose color crema sullo sfondo."],
 };
 
-const PHOTO_CREDITS = [["cortile-fiori", "George Karelitsky", "https://unsplash.com/@georgekar?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-outside-6V7eOl67DM0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["carta-fiori", "Diana Light", "https://unsplash.com/@dreamcatchlight?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/three-flowers-and-a-card-on-a-table-IP70EVPkjNs?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["quaderno-rosa", "Kelly Sikkema", "https://unsplash.com/@kellysikkema?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/orange-rose-flower-H0QV32-mak8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["navata-cerimonia", "Jonathan Borba", "https://unsplash.com/@jonathanborba?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-floral-arch-and-green-arch-_a4OJrB5Q4A?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["arco-mare", "Karwin Luo", "https://unsplash.com/@karw1n?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/archway-view-to-a-spiral-staircase-and-ocean-zNOgrItIMiE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["patio-ulivo-mare", "Jonas from Berlin", "https://unsplash.com/@jonasfromberlin?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/patio-with-tables-chairs-olive-tree-and-scenic-ocean-view-rX2DMYxsma0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["terrazza-tramonto", "Cory Bjork", "https://unsplash.com/@corybjork?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-with-a-view-of-the-ocean-WatdiKeHuho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-sentiero", "Jaakko Perälä | Norway Elopement Photographer", "https://unsplash.com/@jaakkoperala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-down-a-dirt-road-jcJc5cpD8XE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-tramonto", "Vadim Paripa", "https://unsplash.com/@vadimparipaphotography?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-in-wedding-dress-walking-on-brown-grass-field-during-daytime-PuXtB1B4zL8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cerimonia-lago", "Matthew Essman", "https://unsplash.com/@thetruth23?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/white-folding-chair-in-front-of-body-of-water-jTnipV64uLo?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-rose", "Céline Druguet", "https://unsplash.com/@celala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-close-up-of-two-people-holding-hands-over-a-bouquet-of-flowers-Rnton6rhDe4?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-libro", "Sandy Millar", "https://unsplash.com/@sandym10?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/two-gold-colored-rings-on-paper-YeJWDWeIZho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-viale", "Martin Baron", "https://unsplash.com/@elmartinbaron?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-down-a-path-in-the-woods-ukpAsFhGrxY?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-prato", "Tim Stagge", "https://unsplash.com/@tim_stagge?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/bride-and-groom-walking-on-grass-field-between-treeline-photo-yEcKzQtGUgw?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-vialetto", "Fotógrafo Samuel Cruz", "https://unsplash.com/@fotografosamuelcruz?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/couple-walking-hand-in-hand-on-a-paved-path-AbVW_O0kR4Y?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["mani-fedi", "CHUTTERSNAP", "https://unsplash.com/@chuttersnap?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/woman-wearing-gold-colored-and-silver-colored-rings-NYqEk7a42yc?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-bouquet", "Luigi Pozzoli", "https://unsplash.com/@lu_pl_ph?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/silver-colored-wedding-bands-jZrfY30y6Kc?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-bosco", "Jaakko Perälä | Norway Elopement Photographer", "https://unsplash.com/@jaakkoperala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-through-the-woods-AZLuNOtsU8U?utm_source=felice_mondo_progetti&amp;utm_medium=referral"]];
+const PHOTO_CREDITS = [["cortile-fiori", "George Karelitsky", "https://unsplash.com/@georgekar?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-outside-6V7eOl67DM0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["carta-fiori", "Diana Light", "https://unsplash.com/@dreamcatchlight?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/three-flowers-and-a-card-on-a-table-IP70EVPkjNs?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["quaderno-rosa", "Kelly Sikkema", "https://unsplash.com/@kellysikkema?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/orange-rose-flower-H0QV32-mak8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["navata-cerimonia", "Jonathan Borba", "https://unsplash.com/@jonathanborba?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/outdoor-wedding-ceremony-setup-with-floral-arch-and-green-arch-_a4OJrB5Q4A?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["arco-mare", "Karwin Luo", "https://unsplash.com/@karw1n?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/archway-view-to-a-spiral-staircase-and-ocean-zNOgrItIMiE?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["patio-ulivo-mare", "Jonas from Berlin", "https://unsplash.com/@jonasfromberlin?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/patio-with-tables-chairs-olive-tree-and-scenic-ocean-view-rX2DMYxsma0?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["terrazza-tramonto", "Cory Bjork", "https://unsplash.com/@corybjork?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-table-and-chairs-with-a-view-of-the-ocean-WatdiKeHuho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-campo-sole", "Phakphoom Srinorajan", "https://unsplash.com/@phakphoom?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-walking-on-brown-grass-field-during-daytime-hN_kGla8yQU?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-tramonto", "Vadim Paripa", "https://unsplash.com/@vadimparipaphotography?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/man-and-woman-in-wedding-dress-walking-on-brown-grass-field-during-daytime-PuXtB1B4zL8?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["cerimonia-lago", "Matthew Essman", "https://unsplash.com/@thetruth23?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/white-folding-chair-in-front-of-body-of-water-jTnipV64uLo?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-rose", "Céline Druguet", "https://unsplash.com/@celala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-close-up-of-two-people-holding-hands-over-a-bouquet-of-flowers-Rnton6rhDe4?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-libro", "Sandy Millar", "https://unsplash.com/@sandym10?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/two-gold-colored-rings-on-paper-YeJWDWeIZho?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-viale", "Martin Baron", "https://unsplash.com/@elmartinbaron?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-down-a-path-in-the-woods-ukpAsFhGrxY?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-prato", "Tim Stagge", "https://unsplash.com/@tim_stagge?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/bride-and-groom-walking-on-grass-field-between-treeline-photo-yEcKzQtGUgw?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-vialetto", "Fotógrafo Samuel Cruz", "https://unsplash.com/@fotografosamuelcruz?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/couple-walking-hand-in-hand-on-a-paved-path-AbVW_O0kR4Y?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["mani-fedi", "CHUTTERSNAP", "https://unsplash.com/@chuttersnap?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/woman-wearing-gold-colored-and-silver-colored-rings-NYqEk7a42yc?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["fedi-bouquet", "Luigi Pozzoli", "https://unsplash.com/@lu_pl_ph?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/silver-colored-wedding-bands-jZrfY30y6Kc?utm_source=felice_mondo_progetti&amp;utm_medium=referral"], ["sposi-bosco", "Jaakko Perälä | Norway Elopement Photographer", "https://unsplash.com/@jaakkoperala?utm_source=felice_mondo_progetti&amp;utm_medium=referral", "https://unsplash.com/photos/a-bride-and-groom-walking-through-the-woods-AZLuNOtsU8U?utm_source=felice_mondo_progetti&amp;utm_medium=referral"]];
 
 /* =========================================================== SISTEMA (tasteskill 2.5)
    type: service (site-kind other: foto, colore piatto, tipografia; nessun effetto)
@@ -124,16 +124,20 @@ const pageCss = `<style>
 #portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
 #spazio .panel:has(> .app-shot) { --p-h: 440px; }
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
-.hero--split h1 { font-size: clamp(40px, 4.2vw, 60px); }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
-.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
 .card--plan .price .t-stat { font-family: var(--font-display); }
-.card--plan .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 0; display: grid; gap: 6px; }
 .card--plan .checks li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.5; }
 .card--plan .checks li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 10px; height: 6px; border: solid var(--action); border-width: 0 0 1.6px 1.6px; transform: rotate(-45deg); }
 .cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
 .section.is-pricing { --hm: 2; }
-@media (max-width: 1279px) { .section.is-pricing { --h: 2; } }
+@media (max-width: 1279px), (max-height: 860px) { .section.is-pricing { --h: 2; } }
 @media (max-width: 639px) {
   .card--plan { gap: var(--s-3); padding: var(--s-5); }
   .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
@@ -276,6 +280,19 @@ const heroSplit = ({ k, pos, h1, lead, a, b, float }) => `
       </div>
     </div></div>
   </section>`;
+// Apertura a tutta pagina (scelta di Felice): la foto come livello, le parole in un riquadro sul lato calmo, quattro fatti in fondo
+const heroPhoto = ({ k, pos, posPhone = pos, calm = "left", h1, lead, a, b, facts }) => { const [f, w, h, alt] = IMG[k]; return `
+  <section class="hero hero--photo" data-enter data-calm="${calm}" aria-labelledby="hero-h">
+    <img class="hero__bg" src="/img/${f}-l.avif" width="${w}" height="${h}" alt="${alt}" style="--ly-pos: ${pos}; --ly-pos-phone: ${posPhone}" fetchpriority="high">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__text">
+        <h1 id="hero-h">${h1}</h1>
+        <p class="hero__lead">${lead}</p>
+        <div class="btn-row">${a}${b}</div>
+      </div>
+      <dl class="hero__facts">${facts.map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join("")}</dl>
+    </div></div>
+  </section>`; };
 const primary = (label = MAIN, href = SIGNUP) => `<a class="btn btn--primary" href="${href}">${label}${ARROW}</a>`;
 const secondary = (label, href) => `<a class="btn btn--secondary" href="${href}">${label}</a>`;
 const card = (h, p, panel) => `
@@ -295,11 +312,11 @@ const planCard = ({ name, who, price, per = "", items, btn, href, featured = fal
 const PLAN = {
   gratis: { name: "Gratis", who: "Per iniziare a mettere ordine", price: "0 €", per: "senza scadenza", btn: "Apri lo spazio gratuito", href: SIGNUP,
     items: ["Scadenze sulla data", "Budget e pagamenti", "50 invitati, 3 fornitori", "Condiviso con il partner"] },
-  completo: { name: "Completo", who: "Per un matrimonio, IVA inclusa", price: "49 €", per: "una volta sola", btn: "Inizia gratis", href: SIGNUP, featured: true, badge: "Coppie",
+  completo: { name: "Completo", who: "Per un matrimonio, IVA inclusa", price: "49 €", per: "una volta sola", btn: "Inizia gratis", href: SIGNUP, featured: true,
     items: ["Invitati e fornitori illimitati", "Preventivi affiancati", "Tavoli e sala in pianta", "Programma del giorno"] },
   planner: { name: "Planner", who: "Per chi lavora in proprio", price: "29 €", per: "al mese + IVA", btn: "Prova Planner 30 giorni", href: SIGNUP,
     items: ["5 matrimoni attivi", "Portale per gli sposi", "Acconti e saldi per evento", "Note riservate"] },
-  team: { name: "Team", who: "Per chi lavora con collaboratori", price: "59 €", per: "al mese + IVA", btn: "Prova Team 30 giorni", href: SIGNUP, featured: true, badge: "Planner",
+  team: { name: "Team", who: "Per chi lavora con collaboratori", price: "59 €", per: "al mese + IVA", btn: "Prova Team 30 giorni", href: SIGNUP, featured: true,
     items: ["15 matrimoni attivi", "3 collaboratori", "Portale per gli sposi", "Assistenza prioritaria"] },
   studio: { name: "Studio", who: "Per gli studi con più persone", price: "Su misura", btn: "Scrivici per lo Studio", href: "mailto:info@nozzeinordine.com?subject=Piano%20Studio",
     items: ["Matrimoni concordati", "Collaboratori concordati", "Avvio assistito"] },
@@ -328,11 +345,11 @@ LD["index.html"] = [{ "@context": "https://schema.org", "@graph": [ORG,
 write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio", "Budget, fornitori, invitati, tavoli e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner in tutta Italia. Gratis per iniziare.", { moments: ["pinned-chapters", "picture-develops"] }) + top("") + `
 <!-- type: service · deal: hero split, nav nav-centre, close close-type, footer footer-columns, rhythm space, buttons block, mark logo del cliente
      moments: pinned-chapters (#come), picture-develops (#planner) -->
-<main id="top">${heroSplit({ k: "home", pos: "50% 62%",
+<main id="top">${heroPhoto({ k: "home", pos: "70% 60%",
   h1: "L'app per organizzare il matrimonio",
-  lead: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio, condiviso con il partner o con la wedding planner. Il piano gratuito non scade.",
+  lead: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Gratis per iniziare, Completo a 49 € una volta sola.",
   a: primary(), b: secondary("Guarda la demo", DEMO),
-  float: ["Prossima scadenza", "tra 12 giorni", "Saldo del fotografo"] })}
+  facts: [["Coppie", "Gratis, senza scadenza"], ["Completo", "49 € una volta sola"], ["Planner", "Da 29 € al mese"], ["Dove", "In tutta Italia"]] })}
 
   <section class="section g2" id="funzioni" aria-labelledby="funzioni-h">
     <div class="wrap">
@@ -374,10 +391,9 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
 
   <section class="section is-pricing" id="prezzi" aria-labelledby="prezzi-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Per le coppie un pagamento unico, IVA inclusa. Per le planner un canone mensile, con 30 giorni di prova.</p></div>
+      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Coppie: un pagamento unico, IVA inclusa. Planner: un canone mensile, con 30 giorni di prova.</p></div>
       <div class="grid grid--top fill">${planCard(PLAN.gratis)}${planCard(PLAN.completo)}${planCard(PLAN.planner)}
       </div>
-      <p class="cards-foot"><a class="link" href="/prezzi">Confronta tutti i piani</a></p>
     </div>
   </section>
 
@@ -387,7 +403,6 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
         <div class="span-5 stack-6">
           <h2 id="planner-h">Per le wedding planner. <span class="muted">Tutti i matrimoni in una dashboard.</span></h2>
           <p>Acconti e saldi per evento, un portale per gli sposi e note che restano tue. Da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.</p>
-          <p><a class="link" href="/planner">Vedi la pagina per le planner</a></p>
         </div>
         <figure class="develop span-6 start-7" data-moment="picture-develops">${pic("planner", { cls: "", sizes: "(min-width: 1024px) 50vw, 100vw" })}</figure>
       </div>

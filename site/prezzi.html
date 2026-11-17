@@ -56,16 +56,20 @@
 #portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
 #spazio .panel:has(> .app-shot) { --p-h: 440px; }
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
-.hero--split h1 { font-size: clamp(40px, 4.2vw, 60px); }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
-.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
 .card--plan .price .t-stat { font-family: var(--font-display); }
-.card--plan .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 0; display: grid; gap: 6px; }
 .card--plan .checks li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.5; }
 .card--plan .checks li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 10px; height: 6px; border: solid var(--action); border-width: 0 0 1.6px 1.6px; transform: rotate(-45deg); }
 .cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
 .section.is-pricing { --hm: 2; }
-@media (max-width: 1279px) { .section.is-pricing { --h: 2; } }
+@media (max-width: 1279px), (max-height: 860px) { .section.is-pricing { --h: 2; } }
 @media (max-width: 639px) {
   .card--plan { gap: var(--s-3); padding: var(--s-5); }
   .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
@@ -157,7 +161,7 @@
             <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
           </article>
           <article class="card card--plan span-4 start-9 is-featured">
-            <h3>Completo<span class="badge">Coppie</span></h3>
+            <h3>Completo</h3>
             <p class="muted">Per un matrimonio, IVA inclusa</p>
             <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
             <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
@@ -179,7 +183,7 @@
             <ul class="checks"><li>5 matrimoni attivi</li><li>Portale per gli sposi</li><li>Acconti e saldi per evento</li><li>Note riservate</li></ul>
           </article>
           <article class="card card--plan span-4 is-featured">
-            <h3>Team<span class="badge">Planner</span></h3>
+            <h3>Team</h3>
             <p class="muted">Per chi lavora con collaboratori</p>
             <p class="price"><span class="t-stat">59 €</span><span class="muted">al mese + IVA</span></p>
             <a class="btn btn--primary" href="/app/#/registrati">Prova Team 30 giorni<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
