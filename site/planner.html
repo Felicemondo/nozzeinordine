@@ -58,6 +58,21 @@
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
 .hero--split h1 { font-size: clamp(40px, 4.2vw, 60px); }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.card--plan .checks li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.5; }
+.card--plan .checks li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 10px; height: 6px; border: solid var(--action); border-width: 0 0 1.6px 1.6px; transform: rotate(-45deg); }
+.cards-foot { margin-top: var(--s-6); }
+.section.is-pricing { --hm: 2; }
+@media (max-width: 1279px) { .section.is-pricing { --h: 2; } }
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 @media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
 @media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
 </style>
@@ -145,12 +160,32 @@
     </div>
   </section>
 
-  <section class="section" id="piani" aria-labelledby="piani-h">
+  <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="piani-h">Canoni per numero di matrimoni</h2><p>IVA esclusa. 30 giorni di prova senza carta di credito.</p></div>
-      <div class="grid grid--top fill"><div class="span-6"><ul class="rows"><li><span class="rows__name">Planner<small>Fino a 5 matrimoni attivi, portale per gli sposi, note riservate</small></span><span class="rows__value">29 € al mese</span></li><li><span class="rows__name">Team<small>Fino a 15 matrimoni attivi e 3 collaboratori con il proprio accesso</small></span><span class="rows__value">59 € al mese</span></li><li><span class="rows__name">Studio<small>Matrimoni e collaboratori concordati con lo studio</small></span><span class="rows__value">Su richiesta</span></li></ul>
-        <p class="t-small">Un matrimonio è attivo finché la sua data non è passata. <a class="link" href="mailto:info@nozzeinordine.com?subject=Piano%20Studio">Scrivici per il piano Studio</a></p></div>
-        <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/terrazza-tramonto-l.avif" srcset="/img/terrazza-tramonto-m.avif 800w, /img/terrazza-tramonto-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="960" alt="Tavoli apparecchiati su una terrazza sul mare, al tramonto." loading="lazy" decoding="async"></div></div>
+      <div class="section-head"><h2 id="piani-h">Canoni per numero di matrimoni</h2><p>IVA esclusa. 30 giorni di prova su Planner e Team, senza carta di credito. Un matrimonio è attivo finché la sua data non è passata.</p></div>
+      <div class="grid grid--top fill">
+          <article class="card card--plan span-4">
+            <h3>Planner</h3>
+            <p class="muted">Per chi lavora in proprio</p>
+            <p class="price"><span class="t-stat">29 €</span><span class="muted">al mese + IVA</span></p>
+            <a class="btn btn--secondary" href="/app/#/registrati">Prova Planner 30 giorni</a>
+            <ul class="checks"><li>5 matrimoni attivi</li><li>Portale per gli sposi</li><li>Acconti e saldi per evento</li><li>Note riservate</li></ul>
+          </article>
+          <article class="card card--plan span-4 is-featured">
+            <h3>Team<span class="badge">Planner</span></h3>
+            <p class="muted">Per chi lavora con collaboratori</p>
+            <p class="price"><span class="t-stat">59 €</span><span class="muted">al mese + IVA</span></p>
+            <a class="btn btn--primary" href="/app/#/registrati">Prova Team 30 giorni<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+            <ul class="checks"><li>15 matrimoni attivi</li><li>3 collaboratori</li><li>Portale per gli sposi</li><li>Assistenza prioritaria</li></ul>
+          </article>
+          <article class="card card--plan span-4">
+            <h3>Studio</h3>
+            <p class="muted">Per gli studi con più persone</p>
+            <p class="price"><span class="t-stat">Su misura</span></p>
+            <a class="btn btn--secondary" href="mailto:info@nozzeinordine.com?subject=Piano%20Studio">Scrivici per lo Studio</a>
+            <ul class="checks"><li>Matrimoni concordati</li><li>Collaboratori concordati</li><li>Avvio assistito</li></ul>
+          </article>
+      </div>
     </div>
   </section>
 

@@ -59,6 +59,21 @@
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
 .hero--split h1 { font-size: clamp(40px, 4.2vw, 60px); }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.card--plan .checks li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.5; }
+.card--plan .checks li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 10px; height: 6px; border: solid var(--action); border-width: 0 0 1.6px 1.6px; transform: rotate(-45deg); }
+.cards-foot { margin-top: var(--s-6); }
+.section.is-pricing { --hm: 2; }
+@media (max-width: 1279px) { .section.is-pricing { --h: 2; } }
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 @media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
 @media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
 </style>
@@ -188,12 +203,33 @@
     </div>
   </section>
 
-  <section class="section" id="prezzi" aria-labelledby="prezzi-h">
+  <section class="section is-pricing" id="prezzi" aria-labelledby="prezzi-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Per le coppie un pagamento unico, IVA inclusa. Per le planner un canone mensile, IVA esclusa.</p></div>
-      <div class="grid grid--top fill"><div class="span-6"><ul class="rows"><li><span class="rows__name">Gratis<small>Scadenze, budget, fino a 50 invitati e 3 fornitori, senza scadenza</small></span><span class="rows__value">0 €</span></li><li><span class="rows__name">Completo<small>Un matrimonio, invitati e fornitori illimitati, tavoli e programma del giorno</small></span><span class="rows__value">49 € una volta</span></li><li><span class="rows__name">Planner<small>Fino a 5 matrimoni attivi, 30 giorni di prova</small></span><span class="rows__value">29 € al mese + IVA</span></li><li><span class="rows__name">Team<small>Fino a 15 matrimoni attivi e 3 collaboratori</small></span><span class="rows__value">59 € al mese + IVA</span></li></ul>
-        <p><a class="link" href="/prezzi">Confronta i piani</a></p></div>
-        <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/carta-fiori-l.avif" srcset="/img/carta-fiori-m.avif 800w, /img/carta-fiori-l.avif 1152w" sizes="(min-width: 1024px) 50vw, 100vw" width="1152" height="1440" alt="Cartoncini e partecipazioni su un tavolo chiaro, con rose e fiori di campo." loading="lazy" decoding="async"></div></div>
+      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Per le coppie un pagamento unico, IVA inclusa. Per le planner un canone mensile, con 30 giorni di prova.</p></div>
+      <div class="grid grid--top fill">
+          <article class="card card--plan span-4">
+            <h3>Gratis</h3>
+            <p class="muted">Per iniziare a mettere ordine</p>
+            <p class="price"><span class="t-stat">0 €</span><span class="muted">senza scadenza</span></p>
+            <a class="btn btn--secondary" href="/app/#/registrati">Apri lo spazio gratuito</a>
+            <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
+          </article>
+          <article class="card card--plan span-4 is-featured">
+            <h3>Completo<span class="badge">Coppie</span></h3>
+            <p class="muted">Per un matrimonio, IVA inclusa</p>
+            <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
+            <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+            <ul class="checks"><li>Invitati e fornitori illimitati</li><li>Preventivi affiancati</li><li>Tavoli e sala in pianta</li><li>Programma del giorno</li></ul>
+          </article>
+          <article class="card card--plan span-4">
+            <h3>Planner</h3>
+            <p class="muted">Per chi lavora in proprio</p>
+            <p class="price"><span class="t-stat">29 €</span><span class="muted">al mese + IVA</span></p>
+            <a class="btn btn--secondary" href="/app/#/registrati">Prova Planner 30 giorni</a>
+            <ul class="checks"><li>5 matrimoni attivi</li><li>Portale per gli sposi</li><li>Acconti e saldi per evento</li><li>Note riservate</li></ul>
+          </article>
+      </div>
+      <p class="cards-foot"><a class="link" href="/prezzi">Confronta tutti i piani</a></p>
     </div>
   </section>
 

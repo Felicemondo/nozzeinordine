@@ -58,6 +58,21 @@
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
 .hero--split h1 { font-size: clamp(40px, 4.2vw, 60px); }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-2); }
+.card--plan .checks li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.5; }
+.card--plan .checks li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 10px; height: 6px; border: solid var(--action); border-width: 0 0 1.6px 1.6px; transform: rotate(-45deg); }
+.cards-foot { margin-top: var(--s-6); }
+.section.is-pricing { --hm: 2; }
+@media (max-width: 1279px) { .section.is-pricing { --h: 2; } }
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 @media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
 @media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
 </style>
@@ -166,12 +181,29 @@
     </div>
   </section>
 
-  <section class="section" id="piani" aria-labelledby="piani-h">
+  <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="piani-h">Gratis o Completo. <span class="muted">Un solo pagamento, IVA inclusa.</span></h2></div>
-      <div class="grid grid--top fill"><div class="span-6"><ul class="rows"><li><span class="rows__name">Invitati e fornitori<small>Con il Gratis fino a 50 invitati e 3 fornitori</small></span><span class="rows__value">Completo: illimitati</span></li><li><span class="rows__name">Preventivi<small>Con il Gratis uno per fornitore</small></span><span class="rows__value">Completo: affiancati</span></li><li><span class="rows__name">Tavoli, programma del giorno, invito alla planner<small>Non inclusi nel Gratis</small></span><span class="rows__value">Completo</span></li><li><span class="rows__name">Completo<small>Vale per un matrimonio; i nomi degli sposi si fissano all'attivazione</small></span><span class="rows__value">49 €</span></li></ul>
-        <p><a class="link" href="/prezzi">Confronta i piani</a></p></div>
-        <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/fedi-bouquet-l.avif" srcset="/img/fedi-bouquet-m.avif 800w, /img/fedi-bouquet-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="2160" alt="Due fedi in primo piano, con un bouquet di rose color crema sullo sfondo." loading="lazy" decoding="async"></div></div>
+      <div class="grid grid--top fill">
+        <div class="span-4 stack-6">
+          <h2 id="piani-h">Gratis o Completo</h2>
+          <p>Il Completo costa 49 € una volta sola, IVA inclusa, e vale per un matrimonio: i nomi degli sposi si fissano all'attivazione.</p>
+          <p><a class="link" href="/prezzi">Confronta i piani</a></p>
+        </div>
+          <article class="card card--plan span-4 start-5">
+            <h3>Gratis</h3>
+            <p class="muted">Per iniziare a mettere ordine</p>
+            <p class="price"><span class="t-stat">0 €</span><span class="muted">senza scadenza</span></p>
+            <a class="btn btn--secondary" href="/app/#/registrati">Apri lo spazio gratuito</a>
+            <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
+          </article>
+          <article class="card card--plan span-4 start-9 is-featured">
+            <h3>Completo<span class="badge">Coppie</span></h3>
+            <p class="muted">Per un matrimonio, IVA inclusa</p>
+            <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
+            <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+            <ul class="checks"><li>Invitati e fornitori illimitati</li><li>Preventivi affiancati</li><li>Tavoli e sala in pianta</li><li>Programma del giorno</li></ul>
+          </article>
+      </div>
     </div>
   </section>
 
