@@ -1,6 +1,6 @@
 // Genera le pagine di site/ a partire dai contenuti qui sotto.  node build.mjs
 // Struttura e testi seguono i mockup Figma "Website" (Home, Per le coppie, Per le planner, Prezzi).
-import { writeFileSync, readFileSync } from "node:fs";
+import { writeFileSync, readFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -18,8 +18,11 @@ const cleanLinks = (html) => html
 const write = (name, html) => {
   const slug = name === "index.html" ? "" : name.replace(/\.html$/, ""), url = SITE + "/" + slug;
   const h1 = (html.match(/<h1[^>]*>(.*?)<\/h1>/) || [])[1] || "";
-  const blocks = (LD[name] || []).concat(slug ? [crumbs(h1.replace(/<[^>]+>/g, "").replace(/\.$/, ""), slug)] : []);
+  const title = h1.replace(/<[^>]+>/g, "").replace(/\.$/, "");
+  const trail = slug.startsWith("guide/") ? { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Nozze in Ordine", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: "Guide", item: SITE + "/guide" }, { "@type": "ListItem", position: 3, name: title, item: url }] } : crumbs(title, slug);
+  const blocks = (LD[name] || []).concat(slug ? [trail] : []);
   const seo = `<link rel="canonical" href="${url}"><meta property="og:url" content="${url}"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="${SITE}/og.png">${blocks.map(ld).join("")}`;
+  mkdirSync(dirname(join(OUT, name)), { recursive: true });
   writeFileSync(join(OUT, name), cleanLinks(html).replace("</head>", seo + "</head>"));
 };
 
@@ -190,13 +193,13 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
 @media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
 </style>`;
 
-const head = (title, desc, { moments = [], extra = "" } = {}) => `<!doctype html>
+const head = (title, desc, { moments = [], extra = "", robots = "" } = {}) => `<!doctype html>
 <html lang="it" data-type="service" data-radius="soft" data-buttons="block" data-motion>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${title}</title>
-<meta name="description" content="${desc}">
+<meta name="description" content="${desc}">${robots ? `\n<meta name="robots" content="${robots}">` : ""}
 <meta property="og:type" content="website">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${desc}">
@@ -508,7 +511,7 @@ const PHASE_TEXT = [
 const ago = (m, d) => m ? (m === 1 ? "1 mese prima" : `${m} mesi prima`) : d % 7 === 0 ? (d === 7 ? "1 settimana prima" : `${d / 7} settimane prima`) : `${d} giorni prima`;
 const FAQ_SCAD = [
   ["Quanto tempo prima si organizza un matrimonio?", "Questo calendario parte 14 mesi prima, con la data e il rito. Si può fare in meno tempo: le prime decisioni (data, budget, location) restano le stesse e le altre si avvicinano. Se la vostra data è vicina, il calcolatore segna come «da recuperare» le attività già superate."],
-  ["Quando si mandano le partecipazioni?", "Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Ordinatele un paio di mesi prima di spedirle."],
+  ["Quando si mandano le partecipazioni?", "Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Il calendario fa ordinare le partecipazioni un mese prima di spedirle: chiedete alla tipografia quanto tempo le serve."],
   ["Quando si prenota la location?", "Dodici mesi prima, subito dopo aver fissato data e budget. È la scelta che decide il numero di invitati e molti dei fornitori, quindi conviene farla per prima."],
   ["Quando servono i documenti per le pubblicazioni?", "Tre mesi prima. Le pubblicazioni di matrimonio valgono 180 giorni: se il matrimonio non si celebra entro quel termine vanno rifatte. Per le date precise chiedete al comune o alla parrocchia."],
   ["Quando si saldano i fornitori?", "Nel calendario i saldi principali cadono un mese prima e la conferma dei numeri al catering una settimana prima. Valgono le date scritte nei contratti: se sono diverse, seguite quelle."],
@@ -577,6 +580,114 @@ write(SCAD, head("Scadenze del matrimonio: cosa fare mese per mese, sulla vostra
     </div>
   </section>
 </main>` + foot(closeType("Le vostre scadenze, nel vostro spazio", "Con l'account gratuito le stesse attività si spuntano e si spostano, e si ricalcolano se cambia la data.")) + `<script src="/scadenze.js" defer></script>`);
+
+/* =========================================================== GUIDE */
+// Ogni guida risponde a una ricerca reale e porta a una funzione dell'app. Felice le rivede prima che vadano su Google:
+// finché GUIDE_LIVE è false le pagine sono online ma noindex, fuori dalla sitemap e senza link dal resto del sito.
+const GUIDE_LIVE = false;
+const GUIDE_ROBOTS = GUIDE_LIVE ? "" : "noindex, follow";
+const guideCss = `<style>
+.article { max-width: 68ch; display: grid; gap: var(--s-4); padding-block: calc(var(--nav) + var(--s-8)) var(--s-9); }
+.article h1 { font: 400 var(--t-h2)/1.1 var(--font-display); letter-spacing: var(--display-tracking); margin: 0; }
+.article h2 { font: 400 var(--t-h3)/1.25 var(--font-display); margin: var(--s-7) 0 0; }
+.article :is(p, li, td, th) { font-size: 16px; line-height: 1.7; }
+.article :is(ul, ol):not(.rows) { padding-left: 20px; display: grid; gap: var(--s-2); }
+.article ul:not(.rows) { list-style: disc; }
+.article ol { list-style: decimal; }
+.article ul.rows { padding-left: 0; }
+.article a:not(.btn) { color: var(--action); }
+.article .crumb { display: flex; gap: var(--s-2); font-size: var(--t-small); color: var(--muted); }
+.article .crumb a { color: inherit; }
+.answer { padding: var(--s-5) var(--s-6); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface, #fff); display: grid; gap: var(--s-2); }
+.answer p { margin: 0; }
+.table-wrap { overflow-x: auto; }
+.article table { width: 100%; border-collapse: collapse; }
+.article :is(th, td) { text-align: left; vertical-align: top; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: 1px solid var(--line); }
+.article th { font-weight: 500; }
+.article td:nth-child(2) { white-space: nowrap; }
+.tool { display: grid; gap: var(--s-3); padding: var(--s-6); border-radius: var(--r-lg); background: var(--surface, #fff); border: 1px solid var(--line); margin-top: var(--s-6); }
+.tool h2 { margin: 0; }
+.tool p { margin: 0; }
+.related { display: grid; gap: var(--s-2); margin-top: var(--s-6); }
+@media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article td:nth-child(2) { white-space: normal; } }
+</style>`;
+const GUIDES = [];
+const guide = ({ slug, title, desc, h1, answer, updated, updatedIso, published, body, faq, tool }) => {
+  const name = `guide/${slug}.html`;
+  GUIDES.push({ slug, h1, desc });
+  LD[name] = [{ "@context": "https://schema.org", "@graph": [
+    { "@type": "Article", headline: h1, description: desc, inLanguage: "it-IT", datePublished: published, dateModified: updatedIso, mainEntityOfPage: SITE + "/guide/" + slug, author: ORG, publisher: ORG, image: SITE + "/og.png" },
+    { "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }] }];
+  write(name, head(title, desc, { extra: guideCss, robots: GUIDE_ROBOTS }) + top("") + `
+<main id="top"><div class="wrap"><article class="article">
+<nav class="crumb" aria-label="Percorso"><a href="/guide">Guide</a><span aria-hidden="true">›</span><span>${h1.replace(/\?$/, "")}</span></nav>
+<h1>${h1}</h1>
+<p class="t-small muted">Aggiornata il ${updated}</p>
+<div class="answer"><p class="t-label">In breve</p>${answer}</div>
+${body}
+<div class="tool"><h2>${tool.h}</h2><p>${tool.p}</p><p><a class="btn btn--primary" href="${tool.href}">${tool.btn}${ARROW}</a></p></div>
+<h2>Domande frequenti</h2>
+${faqList(faq)}
+</article></div></main>` + foot(closeType("Organizzate il matrimonio in un unico spazio", "Scadenze, invitati e risposte nello stesso posto. Il piano gratuito non scade e non serve la carta di credito.")));
+};
+
+guide({ slug: "quando-si-danno-le-partecipazioni", published: "2026-11-17", updatedIso: "2026-11-17", updated: "17 novembre 2026",
+  title: "Quando si danno le partecipazioni di matrimonio (e i save the date)",
+  desc: "Partecipazioni 3–4 mesi prima, save the date 6–8 mesi prima, risposte entro 1–2 mesi dal matrimonio. Tempi, motivi ed eccezioni, con il calcolatore sulla vostra data.",
+  h1: "Quando si danno le partecipazioni di matrimonio?",
+  answer: `<p>Le partecipazioni si spediscono di solito <strong>3–4 mesi prima</strong> del matrimonio, anche prima per chi deve viaggiare. I save the date partono prima, <strong>6–8 mesi prima</strong>, e fino a un anno se molti invitati vengono da lontano. Sulla partecipazione chiedete una risposta entro <strong>1–2 mesi prima</strong>, in tempo per il catering e i tavoli.</p>`,
+  body: `
+<h2>Il calendario, in una tabella</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Cosa</th><th>Quando</th><th>Perché</th></tr></thead>
+<tbody>
+<tr><td>Save the date</td><td>6–8 mesi prima</td><td>Fissa la data nel calendario degli invitati prima che prendano altri impegni.</td></tr>
+<tr><td>Save the date a chi viene da lontano</td><td>9–12 mesi prima</td><td>Serve tempo per ferie, viaggi e alloggi.</td></tr>
+<tr><td>Ordinare le partecipazioni</td><td>Prima della spedizione</td><td>Stampa, buste e indirizzi richiedono settimane: chiedete i tempi alla tipografia.</td></tr>
+<tr><td>Spedire o consegnare le partecipazioni</td><td>3–4 mesi prima</td><td>Abbastanza presto per organizzarsi, non così presto da essere dimenticate.</td></tr>
+<tr><td>Data limite per le risposte</td><td>1–2 mesi prima</td><td>Il catering vuole i numeri e i tavoli si fanno sulle risposte.</td></tr>
+</tbody></table></div>
+<p>Sono le indicazioni più diffuse in Italia, non regole fisse. Nel <a href="/scadenze-matrimonio">calendario delle scadenze</a> di Nozze in Ordine i save the date cadono 8 mesi prima e le partecipazioni 5 mesi prima: si sta sul lato prudente, così resta margine per i ritardi.</p>
+
+<h2>Save the date: a cosa servono e quando mandarli</h2>
+<p>Il save the date è un avviso: comunica la data quando la partecipazione non è ancora pronta. Non è obbligatorio, ma è utile quando il matrimonio cade in alta stagione, in un giorno festivo, oppure quando una parte degli invitati deve prendere un aereo o chiedere le ferie.</p>
+<p>Mandatelo solo a chi inviterete di sicuro: chi riceve un save the date si aspetta poi la partecipazione. Prima di spedirli conviene quindi avere almeno la data, la location e una lista degli invitati abbastanza stabile.</p>
+
+<h2>Partecipazioni: quando spedirle</h2>
+<p>La finestra più citata è 3–4 mesi prima. Per chi vive vicino si può stare verso i 3 mesi; per chi viaggia, o se avete mandato il save the date solo ad alcuni, conviene anticipare.</p>
+<p>Se le consegnate a mano, mettete in conto il tempo delle visite: con molti invitati la consegna può durare settimane. In quel caso iniziate qualche settimana prima della data che avete scelto.</p>
+
+<h2>La data per le risposte</h2>
+<p>Scrivete sulla partecipazione entro quando volete una risposta e come darla (telefono, messaggio, email). È la data che usate per tutto il resto: il numero finale per il catering, la disposizione dei tavoli, le bomboniere.</p>
+<p>Lasciate un margine prima delle scadenze dei fornitori: qualcuno risponderà in ritardo e andrà sollecitato. Nella dashboard di Nozze in Ordine le risposte si segnano invitato per invitato, e vedete subito chi manca.</p>
+
+<h2>Se il matrimonio è vicino</h2>
+<p>Con pochi mesi a disposizione si salta il save the date e si manda subito la partecipazione, anche in digitale, con una data di risposta chiara. Una telefonata a chi deve viaggiare vale più di qualsiasi biglietto.</p>
+
+<h2>Cosa scrivere sulla partecipazione</h2>
+<ul>
+<li>i nomi degli sposi, e secondo l'uso anche dei genitori;</li>
+<li>giorno, ora e luogo del rito;</li>
+<li>il luogo del ricevimento, se è diverso;</li>
+<li>entro quando rispondere e a chi;</li>
+<li>la lista nozze o le indicazioni per il regalo, se volete darle.</li>
+</ul>`,
+  tool: { h: "Le date esatte sul vostro matrimonio", p: "Inserite il giorno del sì: il calcolatore vi dice quando mandare save the date e partecipazioni, e le altre 18 scadenze principali.", btn: "Calcola le scadenze", href: "/scadenze-matrimonio" },
+  faq: [
+    ["Il save the date è obbligatorio?", "No. È utile se il matrimonio cade in alta stagione o se molti invitati devono viaggiare; altrimenti basta la partecipazione, spedita in tempo."],
+    ["Si possono mandare le partecipazioni su WhatsApp?", "Sì: conta che arrivino in tempo e che sia chiaro entro quando rispondere. Per i parenti che non usano il telefono, o per chi ci tiene, meglio anche la carta."],
+    ["Chi riceve il save the date va invitato?", "Sì. Il save the date è una promessa di invito: mandatelo solo a chi riceverà di sicuro la partecipazione."],
+    ["Quanto prima chiedere la risposta?", "Uno o due mesi prima del matrimonio. Controllate entro quando il catering vuole il numero definitivo e lasciatevi qualche settimana per sollecitare chi non ha risposto."]] });
+
+write("guide.html", head("Guide per organizzare il matrimonio | Nozze in Ordine", "Guide pratiche per organizzare il matrimonio: tempi, documenti, budget, invitati e tavoli. Risposte dirette e strumenti gratuiti.", { extra: guideCss, robots: GUIDE_ROBOTS }) + top("") + `
+<main id="top"><div class="wrap"><article class="article">
+<h1>Guide per organizzare il matrimonio</h1>
+<p class="t-lead">Risposte dirette alle domande che arrivano mentre si organizza: quando, quanto, in che ordine. Ogni guida rimanda a uno strumento gratuito.</p>
+<h2>Strumenti</h2>
+<ul class="rows"><li><span class="rows__name"><a href="/scadenze-matrimonio">Calcolatore delle scadenze del matrimonio</a><small>Inserite la data e vedete il giorno di 20 attività, dalla location ai saldi.</small></span></li></ul>
+<h2>Tempi e scadenze</h2>
+<ul class="rows">${GUIDES.map((g) => `<li><span class="rows__name"><a href="/guide/${g.slug}">${g.h1}</a><small>${g.desc}</small></span></li>`).join("")}</ul>
+</article></div></main>` + foot());
 
 /* =========================================================== PLANNER */
 write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale dei matrimoni", `Il gestionale per wedding planner: tutti i matrimoni in un unico spazio, con acconti, scadenze e portale per gli sposi. Da ${PREZZI.planner} € al mese.`.replace("€ €", "€")) + top("planner") + `

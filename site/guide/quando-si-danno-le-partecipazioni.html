@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="it" data-type="service" data-radius="soft" data-buttons="block" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quando si danno le partecipazioni di matrimonio (e i save the date)</title>
+<meta name="description" content="Partecipazioni 3–4 mesi prima, save the date 6–8 mesi prima, risposte entro 1–2 mesi dal matrimonio. Tempi, motivi ed eccezioni, con il calcolatore sulla vostra data.">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quando si danno le partecipazioni di matrimonio (e i save the date)">
+<meta property="og:description" content="Partecipazioni 3–4 mesi prima, save the date 6–8 mesi prima, risposte entro 1–2 mesi dal matrimonio. Tempi, motivi ed eccezioni, con il calcolatore sulla vostra data.">
+<meta property="og:image" content="https://nozzeinordine.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#f5f0e7">
+<meta name="site-kind" content="other">
+<meta name="page-type" content="service">
+<link rel="preload" href="/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/system.css">
+<link rel="stylesheet" href="/assets/ui/cards.css">
+<link rel="stylesheet" href="/assets/motion/motion.css">
+<link rel="stylesheet" href="/assets/layout/layout.css">
+
+<style>
+@font-face { font-family: "DM Serif Display"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-600-normal.woff2") format("woff2"); }
+:root {
+  --p-bg: #f5f0e7; --p-surface: #ebe4d7; --p-ink: #2b2a24; --p-muted: #5a5650;
+  --p-accent: #a85339; --p-accent-ink: #f5f0e7; --p-action: #a85339; --p-action-ink: #f5f0e7;
+  --p-inv-bg: #2b2a24; --p-inv-surface: #37362f; --p-inv-ink: #f5f0e7; --p-inv-muted: #a8a49c;
+  --p-inv-accent: #f5f0e7; --p-inv-accent-ink: #2b2a24; --p-inv-action: #f5f0e7; --p-inv-action-ink: #2b2a24;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-text: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.012em;
+  --display-tracking-xl: -0.018em;
+}
+.nav__logo svg { width: 26px; height: 26px; fill: #702f43; flex: none; }
+.nav__logo { color: #702f43; }
+.nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
+.nav__toggle svg { width: 22px; height: 22px; }
+.app-shot { object-position: left top; }
+.steps-list { list-style: none; counter-reset: s; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-5); }
+.steps-list li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; column-gap: var(--s-4); row-gap: 4px; }
+.steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
+.steps-list b { font-weight: 500; font-size: 18px; }
+.steps-list span { color: var(--p-muted); }
+/* sezioni alte quanto il contenuto, con spazi misurati (scelta di Felice: la schermata intera lasciava troppo vuoto) */
+:root { --padt: 96px; --padb: 96px; }
+main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
+main > :is(section, .section):not(.hero) > .wrap { height: auto; }
+main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto; height: auto; }
+main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+footer.closing > .wrap { row-gap: var(--s-9); }
+main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
+@media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
+/* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
+@media (max-width: 639px) {
+  :root { --padt: 56px; --padb: 32px; }
+  main > :is(section, .section):not(.hero, .section--hero), footer.closing { min-height: 0 !important; }
+  main > :is(section, .section).g2 > .wrap, main > :is(section, .section).g2m > .wrap, footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-7); }
+  footer.closing > .wrap { row-gap: var(--s-8); }
+  main > :is(section, .section):not(.hero) > .wrap { height: auto; min-height: 0; }
+  main > :is(section, .section):not(.hero, .section--hero) { padding-bottom: var(--padb) !important; }
+  main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto !important; height: auto !important; min-height: 0; }
+  .mo-pc__step { min-height: 0 !important; height: auto !important; padding-block: var(--s-2); }
+  .mo-pc__grid, .mo-pc__text, .mo-pc__steps { min-height: 0 !important; height: auto !important; }
+  .frame, .develop { height: auto !important; min-height: 0 !important; }
+  .frame--photo:has(> .frame__img), .develop { aspect-ratio: 4 / 3; }
+  .frame--photo:has(> .app-shot) { aspect-ratio: 1600 / 1074; }
+}
+/* un solo raggio per tutte le foto e le schermate (scelta di Felice): quello delle card */
+.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel, .menu-card .panel { border-radius: var(--r-lg); overflow: hidden; }
+:is(.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel) img { border-radius: inherit; }
+.rows__name small { display: block; margin-top: var(--s-1); font: 400 var(--t-small)/1.5 var(--font-text); color: var(--muted); }
+.rows__value { text-align: right; }
+.panel:has(> .app-shot) { --p-h: 340px; }
+@media (max-width: 1279px) { .panel:has(> .app-shot) { --p-h: 280px; } }
+.develop { aspect-ratio: 1; }
+.frame--photo:has(> .frame__img) { aspect-ratio: 1; }
+#prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+@media (min-width: 640px) and (max-width: 1023px) { #prezzi .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) {
+  #prezzi .section-head p, #prezzi .rows > li:nth-child(n+3), #domande .faq__item:nth-child(n+3) { display: none; }
+  #prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 3 / 2; }
+}
+#eventi .frame--photo { aspect-ratio: 1600 / 1074; }
+#portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
+#spazio .panel:has(> .app-shot) { --p-h: 440px; }
+@media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
+#piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: stretch; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
+.card--plan .checks li { font-size: 15px; line-height: 1.5; }
+.cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+.pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
+@media (max-width: 1023px) { .pricing-pic { display: none; } }
+@media (max-width: 639px) { .section.is-pricing:has(.card--plan:nth-child(3)):not(#prezzi) { --hm: 2; } }
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
+
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
+</style>
+<script src="/assets/boot.js"></script>
+<script src="/tracking.js"></script>
+<script src="/consent.js" defer></script>
+
+<style>
+.article { max-width: 68ch; display: grid; gap: var(--s-4); padding-block: calc(var(--nav) + var(--s-8)) var(--s-9); }
+.article h1 { font: 400 var(--t-h2)/1.1 var(--font-display); letter-spacing: var(--display-tracking); margin: 0; }
+.article h2 { font: 400 var(--t-h3)/1.25 var(--font-display); margin: var(--s-7) 0 0; }
+.article :is(p, li, td, th) { font-size: 16px; line-height: 1.7; }
+.article :is(ul, ol):not(.rows) { padding-left: 20px; display: grid; gap: var(--s-2); }
+.article ul:not(.rows) { list-style: disc; }
+.article ol { list-style: decimal; }
+.article ul.rows { padding-left: 0; }
+.article a:not(.btn) { color: var(--action); }
+.article .crumb { display: flex; gap: var(--s-2); font-size: var(--t-small); color: var(--muted); }
+.article .crumb a { color: inherit; }
+.answer { padding: var(--s-5) var(--s-6); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface, #fff); display: grid; gap: var(--s-2); }
+.answer p { margin: 0; }
+.table-wrap { overflow-x: auto; }
+.article table { width: 100%; border-collapse: collapse; }
+.article :is(th, td) { text-align: left; vertical-align: top; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: 1px solid var(--line); }
+.article th { font-weight: 500; }
+.article td:nth-child(2) { white-space: nowrap; }
+.tool { display: grid; gap: var(--s-3); padding: var(--s-6); border-radius: var(--r-lg); background: var(--surface, #fff); border: 1px solid var(--line); margin-top: var(--s-6); }
+.tool h2 { margin: 0; }
+.tool p { margin: 0; }
+.related { display: grid; gap: var(--s-2); margin-top: var(--s-6); }
+@media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article td:nth-child(2) { white-space: normal; } }
+</style>
+<link rel="canonical" href="https://nozzeinordine.com/guide/quando-si-danno-le-partecipazioni"><meta property="og:url" content="https://nozzeinordine.com/guide/quando-si-danno-le-partecipazioni"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","headline":"Quando si danno le partecipazioni di matrimonio?","description":"Partecipazioni 3–4 mesi prima, save the date 6–8 mesi prima, risposte entro 1–2 mesi dal matrimonio. Tempi, motivi ed eccezioni, con il calcolatore sulla vostra data.","inLanguage":"it-IT","datePublished":"2026-11-17","dateModified":"2026-11-17","mainEntityOfPage":"https://nozzeinordine.com/guide/quando-si-danno-le-partecipazioni","author":{"@type":"Organization","@id":"https://nozzeinordine.com/#org","name":"Nozze in Ordine","url":"https://nozzeinordine.com/","logo":"https://nozzeinordine.com/apple-touch-icon.png","email":"info@nozzeinordine.com","areaServed":"IT"},"publisher":{"@type":"Organization","@id":"https://nozzeinordine.com/#org","name":"Nozze in Ordine","url":"https://nozzeinordine.com/","logo":"https://nozzeinordine.com/apple-touch-icon.png","email":"info@nozzeinordine.com","areaServed":"IT"},"image":"https://nozzeinordine.com/og.png"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Il save the date è obbligatorio?","acceptedAnswer":{"@type":"Answer","text":"No. È utile se il matrimonio cade in alta stagione o se molti invitati devono viaggiare; altrimenti basta la partecipazione, spedita in tempo."}},{"@type":"Question","name":"Si possono mandare le partecipazioni su WhatsApp?","acceptedAnswer":{"@type":"Answer","text":"Sì: conta che arrivino in tempo e che sia chiaro entro quando rispondere. Per i parenti che non usano il telefono, o per chi ci tiene, meglio anche la carta."}},{"@type":"Question","name":"Chi riceve il save the date va invitato?","acceptedAnswer":{"@type":"Answer","text":"Sì. Il save the date è una promessa di invito: mandatelo solo a chi riceverà di sicuro la partecipazione."}},{"@type":"Question","name":"Quanto prima chiedere la risposta?","acceptedAnswer":{"@type":"Answer","text":"Uno o due mesi prima del matrimonio. Controllate entro quando il catering vuole il numero definitivo e lasciatevi qualche settimana per sollecitare chi non ha risposto."}}]}]}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nozze in Ordine","item":"https://nozzeinordine.com/"},{"@type":"ListItem","position":2,"name":"Guide","item":"https://nozzeinordine.com/guide"},{"@type":"ListItem","position":3,"name":"Quando si danno le partecipazioni di matrimonio?","item":"https://nozzeinordine.com/guide/quando-si-danno-le-partecipazioni"}]}</script></head>
+<body>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Vai al contenuto</a>
+    <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+    <nav class="nav__links" aria-label="Principale">
+      <div class="nav__item"><a class="nav__link" href="/coppie">Coppie</a></div>
+      <div class="nav__item"><a class="nav__link" href="/planner">Planner</a></div>
+      <div class="nav__item"><a class="nav__link" href="/prezzi">Prezzi</a></div>
+      <div class="nav__item"><a class="nav__link" href="/chi-siamo">Chi siamo</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" href="/app/">Accedi</a>
+      <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main id="top"><div class="wrap"><article class="article">
+<nav class="crumb" aria-label="Percorso"><a href="/guide">Guide</a><span aria-hidden="true">›</span><span>Quando si danno le partecipazioni di matrimonio</span></nav>
+<h1>Quando si danno le partecipazioni di matrimonio?</h1>
+<p class="t-small muted">Aggiornata il 17 novembre 2026</p>
+<div class="answer"><p class="t-label">In breve</p><p>Le partecipazioni si spediscono di solito <strong>3–4 mesi prima</strong> del matrimonio, anche prima per chi deve viaggiare. I save the date partono prima, <strong>6–8 mesi prima</strong>, e fino a un anno se molti invitati vengono da lontano. Sulla partecipazione chiedete una risposta entro <strong>1–2 mesi prima</strong>, in tempo per il catering e i tavoli.</p></div>
+
+<h2>Il calendario, in una tabella</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Cosa</th><th>Quando</th><th>Perché</th></tr></thead>
+<tbody>
+<tr><td>Save the date</td><td>6–8 mesi prima</td><td>Fissa la data nel calendario degli invitati prima che prendano altri impegni.</td></tr>
+<tr><td>Save the date a chi viene da lontano</td><td>9–12 mesi prima</td><td>Serve tempo per ferie, viaggi e alloggi.</td></tr>
+<tr><td>Ordinare le partecipazioni</td><td>Prima della spedizione</td><td>Stampa, buste e indirizzi richiedono settimane: chiedete i tempi alla tipografia.</td></tr>
+<tr><td>Spedire o consegnare le partecipazioni</td><td>3–4 mesi prima</td><td>Abbastanza presto per organizzarsi, non così presto da essere dimenticate.</td></tr>
+<tr><td>Data limite per le risposte</td><td>1–2 mesi prima</td><td>Il catering vuole i numeri e i tavoli si fanno sulle risposte.</td></tr>
+</tbody></table></div>
+<p>Sono le indicazioni più diffuse in Italia, non regole fisse. Nel <a href="/scadenze-matrimonio">calendario delle scadenze</a> di Nozze in Ordine i save the date cadono 8 mesi prima e le partecipazioni 5 mesi prima: si sta sul lato prudente, così resta margine per i ritardi.</p>
+
+<h2>Save the date: a cosa servono e quando mandarli</h2>
+<p>Il save the date è un avviso: comunica la data quando la partecipazione non è ancora pronta. Non è obbligatorio, ma è utile quando il matrimonio cade in alta stagione, in un giorno festivo, oppure quando una parte degli invitati deve prendere un aereo o chiedere le ferie.</p>
+<p>Mandatelo solo a chi inviterete di sicuro: chi riceve un save the date si aspetta poi la partecipazione. Prima di spedirli conviene quindi avere almeno la data, la location e una lista degli invitati abbastanza stabile.</p>
+
+<h2>Partecipazioni: quando spedirle</h2>
+<p>La finestra più citata è 3–4 mesi prima. Per chi vive vicino si può stare verso i 3 mesi; per chi viaggia, o se avete mandato il save the date solo ad alcuni, conviene anticipare.</p>
+<p>Se le consegnate a mano, mettete in conto il tempo delle visite: con molti invitati la consegna può durare settimane. In quel caso iniziate qualche settimana prima della data che avete scelto.</p>
+
+<h2>La data per le risposte</h2>
+<p>Scrivete sulla partecipazione entro quando volete una risposta e come darla (telefono, messaggio, email). È la data che usate per tutto il resto: il numero finale per il catering, la disposizione dei tavoli, le bomboniere.</p>
+<p>Lasciate un margine prima delle scadenze dei fornitori: qualcuno risponderà in ritardo e andrà sollecitato. Nella dashboard di Nozze in Ordine le risposte si segnano invitato per invitato, e vedete subito chi manca.</p>
+
+<h2>Se il matrimonio è vicino</h2>
+<p>Con pochi mesi a disposizione si salta il save the date e si manda subito la partecipazione, anche in digitale, con una data di risposta chiara. Una telefonata a chi deve viaggiare vale più di qualsiasi biglietto.</p>
+
+<h2>Cosa scrivere sulla partecipazione</h2>
+<ul>
+<li>i nomi degli sposi, e secondo l'uso anche dei genitori;</li>
+<li>giorno, ora e luogo del rito;</li>
+<li>il luogo del ricevimento, se è diverso;</li>
+<li>entro quando rispondere e a chi;</li>
+<li>la lista nozze o le indicazioni per il regalo, se volete darle.</li>
+</ul>
+<div class="tool"><h2>Le date esatte sul vostro matrimonio</h2><p>Inserite il giorno del sì: il calcolatore vi dice quando mandare save the date e partecipazioni, e le altre 18 scadenze principali.</p><p><a class="btn btn--primary" href="/scadenze-matrimonio">Calcola le scadenze<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a></p></div>
+<h2>Domande frequenti</h2>
+<div class="faq"><div class="faq__item"><h3>Il save the date è obbligatorio?</h3><p>No. È utile se il matrimonio cade in alta stagione o se molti invitati devono viaggiare; altrimenti basta la partecipazione, spedita in tempo.</p></div><div class="faq__item"><h3>Si possono mandare le partecipazioni su WhatsApp?</h3><p>Sì: conta che arrivino in tempo e che sia chiaro entro quando rispondere. Per i parenti che non usano il telefono, o per chi ci tiene, meglio anche la carta.</p></div><div class="faq__item"><h3>Chi riceve il save the date va invitato?</h3><p>Sì. Il save the date è una promessa di invito: mandatelo solo a chi riceverà di sicuro la partecipazione.</p></div><div class="faq__item"><h3>Quanto prima chiedere la risposta?</h3><p>Uno o due mesi prima del matrimonio. Controllate entro quando il catering vuole il numero definitivo e lasciatevi qualche settimana per sollecitare chi non ha risposto.</p></div></div>
+</article></div></main>
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Organizzate il matrimonio in un unico spazio</h2>
+        <p>Scadenze, invitati e risposte nello stesso posto. Il piano gratuito non scade e non serve la carta di credito.</p>
+      </div>
+      <a class="btn btn--primary btn--xl btn--wide" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+          <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/scadenze-matrimonio">Scadenze del matrimonio</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="/app/#/registrati">Crea un account</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/cookie" data-cookie-prefs>Preferenze cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Nozze in Ordine</span>
+        <div class="socials"></div>
+        <a class="credits" href="/privacy#crediti">Fotografie via Unsplash</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<nav class="actionbar" aria-label="Azioni rapide">
+  <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+</nav>
+<script type="module" src="/assets/system.js"></script>
+<script type="module" src="/assets/motion/motion.js"></script>
+<script type="module" src="/assets/layout/layout.js"></script>
+</body>
+</html>
