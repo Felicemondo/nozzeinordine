@@ -20,7 +20,6 @@
 <link rel="stylesheet" href="/assets/ui/cards.css">
 <link rel="stylesheet" href="/assets/motion/motion.css">
 <link rel="stylesheet" href="/assets/layout/layout.css">
-<link rel="stylesheet" href="/assets/moments/pinned-chapters/moment.css">
 <link rel="stylesheet" href="/assets/moments/picture-develops/moment.css">
 <style>
 @font-face { font-family: "DM Serif Display"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); }
@@ -43,6 +42,20 @@
 .nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
 .nav__toggle svg { width: 22px; height: 22px; }
 .app-shot { object-position: left top; }
+.steps-list { list-style: none; counter-reset: s; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-5); }
+.steps-list li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; column-gap: var(--s-4); row-gap: 4px; }
+.steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
+.steps-list b { font-weight: 500; font-size: 18px; }
+.steps-list span { color: var(--p-muted); }
+/* sezioni alte quanto il contenuto, con spazi misurati (scelta di Felice: la schermata intera lasciava troppo vuoto) */
+:root { --padt: 96px; --padb: 96px; }
+main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
+main > :is(section, .section):not(.hero) > .wrap { height: auto; }
+main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto; height: auto; }
+main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+footer.closing > .wrap { row-gap: var(--s-9); }
+main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
+@media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
 /* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
 @media (max-width: 639px) {
   :root { --padt: 56px; --padb: 32px; }
@@ -105,7 +118,7 @@
 <script src="/tracking.js"></script>
 <script src="/consent.js" defer></script>
 <link rel="modulepreload" href="/assets/moments/moments.js"><link rel="modulepreload" href="/assets/moments/lib.js">
-<link rel="modulepreload" href="/assets/moments/pinned-chapters/moment.js"><link rel="modulepreload" href="/assets/moments/picture-develops/moment.js">
+<link rel="modulepreload" href="/assets/moments/picture-develops/moment.js">
 
 <link rel="canonical" href="https://nozzeinordine.com/"><meta property="og:url" content="https://nozzeinordine.com/"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://nozzeinordine.com/#org","name":"Nozze in Ordine","url":"https://nozzeinordine.com/","logo":"https://nozzeinordine.com/apple-touch-icon.png","email":"info@nozzeinordine.com","areaServed":"IT"},{"@type":"WebSite","@id":"https://nozzeinordine.com/#site","url":"https://nozzeinordine.com/","name":"Nozze in Ordine","inLanguage":"it-IT","publisher":{"@id":"https://nozzeinordine.com/#org"}},{"@type":"SoftwareApplication","name":"Nozze in Ordine","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"it-IT","url":"https://nozzeinordine.com/","description":"Dashboard per organizzare il matrimonio: budget, fornitori, invitati, tavoli e scadenze in uno spazio condiviso, per coppie e wedding planner.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR","description":"Piano gratuito per le coppie"},"publisher":{"@id":"https://nozzeinordine.com/#org"}}]}</script></head>
 <body>
@@ -136,10 +149,10 @@
     <div class="wrap"><div class="hero-text">
       <div class="hero__text">
         <h1 id="hero-h">L'app per organizzare il matrimonio</h1>
-        <p class="hero__lead">Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Gratis per iniziare, Completo a 49 € una volta sola.</p>
+        <p class="hero__lead">Budget, fornitori, invitati, tavoli e scadenze in un unico spazio, condiviso con il partner o con la wedding planner.</p>
         <div class="btn-row"><a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="/prezzi">Vedi i prezzi</a></div>
       </div>
-      <dl class="hero__facts"><div><dt>Coppie</dt><dd>Gratis, senza scadenza</dd></div><div><dt>Completo</dt><dd>49 € una volta sola</dd></div><div><dt>Planner</dt><dd>Da 29 € al mese</dd></div><div><dt>Dove</dt><dd>In tutta Italia</dd></div></dl>
+      <dl class="hero__facts"><div><dt>Per chi</dt><dd>Coppie e wedding planner</dd></div><div><dt>Scadenze</dt><dd>Calcolate sulla data</dd></div><div><dt>Dove</dt><dd>In tutta Italia</dd></div><div><dt>Accesso</dt><dd>Da telefono e computer</dd></div></dl>
     </div></div>
   </section>
 
@@ -175,67 +188,29 @@
     </div>
   </section>
 
-  <section class="section" id="come" style="--h: 2" data-moment="pinned-chapters" aria-labelledby="come-h">
-    <div class="wrap mo-pc__grid">
-      <div class="mo-pc__text">
-        <h2 id="come-h">Come si comincia, in 3 passi</h2>
-        <ol class="mo-pc__steps">
-          <li class="mo-pc__step">
-            <h3>Inserite la data del matrimonio</h3>
-            <p>Le scadenze si calcolano da lì: sapete subito cosa viene prima e cosa può aspettare.</p>
-            <figure class="mo-pc__visual"><img class="" src="/img/fedi-libro-l.avif" srcset="/img/fedi-libro-m.avif 800w, /img/fedi-libro-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="960" alt="Due fedi d'oro appoggiate su un libro aperto." loading="lazy" decoding="async"></figure>
-          </li>
-          <li class="mo-pc__step">
-            <h3>Aggiungete i fornitori del matrimonio</h3>
-            <p>Uno alla volta o da un file CSV. Il piano gratuito tiene 50 invitati e 3 fornitori.</p>
-            <figure class="mo-pc__visual"><img class="" src="/img/mani-fedi-l.avif" srcset="/img/mani-fedi-m.avif 800w, /img/mani-fedi-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="2156" alt="Le mani della sposa e dello sposo, con anello e fede." loading="lazy" decoding="async"></figure>
-          </li>
-          <li class="mo-pc__step">
-            <h3>Invitate il partner o la planner</h3>
-            <p>Ognuno entra con il proprio accesso e lavora sulle stesse informazioni.</p>
-            <figure class="mo-pc__visual"><img class="" src="/img/sposi-viale-l.avif" srcset="/img/sposi-viale-m.avif 800w, /img/sposi-viale-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="2160" alt="Due sposi di spalle su un viale alberato." loading="lazy" decoding="async"></figure>
-          </li>
-        </ol>
+  <section class="section" id="come" aria-labelledby="come-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="come-h">Come si comincia, in 3 passi</h2>
+          <ol class="steps-list">
+            <li><b>Inserite la data del matrimonio</b><span>Le scadenze si calcolano da lì: sapete subito cosa viene prima e cosa può aspettare.</span></li>
+            <li><b>Aggiungete fornitori e invitati</b><span>Uno alla volta o da un file CSV, con il budget voce per voce.</span></li>
+            <li><b>Invitate il partner o la planner</b><span>Ognuno entra con il proprio accesso e lavora sulle stesse informazioni.</span></li>
+          </ol>
+        </div>
+        <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/sposi-viale-l.avif" srcset="/img/sposi-viale-m.avif 800w, /img/sposi-viale-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="2160" alt="Due sposi di spalle su un viale alberato." loading="lazy" decoding="async"></div>
       </div>
-      <div class="mo-pc__visuals frame"></div>
     </div>
   </section>
 
-  <section class="section is-pricing" id="prezzi" aria-labelledby="prezzi-h">
-    <div class="wrap">
-      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Coppie: un pagamento unico, IVA inclusa. Planner: un canone mensile, con 7 giorni di prova.</p></div>
-      <div class="grid grid--top">
-          <article class="card card--plan span-4">
-            <h3>Gratis</h3>
-            <p class="muted">Per iniziare a mettere ordine</p>
-            <p class="price"><span class="t-stat">0 €</span><span class="muted">senza scadenza</span></p>
-            <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
-            <a class="btn btn--secondary" href="/app/#/registrati">Apri lo spazio gratuito</a>
-          </article>
-          <article class="card card--plan span-4 is-featured">
-            <h3>Completo</h3>
-            <p class="muted">Per un matrimonio, IVA inclusa</p>
-            <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
-            <ul class="checks"><li>Invitati e fornitori illimitati</li><li>Preventivi affiancati</li><li>Tavoli e sala in pianta</li><li>Programma del giorno</li></ul>
-            <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
-          </article>
-          <article class="card card--plan span-4">
-            <h3>Planner</h3>
-            <p class="muted">Per chi lavora in proprio</p>
-            <p class="price"><span class="t-stat">29 €</span><span class="muted">al mese + IVA</span></p>
-            <ul class="checks"><li>5 matrimoni attivi</li><li>Portale per gli sposi</li><li>Acconti e saldi per evento</li><li>Note riservate</li></ul>
-            <a class="btn btn--secondary" href="/app/#/registrati">Prova Planner 7 giorni</a>
-          </article>
-      </div>
-    </div>
-  </section>
 
   <section class="section" id="planner" aria-labelledby="planner-h">
     <div class="wrap">
       <div class="grid grid--top fill">
         <div class="span-5 stack-6">
           <h2 id="planner-h">Per le wedding planner. <span class="muted">Tutti i matrimoni in una dashboard.</span></h2>
-          <p>Acconti e saldi per evento, un portale per gli sposi e note che restano tue. Da 29 € al mese, con 7 giorni di prova.</p>
+          <p>Acconti e saldi per evento, un portale per gli sposi e note che restano tue.</p>
         </div>
         <figure class="develop span-6 start-7" data-moment="picture-develops"><img class="" src="/img/cerimonia-lago-l.avif" srcset="/img/cerimonia-lago-m.avif 800w, /img/cerimonia-lago-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1064" alt="Sedie bianche allineate lungo una navata all'aperto, davanti a un lago e alle montagne." loading="lazy" decoding="async"></figure>
       </div>
@@ -245,7 +220,7 @@
   <section class="section" id="domande" aria-labelledby="domande-h">
     <div class="wrap">
       <div class="section-head"><h2 id="domande-h">Domande sui piani e sui dati</h2></div>
-      <div class="grid grid--top fill"><div class="span-6"><div class="faq"><div class="faq__item"><h3>Serve la carta di credito per iniziare?</h3><p>No. Vi registrate con email e password, e il piano gratuito resta tale finché volete.</p></div><div class="faq__item"><h3>Il Completo è un abbonamento?</h3><p>No. Sono 49 € una volta sola, per un matrimonio.</p></div><div class="faq__item"><h3>Possiamo lavorare con la nostra planner?</h3><p>Sì: la invitate nel vostro spazio, oppure vi invita lei nel suo. Vedete le stesse scadenze e lo stesso budget.</p></div><div class="faq__item"><h3>Dove sono i nostri dati?</h3><p>Su server in Europa e nel Regno Unito. Non li vendiamo e non li cediamo.</p></div></div></div>
+      <div class="grid grid--top fill"><div class="span-6"><div class="faq"><div class="faq__item"><h3>Serve la carta di credito per iniziare?</h3><p>No. Vi registrate con email e password, e il piano gratuito resta tale finché volete.</p></div><div class="faq__item"><h3>Quanto costa?</h3><p>Per le coppie si parte gratis, senza scadenza. Tutti i piani sono nella <a class="link" href="/prezzi">pagina prezzi</a>.</p></div><div class="faq__item"><h3>Possiamo lavorare con la nostra planner?</h3><p>Sì: la invitate nel vostro spazio, oppure vi invita lei nel suo. Vedete le stesse scadenze e lo stesso budget.</p></div><div class="faq__item"><h3>Dove sono i nostri dati?</h3><p>Su server in Europa e nel Regno Unito. Non li vendiamo e non li cediamo.</p></div></div></div>
         <div class="frame frame--photo span-6 start-7"><img class="frame__img" src="/img/cortile-fiori-l.avif" srcset="/img/cortile-fiori-m.avif 800w, /img/cortile-fiori-l.avif 1440w" sizes="(min-width: 1024px) 50vw, 100vw" width="1440" height="1200" alt="Un cortile di pietra con un tavolo, sedie bianche, vasi di fiori e piante." loading="lazy" decoding="async"></div></div>
     </div>
   </section>
@@ -255,7 +230,7 @@
     <div class="closing__cta close--type">
       <div class="section-head">
         <h2 id="close-h">Organizzate il matrimonio</h2>
-        <p>Il piano gratuito non scade. Il Completo costa 49 €, una volta sola.</p>
+        <p>Il piano gratuito non scade e non serve la carta di credito.</p>
       </div>
       <a class="btn btn--primary btn--xl btn--wide" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
     </div>

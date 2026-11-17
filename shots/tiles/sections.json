@@ -1,12 +1,12 @@
 {
- "url": "http://127.0.0.1:5300/chi-siamo.html",
+ "url": "http://127.0.0.1:5300/index.html",
  "views": {
   "desktop": {
    "width": 1440,
    "height": 900,
    "navH": 72,
-   "scrollHeight": 4500,
-   "screens": 5,
+   "scrollHeight": 5376,
+   "screens": 5.97,
    "sections": [
     {
      "n": 1,
@@ -27,64 +27,86 @@
     {
      "n": 2,
      "tag": "section",
-     "id": "perche",
-     "cls": "section",
+     "id": "funzioni",
+     "cls": "section g2",
      "top": 900,
-     "h": 900,
-     "hScreens": 1,
-     "offGrid": 0,
+     "h": 1302,
+     "hScreens": 1.45,
+     "offGrid": 402,
      "tiles": [
       {
        "file": "desktop-sec-02-a.jpg",
        "scrollY": 900
+      },
+      {
+       "file": "desktop-sec-02-b.jpg",
+       "scrollY": 1302
       }
      ]
     },
     {
      "n": 3,
      "tag": "section",
-     "id": "regole",
+     "id": "come",
      "cls": "section",
-     "top": 1800,
-     "h": 900,
-     "hScreens": 1,
-     "offGrid": 0,
+     "top": 2202,
+     "h": 796,
+     "hScreens": 0.88,
+     "offGrid": 796,
      "tiles": [
       {
        "file": "desktop-sec-03-a.jpg",
-       "scrollY": 1800
+       "scrollY": 2202
       }
      ]
     },
     {
      "n": 4,
      "tag": "section",
-     "id": "felice",
+     "id": "planner",
      "cls": "section",
-     "top": 2700,
-     "h": 900,
-     "hScreens": 1,
-     "offGrid": 0,
+     "top": 2998,
+     "h": 796,
+     "hScreens": 0.88,
+     "offGrid": 796,
      "tiles": [
       {
        "file": "desktop-sec-04-a.jpg",
-       "scrollY": 2700
+       "scrollY": 2998
       }
      ]
     },
     {
      "n": 5,
-     "tag": "footer",
-     "id": "contact",
-     "cls": "footer closing",
-     "top": 3600,
-     "h": 900,
-     "hScreens": 1,
-     "offGrid": 0,
+     "tag": "section",
+     "id": "domande",
+     "cls": "section",
+     "top": 3794,
+     "h": 740,
+     "hScreens": 0.82,
+     "offGrid": 740,
      "tiles": [
       {
        "file": "desktop-sec-05-a.jpg",
-       "scrollY": 3600
+       "scrollY": 3794
+      }
+     ]
+    },
+    {
+     "n": 6,
+     "tag": "footer",
+     "id": "contact",
+     "cls": "footer closing",
+     "top": 4533,
+     "h": 842,
+     "hScreens": 0.94,
+     "offGrid": 842,
+     "tiles": [
+      {
+       "file": "desktop-sec-06-a.jpg",
+       "scrollY": 4476,
+       "cutTop": 57,
+       "height": 842
       }
      ]
     }
@@ -92,5 +114,5 @@
    "consoleErrors": []
   }
  },
- "at": "2026-11-17T16:29:34.667Z"
+ "at": "2026-11-17T17:08:44.430Z"
 }

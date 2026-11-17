@@ -42,6 +42,20 @@
 .nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
 .nav__toggle svg { width: 22px; height: 22px; }
 .app-shot { object-position: left top; }
+.steps-list { list-style: none; counter-reset: s; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-5); }
+.steps-list li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; column-gap: var(--s-4); row-gap: 4px; }
+.steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
+.steps-list b { font-weight: 500; font-size: 18px; }
+.steps-list span { color: var(--p-muted); }
+/* sezioni alte quanto il contenuto, con spazi misurati (scelta di Felice: la schermata intera lasciava troppo vuoto) */
+:root { --padt: 96px; --padb: 96px; }
+main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
+main > :is(section, .section):not(.hero) > .wrap { height: auto; }
+main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto; height: auto; }
+main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+footer.closing > .wrap { row-gap: var(--s-9); }
+main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
+@media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
 /* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
 @media (max-width: 639px) {
   :root { --padt: 56px; --padb: 32px; }
@@ -208,7 +222,7 @@
     <div class="closing__cta close--type">
       <div class="section-head">
         <h2 id="close-h">Organizzate il matrimonio</h2>
-        <p>Il piano gratuito non scade. Il Completo costa 49 €, una volta sola.</p>
+        <p>Il piano gratuito non scade e non serve la carta di credito.</p>
       </div>
       <a class="btn btn--primary btn--xl btn--wide" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
     </div>

@@ -117,6 +117,20 @@ const pageCss = `<style>
 .nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
 .nav__toggle svg { width: 22px; height: 22px; }
 .app-shot { object-position: left top; }
+.steps-list { list-style: none; counter-reset: s; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-5); }
+.steps-list li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; column-gap: var(--s-4); row-gap: 4px; }
+.steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
+.steps-list b { font-weight: 500; font-size: 18px; }
+.steps-list span { color: var(--p-muted); }
+/* sezioni alte quanto il contenuto, con spazi misurati (scelta di Felice: la schermata intera lasciava troppo vuoto) */
+:root { --padt: 96px; --padb: 96px; }
+main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
+main > :is(section, .section):not(.hero) > .wrap { height: auto; }
+main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto; height: auto; }
+main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+footer.closing > .wrap { row-gap: var(--s-9); }
+main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
+@media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
 /* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
 @media (max-width: 639px) {
   :root { --padt: 56px; --padb: 32px; }
@@ -227,7 +241,7 @@ const top = (cur) => `
   </div>
 </header>`;
 
-const closeType = (h2 = "Organizzate il matrimonio", line = `Il piano gratuito non scade. Il Completo costa ${"49 €"}, una volta sola.`) => `
+const closeType = (h2 = "Organizzate il matrimonio", line = "Il piano gratuito non scade e non serve la carta di credito.") => `
     <div class="closing__cta close--type">
       <div class="section-head">
         <h2 id="close-h">${h2}</h2>
@@ -346,14 +360,14 @@ LD["index.html"] = [{ "@context": "https://schema.org", "@graph": [ORG,
   { "@type": "SoftwareApplication", name: "Nozze in Ordine", applicationCategory: "BusinessApplication", operatingSystem: "Web", inLanguage: "it-IT", url: SITE + "/",
     description: "Dashboard per organizzare il matrimonio: budget, fornitori, invitati, tavoli e scadenze in uno spazio condiviso, per coppie e wedding planner.",
     offers: { "@type": "Offer", price: "0", priceCurrency: "EUR", description: "Piano gratuito per le coppie" }, publisher: { "@id": SITE + "/#org" } }] }];
-write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio", "Budget, fornitori, invitati, tavoli e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner in tutta Italia. Gratis per iniziare.", { moments: ["pinned-chapters", "picture-develops"] }) + top("") + `
+write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio", "Budget, fornitori, invitati, tavoli e scadenze del matrimonio in uno spazio condiviso, per coppie e wedding planner in tutta Italia. Gratis per iniziare.", { moments: ["picture-develops"] }) + top("") + `
 <!-- type: service · deal: hero split, nav nav-centre, close close-type, footer footer-columns, rhythm space, buttons block, mark logo del cliente
      moments: pinned-chapters (#come), picture-develops (#planner) -->
 <main id="top">${heroPhoto({ k: "home", pos: "70% 60%",
   h1: "L'app per organizzare il matrimonio",
-  lead: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Gratis per iniziare, Completo a 49 € una volta sola.",
+  lead: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio, condiviso con il partner o con la wedding planner.",
   a: primary(), b: secondary("Vedi i prezzi", "/prezzi"),
-  facts: [["Coppie", "Gratis, senza scadenza"], ["Completo", "49 € una volta sola"], ["Planner", "Da 29 € al mese"], ["Dove", "In tutta Italia"]] })}
+  facts: [["Per chi", "Coppie e wedding planner"], ["Scadenze", "Calcolate sulla data"], ["Dove", "In tutta Italia"], ["Accesso", "Da telefono e computer"]] })}
 
   <section class="section g2" id="funzioni" aria-labelledby="funzioni-h">
     <div class="wrap">
@@ -367,46 +381,29 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
     </div>
   </section>
 
-  <section class="section" id="come" style="--h: 2" data-moment="pinned-chapters" aria-labelledby="come-h">
-    <div class="wrap mo-pc__grid">
-      <div class="mo-pc__text">
-        <h2 id="come-h">Come si comincia, in 3 passi</h2>
-        <ol class="mo-pc__steps">
-          <li class="mo-pc__step">
-            <h3>Inserite la data del matrimonio</h3>
-            <p>Le scadenze si calcolano da lì: sapete subito cosa viene prima e cosa può aspettare.</p>
-            <figure class="mo-pc__visual">${pic("scadenze", { cls: "", sizes: "(min-width: 1024px) 50vw, 100vw" })}</figure>
-          </li>
-          <li class="mo-pc__step">
-            <h3>Aggiungete i fornitori del matrimonio</h3>
-            <p>Uno alla volta o da un file CSV. Il piano gratuito tiene 50 invitati e 3 fornitori.</p>
-            <figure class="mo-pc__visual">${pic("prezzi", { cls: "", sizes: "(min-width: 1024px) 50vw, 100vw" })}</figure>
-          </li>
-          <li class="mo-pc__step">
-            <h3>Invitate il partner o la planner</h3>
-            <p>Ognuno entra con il proprio accesso e lavora sulle stesse informazioni.</p>
-            <figure class="mo-pc__visual">${pic("invitati", { cls: "", sizes: "(min-width: 1024px) 50vw, 100vw" })}</figure>
-          </li>
-        </ol>
+  <section class="section" id="come" aria-labelledby="come-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="come-h">Come si comincia, in 3 passi</h2>
+          <ol class="steps-list">
+            <li><b>Inserite la data del matrimonio</b><span>Le scadenze si calcolano da lì: sapete subito cosa viene prima e cosa può aspettare.</span></li>
+            <li><b>Aggiungete fornitori e invitati</b><span>Uno alla volta o da un file CSV, con il budget voce per voce.</span></li>
+            <li><b>Invitate il partner o la planner</b><span>Ognuno entra con il proprio accesso e lavora sulle stesse informazioni.</span></li>
+          </ol>
+        </div>
+        <div class="frame frame--photo span-6 start-7">${pic("invitati")}</div>
       </div>
-      <div class="mo-pc__visuals frame"></div>
     </div>
   </section>
 
-  <section class="section is-pricing" id="prezzi" aria-labelledby="prezzi-h">
-    <div class="wrap">
-      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Coppie: un pagamento unico, IVA inclusa. Planner: un canone mensile, con 7 giorni di prova.</p></div>
-      <div class="grid grid--top">${planCard(PLAN.gratis)}${planCard(PLAN.completo)}${planCard(PLAN.planner)}
-      </div>
-    </div>
-  </section>
 
   <section class="section" id="planner" aria-labelledby="planner-h">
     <div class="wrap">
       <div class="grid grid--top fill">
         <div class="span-5 stack-6">
           <h2 id="planner-h">Per le wedding planner. <span class="muted">Tutti i matrimoni in una dashboard.</span></h2>
-          <p>Acconti e saldi per evento, un portale per gli sposi e note che restano tue. Da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.</p>
+          <p>Acconti e saldi per evento, un portale per gli sposi e note che restano tue.</p>
         </div>
         <figure class="develop span-6 start-7" data-moment="picture-develops">${pic("planner", { cls: "", sizes: "(min-width: 1024px) 50vw, 100vw" })}</figure>
       </div>
@@ -418,7 +415,7 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
       <div class="section-head"><h2 id="domande-h">Domande sui piani e sui dati</h2></div>
       <div class="grid grid--top fill"><div class="span-6">${faqList([
         ["Serve la carta di credito per iniziare?", "No. Vi registrate con email e password, e il piano gratuito resta tale finché volete."],
-        ["Il Completo è un abbonamento?", `No. Sono ${PREZZI.completo} una volta sola, per un matrimonio.`],
+        ["Quanto costa?", `Per le coppie si parte gratis, senza scadenza. Tutti i piani sono nella <a class="link" href="/prezzi">pagina prezzi</a>.`],
         ["Possiamo lavorare con la nostra planner?", "Sì: la invitate nel vostro spazio, oppure vi invita lei nel suo. Vedete le stesse scadenze e lo stesso budget."],
         ["Dove sono i nostri dati?", "Su server in Europa e nel Regno Unito. Non li vendiamo e non li cediamo."]])}</div>
         <div class="frame frame--photo span-6 start-7">${pic("fiori")}</div></div>
@@ -627,18 +624,6 @@ write("chi-siamo.html", head("Chi siamo: Nozze in Ordine, app per organizzare il
     </div>
   </section>
 
-  <section class="section" id="felice" aria-labelledby="felice-h">
-    <div class="wrap">
-      <div class="grid grid--top fill">
-        <div class="span-5 stack-6">
-          <h2 id="felice-h">Felice Mondo, UX/UI designer</h2>
-          <p>Nozze in Ordine è progettata e sviluppata da Felice Mondo, designer di interfacce a Marcianise, in provincia di Caserta. Ogni schermata nasce dalle domande di chi organizza un matrimonio, e lo strumento cresce con le richieste di coppie e planner.</p>
-          <p>Per domande, idee o problemi scrivi a <a class="link" href="mailto:info@nozzeinordine.com">info@nozzeinordine.com</a>.</p>
-        </div>
-        <div class="frame frame--photo span-6 start-7">${pic("fiori")}</div>
-      </div>
-    </div>
-  </section>
 </main>` + foot());
 
 /* =========================================================== PAGINE LEGALI */
