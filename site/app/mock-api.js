@@ -81,7 +81,8 @@
      ["Fotografo e video", "Studio Luce", 2400, 2200, 700, addDays(40)], ["Abiti e accessori", "Sposa e sposo", 3600, 2900, 1450, addDays(90)], ["Musica e intrattenimento", "Band per la festa", 1500, 1200, 300, addDays(60)],
      ["Fiori e allestimenti", "", 1800, 0, 0, null], ["Bomboniere", "Ceramica di Vietri", 0, 0, 0, null, 12, 0, null], ["Partecipazioni e stampa", "Carta cotone", 0, 0, 0, null, 6.5, 0, null],
      ["Viaggio di nozze", "Giappone, 12 giorni", 4500, 0, 0, addDays(150)]]
-      .forEach(function (b) { db.budget_items.push({ id: uid(), wedding_id: wid, category: b[0], description: b[1], planned: b[2], contracted: b[3], paid: b[4], due_date: b[5], unit_price: b[6] || 0, unit_child: b[7] || 0, rental_amount: b[8] == null ? null : b[8], created_at: now }); });
+      .forEach(function (b) { var dp = { "Location e ricevimento": [3000, -20], "Catering": [2000, -5], "Fotografo e video": [700, -10], "Abiti e accessori": [1450, -30], "Musica e intrattenimento": [600, 20], "Viaggio di nozze": [1500, 45] }[b[0]];
+        db.budget_items.push({ id: uid(), wedding_id: wid, category: b[0], description: b[1], planned: b[2], contracted: b[3], paid: b[4], due_date: b[5], deposit: dp ? dp[0] : 0, deposit_due: dp ? addDays(dp[1]) : null, unit_price: b[6] || 0, unit_child: b[7] || 0, rental_amount: b[8] == null ? null : b[8], created_at: now }); });
     var v = function (category, name, contact, status, notes, quotes) {
       var x = { id: uid(), wedding_id: wid, category: category, name: name, contact: contact, status: status, notes: notes, created_at: now };
       db.vendors.push(x);

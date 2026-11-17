@@ -332,7 +332,9 @@
       { name: "planned", label: "Costo stimato (€)", type: "number", min: 0, step: "0.01", help: "Quanto pensate di spendere per questa voce." },
       { name: "contracted", label: "Importo del contratto (€)", type: "number", min: 0, step: "0.01", required: true, help: "Quando c'è, prende il posto della stima. Scrivete 0 se non c'è ancora un contratto." },
       { name: "paid", label: "Già pagato (€)", type: "number", min: 0, step: "0.01", required: true, help: "Scrivete 0 se non avete ancora pagato nulla." },
-      { name: "due_date", label: "Prossimo pagamento", type: "date", noOpt: true, help: "Serve finché resta qualcosa da pagare." }
+      { name: "deposit", label: "Acconto (€)", type: "number", min: 0, step: "0.01", help: "L'anticipo concordato con il fornitore. Scrivete 0 se non è previsto." },
+      { name: "deposit_due", label: "Acconto entro", type: "date", noOpt: true, help: "Quando va versato l'acconto." },
+      { name: "due_date", label: "Saldo entro", type: "date", noOpt: true, help: "Entro quando saldare il resto. Serve finché resta qualcosa da pagare." }
     ],
     tables: [
       { name: "name", label: "Nome del tavolo", required: true, max: 60, placeholder: "Es. Capri", wide: true },
@@ -880,9 +882,12 @@
     return rowItem({ icon: "clock", tone: "terra-solid", title: late.length === 1 ? "1 attività è in ritardo" : late.length + " attività sono in ritardo", meta: (tasks.length - open.length) + " completate su " + tasks.length + " · " + late.length + " in ritardo", side: h("a", { class: "badge late", href: href }, late.length + " in ritardo") });
   }
   function payList(bud, rel) {
-    var pays = bud.filter(function (b) { return b.due_date && cost(b) > num(b.paid); }).sort(function (a, b) { return a.due_date < b.due_date ? -1 : 1; }).slice(0, 4);
-    return pays.length ? h("ul", { class: "plain-list" }, pays.map(function (b) {
-      return h("li", null, h("span", { class: "ic-circle soft" }, icon(payIcon(b.category))), h("div", null, h("b", null, b.category), h("small", null, eur(cost(b) - num(b.paid)) + " · " + (rel ? whenText(b.due_date) : fmtDate(b.due_date)))));
+    var pays = [];
+    bud.forEach(function (b) { installments(b).forEach(function (r) { if (r.date) pays.push({ b: b, r: r }); }); });
+    pays = pays.sort(function (a, b) { return a.r.date < b.r.date ? -1 : 1; }).slice(0, 4);
+    return pays.length ? h("ul", { class: "plain-list" }, pays.map(function (x) {
+      var b = x.b;
+      return h("li", null, h("span", { class: "ic-circle soft" }, icon(payIcon(b.category))), h("div", null, h("b", null, b.category + (x.r.kind === "pagamento" ? "" : " · " + x.r.kind)), h("small", null, eur(x.r.amount) + " · " + (rel ? whenText(x.r.date) : fmtDate(x.r.date)))));
     })) : h("p", { class: "muted" }, "Nessun pagamento con una data. Aggiungila nelle voci del budget.");
   }
 
@@ -927,12 +932,24 @@
     var table = h("table", { class: "sr" }, h("caption", null, opts.title || "Pagamenti mese per mese"),
       h("thead", null, h("tr", null, h("th", { scope: "col" }, "Mese"), h("th", { scope: "col" }, "Da pagare"))),
       h("tbody", null, cols.map(function (c) { return h("tr", null, h("th", { scope: "row" }, longName(c)), h("td", null, eur(c.total))); })));
+    var future = cols.filter(function (c) { return c.key !== "late"; }), sumF = future.reduce(function (s, c) { return s + c.total; }, 0);
+    var avg = future.length > 1 && sumF ? h("p", { class: "pc-avg" }, "Media mensile fino al " + (opts.until ? "matrimonio" : "ultimo pagamento") + ": ", h("b", null, eur(Math.round(sumF / future.length))), " · " + plural(future.length, "mese", "mesi") + ", " + eur(sumF) + " in tutto" + (overdue.total ? " più " + eur(overdue.total) + " scaduti" : "") + ".") : null;
     var undated = opts.undated ? h("p", { class: "muted small" }, plural(opts.undated, "voce da pagare non ha", "voci da pagare non hanno") + " una data: non " + (opts.undated === 1 ? "compare" : "compaiono") + " nel grafico.") : null;
     return panel(opts.title || "Pagamenti mese per mese", opts.sub || "Quanto c'è da pagare in ogni mese. Tocca una colonna per vedere le voci.", opts.action || null,
-      h("div", { class: "pc" }, h("div", { class: "pc-scroll" }, h("div", { class: "pc-cols", style: "--n:" + cols.length, "aria-hidden": "true" }, bars)), detail, undated, table), "compact pc-panel");
+      h("div", { class: "pc" }, h("div", { class: "pc-scroll" }, h("div", { class: "pc-cols", style: "--n:" + cols.length, "aria-hidden": "true" }, bars)), detail, avg, undated, table), "compact pc-panel");
+  }
+  // Quello che resta da pagare di una voce, diviso in acconto e saldo: il già pagato copre prima l'acconto
+  function installments(b) {
+    var c = cost(b), paid = num(b.paid), dep = Math.min(num(b.deposit), c), out = [];
+    var depLeft = Math.max(0, dep - paid), balLeft = Math.max(0, c - Math.max(paid, dep));
+    if (depLeft > 0) out.push({ kind: "acconto", amount: depLeft, date: b.deposit_due || b.due_date });
+    if (balLeft > 0) out.push({ kind: dep > 0 ? "saldo" : "pagamento", amount: balLeft, date: b.due_date });
+    return out;
   }
   function budgetPayItems(bud, sub) {
-    return bud.map(function (b) { return { date: b.due_date, amount: cost(b) - num(b.paid), label: b.category, sub: sub }; }).filter(function (x) { return x.amount > 0; });
+    var out = [];
+    bud.forEach(function (b) { installments(b).forEach(function (r) { out.push({ date: r.date, amount: r.amount, label: b.category + (r.kind === "pagamento" ? "" : ", " + r.kind), sub: sub }); }); });
+    return out;
   }
 
   async function overview(w) {
@@ -1021,7 +1038,9 @@
   /* ------------------------------------------------------------ budget */
   // Finché resta qualcosa da pagare serve la data del prossimo pagamento
   function checkBudget(d) {
-    if (cost(d) > num(d.paid) && !d.due_date) throw new Error("Scrivete la data del prossimo pagamento: resta ancora qualcosa da pagare.");
+    if (num(d.deposit) > 0 && num(d.deposit) > num(d.paid) && !d.deposit_due) throw new Error("Scrivete entro quando versare l'acconto.");
+    if (num(d.deposit) > cost(d) && cost(d) > 0) throw new Error("L'acconto non può superare il costo della voce.");
+    if (cost(d) > Math.max(num(d.paid), num(d.deposit)) && !d.due_date) throw new Error("Scrivete entro quando saldare: resta ancora qualcosa da pagare.");
   }
   // Un'unica finestra per tutte le voci: i campi cambiano con la voce scelta, e ogni voce si usa una volta sola.
   async function budgetDialog(w, b, items) {
@@ -1073,6 +1092,15 @@
     if (UNIT[b.category] === "nucleo") return eur(b.unit_price) + " × " + unitCount(b, hc) + (b.category === "Bomboniere" ? " nuclei che vengono" : " nuclei invitati");
     return [eur(b.unit_price) + " × " + hc.adulti + " adulti", num(b.unit_child) ? eur(b.unit_child) + " × " + hc.bambini + " bambini" : null, b.rental_amount != null ? "noleggio " + eur(b.rental_amount) : null].filter(Boolean).join(" + ");
   }
+  // Cella "Acconto" o "Saldo": importo, entro quando, e se è già pagato
+  function payCell(b, kind) {
+    var c = cost(b), dep = Math.min(num(b.deposit), c), paid = num(b.paid);
+    var amount = kind === "acconto" ? dep : c - dep, date = kind === "acconto" ? b.deposit_due : b.due_date;
+    if (!amount) return h("td", { class: "n" }, h("span", { class: "muted" }, "—"));
+    var done = kind === "acconto" ? paid >= dep : paid >= c;
+    var late = !done && date && date < todayIso();
+    return h("td", { class: "n" }, h("b", null, eur(amount)), h("small", { class: "pay-when" + (late ? " late" : "") }, done ? "pagato" : date ? (late ? "scaduto il " : "entro il ") + fmtDate(date) : "data da scrivere"));
+  }
   async function budgetView(w) {
     var res = await Promise.all([api.list("budget_items", w.id), api.list("guests", w.id)]);
     var items = res[0], ro = !canEdit(w);
@@ -1094,16 +1122,16 @@
     var sorted = items.slice().sort(function (a, b) { return cost(b) - cost(a); });
     var table = h("div", { class: "tscroll" }, h("table", { class: "tbl" },
       h("caption", { class: "sr" }, "Voci di spesa"),
-      h("thead", null, h("tr", null, ["Voce", "Costo", "Già pagato", "Da pagare", "Prossimo pagamento", ro ? null : "Azioni"].filter(Boolean).map(function (x, i) { return h("th", { scope: "col", class: i >= 1 && i <= 3 ? "n" : null }, x); }))),
+      h("thead", null, h("tr", null, ["Voce", "Costo", "Acconto", "Saldo", "Già pagato", "Da pagare", ro ? null : "Azioni"].filter(Boolean).map(function (x, i) { return h("th", { scope: "col", class: i >= 1 && i <= 5 ? "n" : null }, x); }))),
       h("tbody", null, sorted.map(function (b) {
         var c = cost(b), pct = t.total ? Math.round(c / t.total * 100) : 0, settled = c > 0 && num(b.paid) >= c, unit = isUnit(b);
         return h("tr", { class: settled ? "settled" : null }, h("th", { scope: "row" }, h("b", null, b.category, settled ? badge("Saldato", "ok") : null), h("small", null, [b.description, unit ? unitNote(b) : num(b.contracted) > 0 ? "contratto" : c ? "stima" : "costo da scrivere", pct ? pct + "% del totale" : null].filter(Boolean).join(" · "))),
-          h("td", { class: "n" }, eur(c)), h("td", { class: "n" }, eur(b.paid)), h("td", { class: "n" }, eur(Math.max(0, c - num(b.paid)))), h("td", null, b.due_date ? fmtDate(b.due_date) : "—"),
+          h("td", { class: "n" }, eur(c)), payCell(b, "acconto"), payCell(b, "saldo"), h("td", { class: "n" }, eur(b.paid)), h("td", { class: "n" }, eur(Math.max(0, c - num(b.paid)))),
           ro ? null : h("td", null, h("span", { class: "row-actions" },
             mini("Modifica", function () { budgetDialog(w, b, items); }),
             mini("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina la spesa")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger"))));
       })),
-      h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), h("td", null, "—"), ro ? null : h("td", null)))));
+      h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.min(num(b.deposit), cost(b)); }, 0))), h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.max(0, cost(b) - Math.min(num(b.deposit), cost(b))); }, 0))), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), ro ? null : h("td", null)))));
     return [head, k, h("section", { class: "panel" }, h("div", { class: "panel-head" }, h("div", null, addBtn, h("h2", { class: "serif" }, "Tutte le voci"))), table,
       h("p", { class: "muted small pad-t" }, "Totale previsto " + eur(t.total) + " · Pagato " + eur(t.paid) + " · Da pagare " + eur(left) + (cap ? " · " + (t.total > cap ? "Sopra il budget di " + eur(t.total - cap) : "Margine sul budget " + eur(cap - t.total)) : "") + ". Location, catering, bomboniere e partecipazioni si calcolano dagli invitati; le altre voci usano il contratto quando c'è, altrimenti la stima."))];
   }

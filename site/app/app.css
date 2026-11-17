@@ -812,3 +812,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
 @media (max-width: 720px) { .pc-cols { height: 170px; } }
 .pc-cols { grid-template-columns: repeat(var(--n), minmax(40px, 1fr)); min-width: calc(var(--n) * 42px); }
 @media (max-width: 720px) { .pc-panel { order: 1; } }
+.tbl td.n .pay-when { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.tbl td.n .pay-when.late { color: var(--terra-ink); font-weight: 600; }
+.pc-avg { font-size: 14px; color: var(--muted); }
+.pc-avg b { color: var(--ink); }
