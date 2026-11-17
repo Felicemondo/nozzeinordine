@@ -636,3 +636,9 @@ picture { display: contents; }
   .hero-pic::after { background: linear-gradient(0deg, rgba(28, 32, 26, .78) 0%, rgba(28, 32, 26, .5) 50%, rgba(28, 32, 26, .12) 100%); }
   .hero-in { padding: 120px var(--gut) 36px; }
 }
+
+/* ---- Apertura: gradiente nei colori del marchio sotto il testo (bordeaux che sfuma nell'oliva e poi nella foto) ---- */
+.hero-pic::after { background: linear-gradient(90deg, rgba(112, 47, 67, .82) 0%, rgba(112, 47, 67, .55) 32%, rgba(70, 80, 68, .28) 62%, rgba(70, 80, 68, 0) 100%); }
+@media (max-width: 900px) {
+  .hero-pic::after { background: linear-gradient(0deg, rgba(112, 47, 67, .88) 0%, rgba(112, 47, 67, .62) 45%, rgba(70, 80, 68, .22) 75%, rgba(70, 80, 68, 0) 100%); }
+}
