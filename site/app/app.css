@@ -761,3 +761,24 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   .kpis.four .kpi-m { font-size: 12px; }
 }
 @media (max-width: 720px) { .head-actions > :not(.btn) { grid-column: 1 / -1; justify-self: start; } }
+
+/* da fare su telefono: una riga di controlli per attività (stato, completata, azioni) invece di tre */
+@media (max-width: 720px) {
+  .rows { gap: 8px; }
+  .row { padding: 10px 12px; gap: 8px 12px; min-height: 0; }
+  .row-side { gap: 6px 10px; align-items: center; }
+  .row-side .badge { min-height: 26px; padding: 2px 10px; font-size: 12px; }
+  .ticks .tick:first-child { display: none; }
+  .tick { min-height: 44px; padding: 4px 6px; }
+  .row-actions { display: flex; gap: 2px; margin-left: auto; }
+  .row-actions .mini { min-height: 44px; padding: 4px 8px; }
+  .seg:not(nav) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .seg:not(nav) > * { flex: none; }
+}
+@media (max-width: 720px) {
+  .row-side { flex-wrap: nowrap; gap: 4px; }
+  .row-side .badge { padding: 2px 8px; }
+  .tick { gap: 6px; font-size: 13px; padding: 4px; }
+  .row-actions .mini { padding: 4px 5px; font-size: 13px; }
+}
+@media screen and (max-width: 720px) { .row-side .row-actions { display: flex !important; flex-direction: row; flex-wrap: nowrap; grid-template-columns: none; } }
