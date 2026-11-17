@@ -85,7 +85,7 @@ const APPSHOT = {
 const shot = (k, lazy = true) => `<img class="frame__img app-shot" src="/img/app-${k}-l.avif" srcset="/img/app-${k}-m.avif 800w, /img/app-${k}-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1074" alt="${APPSHOT[k]}"${lazy ? ' loading="lazy" decoding="async"' : ""}>`;
 
 // ---- Strumenti di misura: incollare qui gli ID. Vuoti = nessun banner, nessuno script, testi legali senza questi strumenti.
-const TRACKING = { gtm: "GTM-PMMT44NV", ga4: "", clarity: "", pixel: "" }; // es. ga4: "G-XXXXXXX", clarity: "abcd1234", pixel: "1234567890"
+const TRACKING = { gtm: "GTM-PMMT44NV", ga4: "", clarity: "zf5lgqhpfx", pixel: "2090698578227221" }; // es. ga4: "G-XXXXXXX", clarity: "abcd1234", pixel: "1234567890"
 const TRK_ON = !!(TRACKING.gtm || TRACKING.ga4 || TRACKING.clarity || TRACKING.pixel);
 writeFileSync(join(OUT, "tracking.js"), "window.NIO_TRACKING = " + JSON.stringify(TRACKING) + ";\n");
 { // la Content Security Policy si allarga solo per gli strumenti attivi
