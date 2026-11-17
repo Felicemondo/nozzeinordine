@@ -61,17 +61,19 @@
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
 .hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
-.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan { display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: stretch; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
 .card--plan .price { margin-block: var(--s-1); }
 .card--plan .price .t-stat { font-family: var(--font-display); }
-.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 0; display: grid; gap: var(--s-2); align-content: start; }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
 .card--plan .checks li { font-size: 15px; line-height: 1.5; }
 .cards-foot { margin-top: var(--s-6); }
 /* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+.pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
+@media (max-width: 1023px) { .pricing-pic { display: none; } }
+@media (max-width: 639px) { .section.is-pricing:has(.card--plan:nth-child(3)):not(#prezzi) { --hm: 2; } }
 #prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
 @media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
-.section.is-pricing { --hm: 2; }
-@media (max-width: 1279px), (max-height: 860px) { .section.is-pricing { --h: 2; } }
+
 @media (max-width: 639px) {
   .card--plan { gap: var(--s-3); padding: var(--s-5); }
   .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
@@ -130,20 +132,15 @@
   </div>
 </header>
 <main id="top">
-  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
-    <div class="wrap"><div class="hero-text grid hero__grid">
-      <div class="hero__text span-5">
+  <section class="hero hero--photo" data-enter data-calm="left" aria-labelledby="hero-h">
+    <img class="hero__bg" src="/img/cerimonia-prato-l.avif" width="1920" height="1280" alt="Sedie bianche e un arco di legno pronti per una cerimonia su un prato, davanti agli alberi." style="--ly-pos: 60% 55%; --ly-pos-phone: 70% 55%" fetchpriority="high">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__text">
         <h1 id="hero-h">Gestionale per wedding planner</h1>
-        <p class="hero__lead">Tutti i matrimoni che segui in una dashboard: acconti e saldi, scadenze, tavoli e un portale per gli sposi. Da 29 € al mese, 30 giorni di prova.</p>
+        <p class="hero__lead">Tutti i tuoi matrimoni in una dashboard, con un portale per gli sposi. Da 29 € al mese, 30 giorni di prova.</p>
         <div class="btn-row"><a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="/app/demo?ruolo=planner">Guarda la demo</a></div>
       </div>
-      <div class="hero__media span-6 start-7">
-        <picture><source type="image/avif" srcset="/img/cerimonia-lago-m.avif 800w, /img/cerimonia-lago-l.avif 1600w" sizes="(min-width: 1024px) 45vw, 100vw"><img src="/img/cerimonia-lago.jpg" width="1600" height="1064" alt="Sedie bianche allineate lungo una navata all'aperto, davanti a un lago e alle montagne." style="--ly-pos: 50% 55%" fetchpriority="high"></picture>
-        <div class="ly-float">
-          <div class="ly-float__row"><span class="ly-live">Questa settimana</span><span>3 scadenze</span></div>
-          <div class="ly-float__title">Acconto catering, matrimonio di ottobre</div>
-        </div>
-      </div>
+      <dl class="hero__facts"><div><dt>Planner</dt><dd>29 € al mese + IVA</dd></div><div><dt>Team</dt><dd>59 € al mese + IVA</dd></div><div><dt>Prova</dt><dd>30 giorni, senza carta</dd></div><div><dt>Matrimoni</dt><dd>Fino a 15 attivi</dd></div></dl>
     </div></div>
   </section>
 
@@ -169,27 +166,27 @@
   <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
       <div class="section-head"><h2 id="piani-h">Canoni per numero di matrimoni</h2><p>IVA esclusa. 30 giorni di prova su Planner e Team, senza carta di credito. Un matrimonio è attivo finché la sua data non è passata.</p></div>
-      <div class="grid grid--top fill">
+      <div class="grid grid--top">
           <article class="card card--plan span-4">
             <h3>Planner</h3>
             <p class="muted">Per chi lavora in proprio</p>
             <p class="price"><span class="t-stat">29 €</span><span class="muted">al mese + IVA</span></p>
-            <a class="btn btn--secondary" href="/app/#/registrati">Prova Planner 30 giorni</a>
             <ul class="checks"><li>5 matrimoni attivi</li><li>Portale per gli sposi</li><li>Acconti e saldi per evento</li><li>Note riservate</li></ul>
+            <a class="btn btn--secondary" href="/app/#/registrati">Prova Planner 30 giorni</a>
           </article>
           <article class="card card--plan span-4 is-featured">
             <h3>Team</h3>
             <p class="muted">Per chi lavora con collaboratori</p>
             <p class="price"><span class="t-stat">59 €</span><span class="muted">al mese + IVA</span></p>
-            <a class="btn btn--primary" href="/app/#/registrati">Prova Team 30 giorni<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
             <ul class="checks"><li>15 matrimoni attivi</li><li>3 collaboratori</li><li>Portale per gli sposi</li><li>Assistenza prioritaria</li></ul>
+            <a class="btn btn--primary" href="/app/#/registrati">Prova Team 30 giorni<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           </article>
           <article class="card card--plan span-4">
             <h3>Studio</h3>
             <p class="muted">Per gli studi con più persone</p>
             <p class="price"><span class="t-stat">Su misura</span></p>
-            <a class="btn btn--secondary" href="mailto:info@nozzeinordine.com?subject=Piano%20Studio">Scrivici per lo Studio</a>
             <ul class="checks"><li>Matrimoni concordati</li><li>Collaboratori concordati</li><li>Avvio assistito</li></ul>
+            <a class="btn btn--secondary" href="mailto:info@nozzeinordine.com?subject=Piano%20Studio">Scrivici per lo Studio</a>
           </article>
       </div>
     </div>

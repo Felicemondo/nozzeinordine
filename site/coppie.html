@@ -61,17 +61,19 @@
 @media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
 .hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
 #piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
-.card--plan { display: grid; grid-template-rows: auto auto auto auto 1fr; align-content: start; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan { display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: stretch; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
 .card--plan .price { margin-block: var(--s-1); }
 .card--plan .price .t-stat { font-family: var(--font-display); }
-.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 0; display: grid; gap: var(--s-2); align-content: start; }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
 .card--plan .checks li { font-size: 15px; line-height: 1.5; }
 .cards-foot { margin-top: var(--s-6); }
 /* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+.pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
+@media (max-width: 1023px) { .pricing-pic { display: none; } }
+@media (max-width: 639px) { .section.is-pricing:has(.card--plan:nth-child(3)):not(#prezzi) { --hm: 2; } }
 #prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
 @media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
-.section.is-pricing { --hm: 2; }
-@media (max-width: 1279px), (max-height: 860px) { .section.is-pricing { --h: 2; } }
+
 @media (max-width: 639px) {
   .card--plan { gap: var(--s-3); padding: var(--s-5); }
   .card--plan .checks { grid-template-columns: 1fr 1fr; column-gap: var(--s-3); }
@@ -92,7 +94,7 @@
 #scadenze .count span { font: 400 var(--t-small)/1.4 var(--font-text); color: var(--muted); }
 #scadenze .rows small { color: var(--muted); }
 </style>
-<link rel="canonical" href="https://nozzeinordine.com/coppie"><meta property="og:url" content="https://nozzeinordine.com/coppie"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nozze in Ordine","item":"https://nozzeinordine.com/"},{"@type":"ListItem","position":2,"name":"App per organizzare il vostro matrimonio","item":"https://nozzeinordine.com/coppie"}]}</script></head>
+<link rel="canonical" href="https://nozzeinordine.com/coppie"><meta property="og:url" content="https://nozzeinordine.com/coppie"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nozze in Ordine","item":"https://nozzeinordine.com/"},{"@type":"ListItem","position":2,"name":"Il vostro matrimonio in un'app","item":"https://nozzeinordine.com/coppie"}]}</script></head>
 <body>
 <header class="nav nav--centre">
   <div class="wrap nav__bar">
@@ -137,20 +139,15 @@
   </div>
 </header>
 <main id="top">
-  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
-    <div class="wrap"><div class="hero-text grid hero__grid">
-      <div class="hero__text span-5">
-        <h1 id="hero-h">App per organizzare il vostro matrimonio</h1>
-        <p class="hero__lead">Budget, preventivi, invitati, tavoli e scadenze nello stesso posto, condiviso tra voi due. Piano gratuito senza scadenza, Completo a 49 € una volta sola.</p>
+  <section class="hero hero--photo" data-enter data-calm="left" aria-labelledby="hero-h">
+    <img class="hero__bg" src="/img/sposi-valle-l.avif" width="1920" height="1280" alt="Due sposi camminano mano nella mano su un'altura, con una valle di boschi alle spalle." style="--ly-pos: 62% 55%; --ly-pos-phone: 72% 55%" fetchpriority="high">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__text">
+        <h1 id="hero-h">Il vostro matrimonio in un'app</h1>
+        <p class="hero__lead">Budget, preventivi, invitati, tavoli e scadenze in uno spazio condiviso. Gratis, o Completo a 49 € una volta sola.</p>
         <div class="btn-row"><a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="/app/demo">Guarda la demo</a></div>
       </div>
-      <div class="hero__media span-6 start-7">
-        <picture><source type="image/avif" srcset="/img/sposi-tramonto-m.avif 800w, /img/sposi-tramonto-l.avif 1440w" sizes="(min-width: 1024px) 45vw, 100vw"><img src="/img/sposi-tramonto.jpg" width="1440" height="2160" alt="Due sposi camminano in un prato al tramonto, verso le colline." style="--ly-pos: 50% 70%" fetchpriority="high"></picture>
-        <div class="ly-float">
-          <div class="ly-float__row"><span class="ly-live">Invitati</span><span>84 su 150</span></div>
-          <div class="ly-float__title">Hanno risposto sì, 44 in attesa</div>
-        </div>
-      </div>
+      <dl class="hero__facts"><div><dt>Gratis</dt><dd>Senza scadenza</dd></div><div><dt>Completo</dt><dd>49 € una volta sola</dd></div><div><dt>Invitati</dt><dd>50 con il Gratis</dd></div><div><dt>Dove</dt><dd>In tutta Italia</dd></div></dl>
     </div></div>
   </section>
 
@@ -189,25 +186,26 @@
 
   <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
-      <div class="grid grid--top fill">
+      <div class="grid grid--top">
         <div class="span-4 stack-6">
           <h2 id="piani-h">Gratis o Completo</h2>
           <p>Il Completo costa 49 € una volta sola, IVA inclusa, e vale per un matrimonio: i nomi degli sposi si fissano all'attivazione.</p>
           <p><a class="link" href="/prezzi">Confronta i piani</a></p>
+          <div class="frame frame--photo pricing-pic"><img class="frame__img" src="/img/fedi-libro-l.avif" srcset="/img/fedi-libro-m.avif 800w, /img/fedi-libro-l.avif 1440w" sizes="(min-width: 1024px) 30vw, 100vw" width="1440" height="960" alt="Due fedi d'oro appoggiate su un libro aperto." loading="lazy" decoding="async"></div>
         </div>
           <article class="card card--plan span-4 start-5">
             <h3>Gratis</h3>
             <p class="muted">Per iniziare a mettere ordine</p>
             <p class="price"><span class="t-stat">0 €</span><span class="muted">senza scadenza</span></p>
-            <a class="btn btn--secondary" href="/app/#/registrati">Apri lo spazio gratuito</a>
             <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
+            <a class="btn btn--secondary" href="/app/#/registrati">Apri lo spazio gratuito</a>
           </article>
           <article class="card card--plan span-4 start-9 is-featured">
             <h3>Completo</h3>
             <p class="muted">Per un matrimonio, IVA inclusa</p>
             <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
-            <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
             <ul class="checks"><li>Invitati e fornitori illimitati</li><li>Preventivi affiancati</li><li>Tavoli e sala in pianta</li><li>Programma del giorno</li></ul>
+            <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           </article>
       </div>
     </div>
