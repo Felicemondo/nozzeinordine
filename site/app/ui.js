@@ -392,7 +392,15 @@
   window.addEventListener("hashchange", function () { state.navOpen = false; document.body.classList.remove("nav-open"); render(); });
 
   /* ------------------------------------------------------------ pezzi comuni */
-  function brand(tone) { return h("a", { class: "brand" + (tone ? " " + tone : ""), href: "#/", "aria-label": "Nozze in Ordine, torna all'inizio" }, h("span", { class: "mono", "aria-hidden": "true" }, "N"), h("span", null, "Nozze in Ordine")); }
+  // Il marchio del sito (le quattro tessere attorno al cerchio), disegnato come SVG: lo stesso della landing
+  var MARK_PATHS = ["M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z", "M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z", "M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z", "M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z", "M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"];
+  function markSvg() {
+    var ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg");
+    s.setAttribute("viewBox", "0 0 64 64"); s.setAttribute("aria-hidden", "true"); s.setAttribute("class", "mark");
+    MARK_PATHS.forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); s.appendChild(p); });
+    return s;
+  }
+  function brand(tone) { return h("a", { class: "brand" + (tone ? " " + tone : ""), href: "#/", "aria-label": "Nozze in Ordine, torna all'inizio" }, markSvg(), h("span", null, "Nozze in Ordine")); }
   function btn(label, onclick, cls, ic) { return h("button", { class: "btn " + (cls || "soft"), type: "button", onclick: onclick }, ic ? icon(ic) : null, label); }
   function linkBtn(href, label, cls, ic, after) { return h("a", { class: "btn " + (cls || "soft"), href: href }, ic ? icon(ic) : null, label, after ? icon(after) : null); }
   function more(href, label) { return h("a", { class: "pill-link", href: href }, label, icon("arrow")); }
@@ -560,7 +568,7 @@
     return h("div", { class: "fld" }, h("label", { for: "f-" + name }, label), h("div", { class: "pw" }, inp, eye), help ? h("small", null, help) : null);
   }
   function authLayout(card, tone) {
-    return h("div", { class: "auth" }, h("div", { class: "auth-card" }, brand(tone || "ceramica"), card),
+    return h("div", { class: "auth" }, h("div", { class: "auth-card" }, brand(tone), card),
       h("figure", { class: "auth-pic", "aria-hidden": "true" }));
   }
   // La registrazione è aperta a tutti: chi ha un invito usa la stessa email a cui è arrivato
@@ -622,7 +630,6 @@
         h("p", { class: "alt-row" }, h("span", null, "Password dimenticata?"), h("a", { href: "#/password" }, "Recupera")),
         noAccount()];
     }
-    card.push(h("p", { class: "alt-link demo-link" }, "Vuoi solo guardare? ", h("a", { href: "demo.html" }, "Apri la demo con dati di esempio")));
     return authLayout(card);
   }
 
