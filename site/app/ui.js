@@ -602,7 +602,7 @@
         if (d.password.length < 8) return say("La password deve avere almeno 8 caratteri.", true);
         if (!f.elements.privacy.checked) return say("Per creare l'account serve spuntare la casella su privacy e termini.", true);
         busy(f, true);
-        try { var r = await api.signUp(d); say(r.needsConfirmation ? "Fatto. Ti abbiamo mandato un'email: apri il link per confermare l'indirizzo, poi accedi. Al primo accesso configuri il tuo spazio." : "Account creato.", false); }
+        try { var r = await api.signUp(d); if (window.nioTrack) window.nioTrack("sign_up", { method: d.role }); say(r.needsConfirmation ? "Fatto. Ti abbiamo mandato un'email: apri il link per confermare l'indirizzo, poi accedi. Al primo accesso configuri il tuo spazio." : "Account creato.", false); }
         catch (err) { say(err.message, true); }
         busy(f, false);
       });

@@ -1,6 +1,6 @@
 // Genera le pagine di site/ a partire dai contenuti qui sotto.  node build.mjs
 // Struttura e testi seguono i mockup Figma "Website" (Home, Per le coppie, Per le planner, Prezzi).
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -84,6 +84,18 @@ const APPSHOT = {
 };
 const shot = (k, lazy = true) => `<img class="frame__img app-shot" src="/img/app-${k}-l.avif" srcset="/img/app-${k}-m.avif 800w, /img/app-${k}-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1074" alt="${APPSHOT[k]}"${lazy ? ' loading="lazy" decoding="async"' : ""}>`;
 
+// ---- Strumenti di misura: incollare qui gli ID. Vuoti = nessun banner, nessuno script, testi legali senza questi strumenti.
+const TRACKING = { ga4: "", clarity: "", pixel: "" }; // es. ga4: "G-XXXXXXX", clarity: "abcd1234", pixel: "1234567890"
+const TRK_ON = !!(TRACKING.ga4 || TRACKING.clarity || TRACKING.pixel);
+writeFileSync(join(OUT, "tracking.js"), "window.NIO_TRACKING = " + JSON.stringify(TRACKING) + ";\n");
+{ // la Content Security Policy si allarga solo per gli strumenti attivi
+  const extra = { script: [], connect: [], img: [] };
+  if (TRACKING.ga4) { extra.script.push("https://www.googletagmanager.com"); extra.connect.push("https://*.google-analytics.com", "https://*.analytics.google.com", "https://www.googletagmanager.com"); extra.img.push("https://*.google-analytics.com", "https://www.googletagmanager.com"); }
+  if (TRACKING.clarity) { extra.script.push("https://www.clarity.ms", "https://*.clarity.ms"); extra.connect.push("https://*.clarity.ms"); extra.img.push("https://*.clarity.ms", "https://c.bing.com"); }
+  if (TRACKING.pixel) { extra.script.push("https://connect.facebook.net"); extra.connect.push("https://www.facebook.com", "https://connect.facebook.net"); extra.img.push("https://www.facebook.com"); }
+  const csp = `  Content-Security-Policy: default-src 'self'; img-src 'self' data:${extra.img.map((x) => " " + x).join("")}; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'${extra.script.map((x) => " " + x).join("")}; connect-src 'self' https://msokhiezfsmkqsvzgmmi.supabase.co${extra.connect.map((x) => " " + x).join("")}; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`;
+  const hp = join(OUT, "_headers"); const hs = readFileSync(hp, "utf8").replace(/^  Content-Security-Policy:.*$/m, csp); writeFileSync(hp, hs);
+}
 const pageCss = `<style>
 @font-face { font-family: "DM Serif Display"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "DM Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
@@ -189,6 +201,8 @@ const head = (title, desc, { moments = [], extra = "" } = {}) => `<!doctype html
 ${moments.map((m) => `<link rel="stylesheet" href="/assets/moments/${m}/moment.css">`).join("\n")}
 ${pageCss}
 <script src="/assets/boot.js"></script>
+<script src="/tracking.js"></script>
+<script src="/consent.js" defer></script>
 ${moments.length ? `<link rel="modulepreload" href="/assets/moments/moments.js"><link rel="modulepreload" href="/assets/moments/lib.js">\n${moments.map((m) => `<link rel="modulepreload" href="/assets/moments/${m}/moment.js">`).join("")}` : ""}
 ${extra}
 </head>
@@ -233,7 +247,7 @@ const foot = (close = closeType()) => `
         </div>
         <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="${SIGNUP}">Crea un account</a></li></ul></div>
-        <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li>${TRK_ON ? `<li><a href="/cookie" data-cookie-prefs>Preferenze cookie</a></li>` : ""}<li><a href="/termini">Termini</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
       </div>
       <div class="footer__legal">
@@ -678,7 +692,9 @@ legalPage({ file: "privacy.html", title: "Informativa privacy | Nozze in Ordine"
 <p>I dati sono trattati da noi e dai fornitori che ci permettono di offrire il servizio, nominati responsabili del trattamento:</p>
 <ul><li><strong>Supabase</strong> (Supabase, Inc.): database e autenticazione. I dati della dashboard sono conservati in un data center a Londra (Regno Unito).</li>
 <li><strong>Cloudflare</strong> (Cloudflare, Inc.): consegna del sito e della dashboard, protezione dagli attacchi, inoltro delle email inviate a ${TITOLARE.email}.</li>
-<li><strong>Google</strong> (Google Ireland Limited): casella di posta in cui leggiamo i vostri messaggi.</li></ul>
+<li><strong>Google</strong> (Google Ireland Limited): casella di posta in cui leggiamo i vostri messaggi${TRACKING.ga4 ? " e, solo con il vostro consenso, Google Analytics per contare le visite al sito" : ""}.</li>${TRACKING.clarity ? `
+<li><strong>Microsoft</strong> (Microsoft Ireland Operations Limited): Microsoft Clarity, solo con il vostro consenso, per capire come viene usato il sito.</li>` : ""}${TRACKING.pixel ? `
+<li><strong>Meta</strong> (Meta Platforms Ireland Limited): Meta Pixel, solo con il vostro consenso, per misurare le campagne su Facebook e Instagram.</li>` : ""}</ul>
 <p>Chi invitate nel vostro matrimonio (partner, wedding planner, collaboratori) vede i dati di quel matrimonio secondo il proprio ruolo.</p>
 <h2>8. Trasferimenti fuori dall'Unione Europea</h2>
 <p>Il Regno Unito è coperto da una decisione di adeguatezza della Commissione europea. Alcuni fornitori hanno sede negli Stati Uniti: in quel caso il trasferimento avviene sulla base del Data Privacy Framework UE-USA, quando il fornitore vi aderisce, oppure delle clausole contrattuali standard approvate dalla Commissione europea. Potete chiederci copia delle garanzie adottate.</p>
@@ -692,7 +708,7 @@ legalPage({ file: "privacy.html", title: "Informativa privacy | Nozze in Ordine"
 <h2>12. Età minima</h2>
 <p>Il servizio è riservato a chi ha compiuto 18 anni.</p>
 <h2>13. Cookie</h2>
-<p>Non usiamo cookie di profilazione né strumenti di analisi. I dettagli sono nella <a href="cookie.html">pagina cookie</a>.</p>
+<p>${TRK_ON ? "Strumenti di statistica e di marketing partono solo se li accettate dal banner, e potete cambiare idea in qualsiasi momento." : "Non usiamo cookie di profilazione né strumenti di analisi."} I dettagli sono nella <a href="cookie.html">pagina cookie</a>.</p>
 <h2>14. Modifiche</h2>
 <p>Se questa informativa cambia in modo sostanziale, lo scriviamo qui e avvisiamo per email chi ha un account.</p>
 <h2 id="crediti">Immagini</h2>
@@ -700,11 +716,14 @@ legalPage({ file: "privacy.html", title: "Informativa privacy | Nozze in Ordine"
 <p>Le altre fotografie vengono da <a href="https://unsplash.com/?utm_source=felice_mondo_progetti&amp;utm_medium=referral">Unsplash</a>, con la <a href="https://unsplash.com/license">licenza Unsplash</a>:</p>
 <ul class="credits">${PHOTO_CREDITS.map(([f, a, au, p]) => `<li><a href="${p}">${f.replace(/-/g, " ")}</a> di <a href="${au}">${a}</a></li>`).join("")}</ul>` });
 
-legalPage({ file: "cookie.html", title: "Informativa sui cookie | Nozze in Ordine", desc: "Quali cookie e strumenti simili usano il sito e la dashboard di Nozze in Ordine: solo quelli tecnici, necessari al funzionamento.", eb: "Informativa", h1: "Cookie.",
-  lead: "Il sito e la dashboard usano soltanto strumenti tecnici, necessari al funzionamento. Per questo non compare un banner di consenso: la legge lo richiede solo per cookie di profilazione e strumenti di analisi non anonimi, che qui non ci sono.",
+legalPage({ file: "cookie.html", title: "Informativa sui cookie | Nozze in Ordine", desc: TRK_ON ? "Quali cookie usano il sito e la dashboard di Nozze in Ordine: quelli tecnici, sempre attivi, e gli strumenti di misura, solo con il vostro consenso." : "Quali cookie e strumenti simili usano il sito e la dashboard di Nozze in Ordine: solo quelli tecnici, necessari al funzionamento.", eb: "Informativa", h1: "Cookie.",
+  lead: TRK_ON ? "Il sito usa cookie tecnici, sempre attivi, e alcuni strumenti di misura che partono solo se li accettate dal banner. Potete cambiare scelta in qualsiasi momento." : "Il sito e la dashboard usano soltanto strumenti tecnici, necessari al funzionamento. Per questo non compare un banner di consenso: la legge lo richiede solo per cookie di profilazione e strumenti di analisi non anonimi, che qui non ci sono.",
   body: `
 <h2>Sul sito</h2>
-<p>Le pagine del sito non impostano cookie nostri, non caricano contenuti da altri siti e non usano strumenti di analisi o pixel pubblicitari. I caratteri tipografici e le immagini sono ospitati sul nostro stesso dominio.</p>
+${TRK_ON ? `<p>Con il vostro consenso, dato o negato dal banner e modificabile da <a href="/cookie" data-cookie-prefs>Preferenze cookie</a>, il sito usa:</p>
+<ul>${TRACKING.ga4 ? `<li><strong>Google Analytics 4</strong> (statistiche): conta visite e pagine viste in forma aggregata. Cookie <em>_ga</em> e <em>_ga_*</em>, durata fino a 13 mesi. Fornitore: Google Ireland Limited.</li>` : ""}${TRACKING.clarity ? `<li><strong>Microsoft Clarity</strong> (statistiche): mostra come viene usata la pagina, con mappe dei clic e registrazioni anonime delle sessioni; i campi dei moduli sono oscurati. Cookie <em>_clck</em> e <em>_clsk</em>, durata fino a 12 mesi. Fornitore: Microsoft Ireland Operations Limited.</li>` : ""}${TRACKING.pixel ? `<li><strong>Meta Pixel</strong> (marketing): misura le campagne su Facebook e Instagram e le registrazioni che ne derivano. Cookie <em>_fbp</em>, durata fino a 3 mesi. Fornitore: Meta Platforms Ireland Limited.</li>` : ""}</ul>
+<p>Se rifiutate, nessuno di questi strumenti viene caricato. La vostra scelta si conserva nel browser per 6 mesi.</p>` : ""}
+<p>${TRK_ON ? "Oltre a questi, le pagine del sito non impostano cookie nostri." : "Le pagine del sito non impostano cookie nostri, non caricano contenuti da altri siti e non usano strumenti di analisi o pixel pubblicitari."} I caratteri tipografici e le immagini sono ospitati sul nostro stesso dominio.</p>
 <p>Cloudflare, che consegna il sito, può impostare cookie tecnici di sicurezza per distinguere le visite reali dal traffico automatico. Sono strettamente necessari e non servono a riconoscervi tra siti diversi.</p>
 <h2>Nella dashboard</h2>
 <p>Quando accedete, il browser conserva nella propria memoria locale (<em>localStorage</em> e <em>sessionStorage</em>):</p>
@@ -714,7 +733,7 @@ legalPage({ file: "cookie.html", title: "Informativa sui cookie | Nozze in Ordin
 <h2>Come cancellarli</h2>
 <p>Potete cancellare in ogni momento cookie e dati dei siti dalle impostazioni del browser. Senza la sessione di accesso la dashboard vi chiederà di nuovo email e password.</p>
 <h2>Se qualcosa cambia</h2>
-<p>Se in futuro useremo strumenti di analisi o di altro tipo che richiedono il consenso, li attiveremo solo dopo avervelo chiesto, e aggiorneremo questa pagina.</p>
+<p>${TRK_ON ? "Se aggiungeremo altri strumenti che richiedono il consenso, li elencheremo qui e ve lo chiederemo di nuovo." : "Se in futuro useremo strumenti di analisi o di altro tipo che richiedono il consenso, li attiveremo solo dopo avervelo chiesto, e aggiorneremo questa pagina."}</p>
 <p>Per il resto vale l'<a href="privacy.html">informativa privacy</a>. Domande: ${MAILTO}.</p>` });
 
 legalPage({ file: "termini.html", title: "Termini di servizio | Nozze in Ordine", desc: "Le condizioni d'uso di Nozze in Ordine per coppie e wedding planner: account, piani, prezzi, recesso, dati e responsabilità.", eb: "Condizioni", h1: "Termini di servizio.",
