@@ -1132,7 +1132,26 @@
             mini("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina la spesa")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger"))));
       })),
       h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.min(num(b.deposit), cost(b)); }, 0))), h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.max(0, cost(b) - Math.min(num(b.deposit), cost(b))); }, 0))), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), ro ? null : h("td", null)))));
-    return [head, k, h("section", { class: "panel" }, h("div", { class: "panel-head" }, h("div", null, addBtn, h("h2", { class: "serif" }, "Tutte le voci"))), table,
+    // su telefono: una scheda per voce invece della tabella
+    var cards = h("ul", { class: "bud-cards" }, sorted.map(function (b) {
+      var c = cost(b), paid = num(b.paid), settled = c > 0 && paid >= c, unit = isUnit(b);
+      var line = function (kind) {
+        var dep = Math.min(num(b.deposit), c), amount = kind === "acconto" ? dep : c - dep, date = kind === "acconto" ? b.deposit_due : b.due_date;
+        if (!amount) return null;
+        var done = kind === "acconto" ? paid >= dep : paid >= c, late = !done && date && date < todayIso();
+        return h("li", { class: "bud-pay" + (done ? " done" : "") + (late ? " late" : "") }, h("span", null, kind === "acconto" ? "Acconto" : dep ? "Saldo" : "Pagamento"),
+          h("span", { class: "bud-when" }, done ? "pagato" : date ? (late ? "scaduto il " : "entro il ") + fmtDate(date) : "data da scrivere"), h("b", null, eur(amount)));
+      };
+      return h("li", { class: "bud-card" + (settled ? " settled" : "") },
+        h("div", { class: "bud-top" }, h("div", null, h("b", null, b.category), h("small", null, [b.description, unit ? unitNote(b) : num(b.contracted) > 0 ? "contratto" : c ? "stima" : "costo da scrivere"].filter(Boolean).join(" · "))),
+          h("b", { class: "bud-cost" }, eur(c))),
+        c ? h("div", { class: "bud-prog" }, bar([[Math.min(paid, c), "cer"]], c, "Pagato"), h("small", null, settled ? "Saldato" : "Pagato " + eur(paid) + " · da pagare " + eur(Math.max(0, c - paid)))) : null,
+        h("ul", { class: "bud-pays" }, line("acconto"), line("saldo")),
+        ro ? null : h("div", { class: "bud-act" },
+          mini("Modifica", function () { budgetDialog(w, b, items); }),
+          mini("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina la spesa")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger")));
+    }));
+    return [head, k, h("section", { class: "panel" }, h("div", { class: "panel-head" }, h("div", null, addBtn, h("h2", { class: "serif" }, "Tutte le voci"))), table, cards,
       h("p", { class: "muted small pad-t" }, "Totale previsto " + eur(t.total) + " · Pagato " + eur(t.paid) + " · Da pagare " + eur(left) + (cap ? " · " + (t.total > cap ? "Sopra il budget di " + eur(t.total - cap) : "Margine sul budget " + eur(cap - t.total)) : "") + ". Location, catering, bomboniere e partecipazioni si calcolano dagli invitati; le altre voci usano il contratto quando c'è, altrimenti la stima."))];
   }
 

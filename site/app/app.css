@@ -827,3 +827,33 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   .bell .ic { width: 22px; height: 22px; }
   .dot-n { top: 4px; right: 4px; min-width: 18px; height: 18px; font-size: 11px; padding: 0 5px; }
 }
+
+/* budget: schede al posto della tabella su telefono */
+.bud-cards { display: none; }
+@media (max-width: 720px) {
+  .panel:has(> .bud-cards) > .tscroll { display: none; }
+  .bud-cards { display: grid; gap: 10px; list-style: none; padding: 0; margin: 0; }
+  .bud-card { background: var(--row); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+  .bud-card.settled { background: var(--ok-tint); }
+  .bud-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+  .bud-top > div { display: grid; gap: 2px; min-width: 0; }
+  .bud-top b { font-weight: 600; }
+  .bud-top small, .bud-prog small { color: var(--muted); font-size: 13px; }
+  .bud-cost { font: 400 22px/1.1 var(--serif); white-space: nowrap; }
+  .bud-prog { display: grid; gap: 6px; }
+  .bud-pays { list-style: none; padding: 0; margin: 0; display: grid; border-top: 1px solid var(--line); }
+  .bud-pay { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .bud-pay:last-child { border-bottom: 0; padding-bottom: 0; }
+  .bud-when { color: var(--muted); font-size: 13px; }
+  .bud-pay.done .bud-when { color: var(--olive-soft); }
+  .bud-pay.done b { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(92, 86, 77, .4); }
+  .bud-pay.late .bud-when { color: var(--terra-ink); font-weight: 600; }
+  .bud-act { display: flex; justify-content: flex-end; gap: 4px; margin-top: -4px; }
+  .bud-act .mini { min-height: 44px; }
+}
+/* barra in basso: agganciata al bordo, come le app, invece che sospesa */
+@media (max-width: 1023px) {
+  .tabbar { left: 0; right: 0; bottom: 0; border-radius: 0; border-width: 1px 0 0; padding: 4px 6px calc(4px + env(safe-area-inset-bottom)); background: var(--card); }
+  .tabbar a { min-height: 50px; border-radius: 10px; }
+  .shell { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+}
