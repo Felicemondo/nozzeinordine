@@ -14,8 +14,8 @@ Serve solo Node 18 o successivo. Gli stili e lo script stanno in `site/styles.cs
 ## Dashboard (`site/app/`)
 
 - `site/app/index.html`: accesso, registrazione (coppia o wedding planner), recupero password e dashboard.
-- `site/app/demo.html`: la stessa dashboard con dati finti in memoria, per mostrarla senza account (`?ruolo=coppia`, `planner` o `admin`).
-- `site/app/ui.js` disegna tutto; `api.js` parla con Supabase, `mock-api.js` fa lo stesso per la demo. `vendor/supabase.js` è supabase-js 2.117.3 (UMD), salvato in locale per rispettare la CSP.
+- `tools/demo/demo.html` (non pubblicata): la stessa dashboard con dati finti in memoria, usata solo per rifare le schermate del sito (`?ruolo=coppia`, `planner` o `admin`).
+- `site/app/ui.js` disegna tutto; `api.js` parla con Supabase, `tools/demo/mock-api.js` fa lo stesso per la demo. `vendor/supabase.js` è supabase-js 2.117.3 (UMD), salvato in locale per rispettare la CSP.
 
 Ruoli:
 - **coppia**: crea il proprio matrimonio, gestisce budget (spesa totale, pagato, voci, viaggio di nozze), fornitori e preventivi, invitati per gruppo (famiglia e amici di ciascuno, amici comuni), tavoli e sala in pianta 2D (8-12 posti, nome del tavolo, nome su ogni posto), scadenze e scaletta; invita il partner o la planner.

@@ -14,7 +14,7 @@ const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replac
 const cleanLinks = (html) => html
   .replace(/href="index\.html(#[^"]*)?"/g, (m, a) => `href="/${a || ""}"`)
   .replace(/href="(coppie|planner|prezzi|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
-  .replace(/href="app\/demo\.html/g, 'href="/app/demo').replace(/href="app\//g, 'href="/app/');
+  .replace(/href="app\//g, 'href="/app/');
 const write = (name, html) => {
   const slug = name === "index.html" ? "" : name.replace(/\.html$/, ""), url = SITE + "/" + slug;
   const h1 = (html.match(/<h1[^>]*>(.*?)<\/h1>/) || [])[1] || "";
@@ -62,7 +62,6 @@ const PHOTO_CREDITS = [["cortile-fiori", "George Karelitsky", "https://unsplash.
 const ARROW = `<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg>`;
 const MAIN = "Inizia gratis";
 const SIGNUP = "/app/#/registrati";
-const DEMO = "/app/demo";
 
 // Foto: AVIF a due larghezze, JPEG come riserva dove serve <picture>
 const src = (f, w) => `src="/img/${f}-l.avif" srcset="/img/${f}-m.avif 800w, /img/${f}-l.avif ${w}w"`;
@@ -101,7 +100,7 @@ const pageCss = `<style>
 }
 .nav__logo svg { width: 26px; height: 26px; fill: #702f43; flex: none; }
 .nav__logo { color: #702f43; }
-.nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; margin-right: -10px; color: var(--p-ink); }
+.nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
 .nav__toggle svg { width: 22px; height: 22px; }
 .app-shot { object-position: left top; }
 /* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
@@ -216,16 +215,15 @@ const top = (cur) => `
               <a href="/planner#portale">Portale sposi<span>La coppia vede ciò che condividi</span></a>
               <a href="/planner#piani">Planner, Team e Studio<span>Canoni per numero di matrimoni</span></a>
             </div>
-            <a class="menu-card span-3 start-10" href="${DEMO}">
+            <a class="menu-card span-3 start-10" href="/prezzi">
               <div class="panel">${shot("panoramica")}</div>
-              <span class="t-card">La demo della dashboard</span>
-              <span class="t-small muted">Si apre senza account</span>
+              <span class="t-card">Prezzi e piani</span>
+              <span class="t-small muted">Gratis per iniziare, senza carta</span>
             </a>
           </div>
         </div>
       </div>
       ${NAV.slice(1).map(([h, l]) => `<div class="nav__item"><a class="nav__link" href="/${h}"${cur === h ? ' aria-current="page"' : ""}>${l}</a></div>`).join("\n      ")}
-      <div class="nav__item"><a class="nav__link" href="${DEMO}">Demo</a></div>
     </nav>
     <div class="nav__actions">
       <a class="nav__link" href="/app/">Accedi</a>
@@ -256,7 +254,7 @@ const foot = (close = closeType()) => `
           <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
         </div>
         <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li></ul></div>
-        <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="${DEMO}">Demo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="${SIGNUP}">Crea un account</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
       </div>
@@ -328,9 +326,9 @@ const PLAN = {
     items: ["Scadenze sulla data", "Budget e pagamenti", "50 invitati, 3 fornitori", "Condiviso con il partner"] },
   completo: { name: "Completo", who: "Per un matrimonio, IVA inclusa", price: "49 €", per: "una volta sola", btn: "Inizia gratis", href: SIGNUP, featured: true,
     items: ["Invitati e fornitori illimitati", "Preventivi affiancati", "Tavoli e sala in pianta", "Programma del giorno"] },
-  planner: { name: "Planner", who: "Per chi lavora in proprio", price: "29 €", per: "al mese + IVA", btn: "Prova Planner 30 giorni", href: SIGNUP,
+  planner: { name: "Planner", who: "Per chi lavora in proprio", price: "29 €", per: "al mese + IVA", btn: "Prova Planner 7 giorni", href: SIGNUP,
     items: ["5 matrimoni attivi", "Portale per gli sposi", "Acconti e saldi per evento", "Note riservate"] },
-  team: { name: "Team", who: "Per chi lavora con collaboratori", price: "59 €", per: "al mese + IVA", btn: "Prova Team 30 giorni", href: SIGNUP, featured: true,
+  team: { name: "Team", who: "Per chi lavora con collaboratori", price: "59 €", per: "al mese + IVA", btn: "Prova Team 7 giorni", href: SIGNUP, featured: true,
     items: ["15 matrimoni attivi", "3 collaboratori", "Portale per gli sposi", "Assistenza prioritaria"] },
   studio: { name: "Studio", who: "Per gli studi con più persone", price: "Su misura", btn: "Scrivici per lo Studio", href: "mailto:info@nozzeinordine.com?subject=Piano%20Studio",
     items: ["Matrimoni concordati", "Collaboratori concordati", "Avvio assistito"] },
@@ -339,7 +337,7 @@ const faqList = (items) => `<div class="faq">${items.map(([q, a]) => `<div class
 const rows = (items) => `<ul class="rows">${items.map(([n, s, v]) => `<li><span class="rows__name">${n}<small>${s}</small></span><span class="rows__value">${v}</span></li>`).join("")}</ul>`;
 
 /* =========================================================== PREZZI (dati) */
-const PREZZI = { completo: "49 €", planner: "29 €", team: "59 €", eventiPlanner: 5, eventiTeam: 15, collabTeam: 3, prova: 30 };
+const PREZZI = { completo: "49 €", planner: "29 €", team: "59 €", eventiPlanner: 5, eventiTeam: 15, collabTeam: 3, prova: 7 };
 const faq = [["Devo inserire una carta di credito per iniziare?", "No. Vi registrate con email e password. Il piano gratuito per le coppie non scade, e la prova per le planner non chiede la carta."],
   ["Il piano Completo è un abbonamento?", `No. Sono ${PREZZI.completo} una volta sola, per tutto il matrimonio: un matrimonio si organizza una volta.`],
   ["Posso usare il piano Completo per più matrimoni?", "No. Il Completo vale per un solo matrimonio e i nomi degli sposi si fissano all'attivazione, senza poterli cambiare. Chi organizza matrimoni per lavoro trova i piani per le wedding planner."],
@@ -362,7 +360,7 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
 <main id="top">${heroPhoto({ k: "home", pos: "70% 60%",
   h1: "L'app per organizzare il matrimonio",
   lead: "Budget, fornitori, invitati, tavoli e scadenze in un unico spazio condiviso. Gratis per iniziare, Completo a 49 € una volta sola.",
-  a: primary(), b: secondary("Guarda la demo", DEMO),
+  a: primary(), b: secondary("Vedi i prezzi", "/prezzi"),
   facts: [["Coppie", "Gratis, senza scadenza"], ["Completo", "49 € una volta sola"], ["Planner", "Da 29 € al mese"], ["Dove", "In tutta Italia"]] })}
 
   <section class="section g2" id="funzioni" aria-labelledby="funzioni-h">
@@ -405,7 +403,7 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
 
   <section class="section is-pricing" id="prezzi" aria-labelledby="prezzi-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Coppie: un pagamento unico, IVA inclusa. Planner: un canone mensile, con 30 giorni di prova.</p></div>
+      <div class="section-head"><h2 id="prezzi-h">Prezzi per coppie e planner</h2><p>Coppie: un pagamento unico, IVA inclusa. Planner: un canone mensile, con 7 giorni di prova.</p></div>
       <div class="grid grid--top">${planCard(PLAN.gratis)}${planCard(PLAN.completo)}${planCard(PLAN.planner)}
       </div>
     </div>
@@ -449,7 +447,7 @@ write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un un
 <main id="top">${heroPhoto({ k: "heroCoppie", pos: "62% 55%", posPhone: "72% 55%",
   h1: "Il vostro matrimonio in un'app",
   lead: `Budget, preventivi, invitati, tavoli e scadenze in uno spazio condiviso. Gratis, o Completo a ${PREZZI.completo} una volta sola.`,
-  a: primary(), b: secondary("Guarda la demo", DEMO),
+  a: primary(), b: secondary("Vedi i prezzi", "/prezzi"),
   facts: [["Gratis", "Senza scadenza"], ["Completo", `${PREZZI.completo} una volta sola`], ["Invitati", "50 con il Gratis"], ["Dove", "In tutta Italia"]] })}
 
   <section class="section" id="scadenze" aria-labelledby="scadenze-h">
@@ -507,7 +505,7 @@ write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale d
 <main id="top">${heroPhoto({ k: "heroPlanner", pos: "60% 55%", posPhone: "70% 55%",
   h1: "Gestionale per wedding planner",
   lead: `Tutti i tuoi matrimoni in una dashboard, con un portale per gli sposi. Da ${PREZZI.planner} al mese, ${PREZZI.prova} giorni di prova.`,
-  a: primary(), b: secondary("Guarda la demo", DEMO + "?ruolo=planner"),
+  a: primary(), b: secondary("Vedi i piani", "#piani"),
   facts: [["Planner", `${PREZZI.planner} al mese + IVA`], ["Team", `${PREZZI.team} al mese + IVA`], ["Prova", `${PREZZI.prova} giorni, senza carta`], ["Matrimoni", `Fino a ${PREZZI.eventiTeam} attivi`]] })}
 
   <section class="section" id="eventi" aria-labelledby="eventi-h">
@@ -531,7 +529,7 @@ write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale d
 
   <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="piani-h">Canoni per numero di matrimoni</h2><p>IVA esclusa. 30 giorni di prova su Planner e Team, senza carta di credito. Un matrimonio è attivo finché la sua data non è passata.</p></div>
+      <div class="section-head"><h2 id="piani-h">Canoni per numero di matrimoni</h2><p>IVA esclusa. 7 giorni di prova su Planner e Team, senza carta di credito. Un matrimonio è attivo finché la sua data non è passata.</p></div>
       <div class="grid grid--top">${planCard(PLAN.planner)}${planCard(PLAN.team)}${planCard(PLAN.studio)}
       </div>
     </div>
@@ -561,7 +559,7 @@ write("prezzi.html", head("Prezzi di Nozze in Ordine per coppie e wedding planne
 <main id="top">${heroPhoto({ k: "heroPrezzi", pos: "70% 60%", posPhone: "78% 60%",
   h1: "Prezzi per coppie e planner",
   lead: `Coppie: gratis o ${PREZZI.completo} una volta sola. Planner: da ${PREZZI.planner} al mese, IVA esclusa, con ${PREZZI.prova} giorni di prova.`,
-  a: primary(), b: secondary("Guarda la demo", DEMO),
+  a: primary(), b: secondary("Confronta i piani", "#coppie"),
   facts: [["Gratis", "0 €, senza scadenza"], ["Completo", `${PREZZI.completo} una volta`], ["Planner", `Da ${PREZZI.planner} al mese`], ["Studio", "Su richiesta"]] })}
 
   <section class="section is-pricing" id="coppie" aria-labelledby="coppie-h">
@@ -579,7 +577,7 @@ write("prezzi.html", head("Prezzi di Nozze in Ordine per coppie e wedding planne
 
   <section class="section is-pricing" id="planner" aria-labelledby="planner-h">
     <div class="wrap">
-      <div class="section-head"><h2 id="planner-h">Per le wedding planner. <span class="muted">IVA esclusa.</span></h2><p>Un canone fisso al mese, scelto in base ai matrimoni che segui. 30 giorni di prova su Planner e Team.</p></div>
+      <div class="section-head"><h2 id="planner-h">Per le wedding planner. <span class="muted">IVA esclusa.</span></h2><p>Un canone fisso al mese, scelto in base ai matrimoni che segui. ${PREZZI.prova} giorni di prova su Planner e Team.</p></div>
       <div class="grid grid--top">${planCard(PLAN.planner)}${planCard(PLAN.team)}${planCard(PLAN.studio)}
       </div>
     </div>

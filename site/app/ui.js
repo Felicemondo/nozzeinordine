@@ -578,7 +578,7 @@
     if (invited) return h("p", { class: "small" }, "Registrandoti accetti i termini e confermi di avere almeno 18 anni.");
     return h("div", { class: "no-account" }, h("h2", null, "Non hai ancora un account?"),
       h("p", null, "Crearlo è gratuito e non serve la carta di credito."),
-      h("div", { class: "choices two" }, linkBtn("#/registrati", "Crea un account", "soft"), linkBtn("demo.html", "Guarda la demo", "soft")),
+      h("div", { class: "choices two" }, linkBtn("#/registrati", "Crea un account", "soft")),
       h("p", { class: "small" }, "Hai ricevuto un invito a un matrimonio? Registrati con la stessa email a cui è arrivato."));
   }
   function authScreen(kind) {
@@ -2133,9 +2133,9 @@
         if (r.value === "ok") { toast("Piano aggiornato."); await loadBase(); render(); }
       };
       var W_OPTS = [["gratis", "Gratis"], ["completo", "Completo"], ["planner", "Planner (creato da una planner)"]];
-      var P_OPTS = [["prova", "Prova gratuita (riparte da 30 giorni)"], ["planner", "Planner"], ["team", "Team"], ["studio", "Studio"], ["libero", "Senza limiti"]];
+      var P_OPTS = [["prova", "Prova gratuita (riparte da 7 giorni)"], ["planner", "Planner"], ["team", "Team"], ["studio", "Studio"], ["libero", "Senza limiti"]];
       var editW = function (w) { return pick("Piano del matrimonio", "Matrimonio: " + w.title, W_OPTS, w.plan, function (v) { return api.setWeddingPlan(w.id, v); }); };
-      var editP = function (p) { return pick("Piano della planner", "Planner: " + (p.full_name || p.email), P_OPTS, p.plan, function (v) { return api.setProfilePlan(p.id, v, v === "prova" ? 30 : null); }); };
+      var editP = function (p) { return pick("Piano della planner", "Planner: " + (p.full_name || p.email), P_OPTS, p.plan, function (v) { return api.setProfilePlan(p.id, v, v === "prova" ? 7 : null); }); };
       var grant = async function (x) {
         await attempt(async function () {
           if (x.plan === "completo") { if (!x.wedding_id) throw new Error("La richiesta non indica un matrimonio."); await api.setWeddingPlan(x.wedding_id, "completo"); }
