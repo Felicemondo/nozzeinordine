@@ -637,8 +637,8 @@ picture { display: contents; }
   .hero-in { padding: 120px var(--gut) 36px; }
 }
 
-/* ---- Apertura: gradiente nei colori del marchio sotto il testo (bordeaux che sfuma nell'oliva e poi nella foto) ---- */
-.hero-pic::after { background: linear-gradient(90deg, rgba(112, 47, 67, .82) 0%, rgba(112, 47, 67, .55) 32%, rgba(70, 80, 68, .28) 62%, rgba(70, 80, 68, 0) 100%); }
+/* ---- Apertura: gradiente sotto il testo nei toni della palette (inchiostro e oliva, gli stessi del piè di pagina e delle fasce) ---- */
+.hero-pic::after { background: linear-gradient(90deg, rgba(48, 58, 48, .84) 0%, rgba(70, 80, 68, .62) 34%, rgba(70, 80, 68, .26) 64%, rgba(70, 80, 68, 0) 100%); }
 @media (max-width: 900px) {
-  .hero-pic::after { background: linear-gradient(0deg, rgba(112, 47, 67, .88) 0%, rgba(112, 47, 67, .62) 45%, rgba(70, 80, 68, .22) 75%, rgba(70, 80, 68, 0) 100%); }
+  .hero-pic::after { background: linear-gradient(0deg, rgba(48, 58, 48, .9) 0%, rgba(70, 80, 68, .66) 45%, rgba(70, 80, 68, .2) 76%, rgba(70, 80, 68, 0) 100%); }
 }
