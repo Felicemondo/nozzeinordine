@@ -18,7 +18,7 @@
   --ok-tint: #EDF0E6;
   --serif: "DM Serif Display", Georgia, serif;
   --font: "DM Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --r-card: 16px; --r-field: 8px;
+  --r-card: 20px; --r-field: 8px; --r-btn: 2px;
   --g-fa: #702F43; --g-fb: #386070; --g-aa: #A9533B; --g-ab: #56683F; --g-ac: #C49A3C;
   --grout: #DCD2BF; --tile: #FBF8F2;
 }
@@ -699,3 +699,20 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   .cmp-bars li { grid-template-columns: minmax(0, 1fr) auto; }
   .cmp-track { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* ---- Allineamento al sito (2026-11-17): stessi pulsanti squadrati, stesso raggio delle card ---- */
+.btn { border-radius: var(--r-btn); }
+.seg button, .seg a { border-radius: var(--r-field); }
+/* righe delle attività: quando la colonna è stretta, stato e spunte vanno a capo sotto il titolo */
+.rows { container-type: inline-size; }
+@container (max-width: 560px) {
+  .row { grid-template-columns: auto minmax(0, 1fr); }
+  .row-side { grid-column: 1 / -1; justify-content: flex-start; }
+}
+/* telefono: i riquadri dei numeri più compatti, così l'elenco arriva prima */
+@media (max-width: 720px) {
+  .kpis.six .kpi, .kpis.four .kpi { padding: 12px 14px; gap: 4px; }
+  .kpis.six .kpi-m { display: none; }
+  .kpis.six .kpi-v { font-size: 22px; }
+}
+.pill-link { border-radius: var(--r-btn); }
