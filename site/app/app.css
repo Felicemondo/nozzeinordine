@@ -782,3 +782,14 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1
   .row-actions .mini { padding: 4px 5px; font-size: 13px; }
 }
 @media screen and (max-width: 720px) { .row-side .row-actions { display: flex !important; flex-direction: row; flex-wrap: nowrap; grid-template-columns: none; } }
+
+/* pulsanti piccoli squadrati come il resto; programma del giorno e messaggi più compatti su telefono */
+.mini.pill { border-radius: var(--r-btn); }
+@media (max-width: 720px) {
+  .row.tl { gap: 4px 12px; }
+  .tl-col { display: block; font-size: 14px; }
+  .tl-col small { display: inline; margin-right: 6px; color: var(--muted); font-weight: 500; }
+  .row.tl .row-side { margin-top: 4px; }
+  pre, .msg, textarea[readonly], [class*="invite"] p { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+.box p { overflow-wrap: anywhere; }
