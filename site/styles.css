@@ -619,3 +619,20 @@ picture { display: contents; }
 .hero-pic { min-height: 0; aspect-ratio: 1440 / 560; }
 .hero-pic img { object-position: var(--pos, 50% 60%); }
 @media (max-width: 900px) { .hero-in { padding: 36px var(--gut) 32px; } .hero-pic { aspect-ratio: 4 / 3; } }
+
+/* ---- Apertura: foto a tutta pagina con il testo in sovrimpressione e ombra (scelta di Felice, 2026-11-17).
+   Una velatura leggera dal lato del testo garantisce il contrasto anche dove la foto è chiara. ---- */
+.hero, .hero.tall { position: relative; display: flex; align-items: center; min-height: clamp(560px, 50vw, 760px); background: #3A4237; overflow: hidden; }
+.hero-pic { position: absolute; inset: 0; margin: 0; aspect-ratio: auto; min-height: 0; }
+.hero-pic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(28, 32, 26, .62) 0%, rgba(28, 32, 26, .34) 50%, rgba(28, 32, 26, .06) 100%); }
+.hero-in { position: relative; z-index: 1; width: 100%; padding: clamp(64px, 7vw, 112px) var(--gut); }
+.hero h1, .hero.tall h1 { color: #FFFCF7; text-shadow: 0 2px 28px rgba(0, 0, 0, .45), 0 1px 3px rgba(0, 0, 0, .35); }
+.hero .eyebrow { color: #F1EBE0; text-shadow: 0 1px 10px rgba(0, 0, 0, .55); }
+.hero-p, .hero .fine { color: rgba(255, 252, 247, .94); text-shadow: 0 1px 14px rgba(0, 0, 0, .55), 0 1px 2px rgba(0, 0, 0, .3); }
+.hero .btn.line { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .7); color: #fff; }
+.hero .btn.line:hover { background: rgba(255, 255, 255, .2); }
+@media (max-width: 900px) {
+  .hero, .hero.tall { align-items: flex-end; min-height: min(760px, 92svh); }
+  .hero-pic::after { background: linear-gradient(0deg, rgba(28, 32, 26, .78) 0%, rgba(28, 32, 26, .5) 50%, rgba(28, 32, 26, .12) 100%); }
+  .hero-in { padding: 120px var(--gut) 36px; }
+}
