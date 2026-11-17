@@ -612,9 +612,9 @@ const guideCss = `<style>
 @media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article td:nth-child(2) { white-space: normal; } }
 </style>`;
 const GUIDES = [];
-const guide = ({ slug, title, desc, h1, answer, updated, updatedIso, published, body, faq, tool }) => {
+const guide = ({ slug, cat, img, title, desc, h1, answer, updated, updatedIso, published, body, faq, tool }) => {
   const name = `guide/${slug}.html`;
-  GUIDES.push({ slug, h1, desc });
+  GUIDES.push({ slug, cat, img, h1, desc });
   LD[name] = [{ "@context": "https://schema.org", "@graph": [
     { "@type": "Article", headline: h1, description: desc, inLanguage: "it-IT", datePublished: published, dateModified: updatedIso, mainEntityOfPage: SITE + "/guide/" + slug, author: ORG, publisher: ORG, image: SITE + "/og.png" },
     { "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }] }];
@@ -631,7 +631,7 @@ ${faqList(faq)}
 </article></div></main>` + foot(closeType("Organizzate il matrimonio in un unico spazio", "Scadenze, invitati e risposte nello stesso posto. Il piano gratuito non scade e non serve la carta di credito.")));
 };
 
-guide({ slug: "quando-si-danno-le-partecipazioni", published: "2026-11-17", updatedIso: "2026-11-17", updated: "17 novembre 2026",
+guide({ slug: "quando-si-danno-le-partecipazioni", cat: "Tempi e scadenze", img: "fiori", published: "2026-11-17", updatedIso: "2026-11-17", updated: "17 novembre 2026",
   title: "Quando si danno le partecipazioni di matrimonio (e i save the date)",
   desc: "Partecipazioni 3–4 mesi prima, save the date 6–8 mesi prima, risposte entro 1–2 mesi dal matrimonio. Tempi, motivi ed eccezioni, con il calcolatore sulla vostra data.",
   h1: "Quando si danno le partecipazioni di matrimonio?",
@@ -679,15 +679,38 @@ guide({ slug: "quando-si-danno-le-partecipazioni", published: "2026-11-17", upda
     ["Chi riceve il save the date va invitato?", "Sì. Il save the date è una promessa di invito: mandatelo solo a chi riceverà di sicuro la partecipazione."],
     ["Quanto prima chiedere la risposta?", "Uno o due mesi prima del matrimonio. Controllate entro quando il catering vuole il numero definitivo e lasciatevi qualche settimana per sollecitare chi non ha risposto."]] });
 
-write("guide.html", head("Guide per organizzare il matrimonio | Nozze in Ordine", "Guide pratiche per organizzare il matrimonio: tempi, documenti, budget, invitati e tavoli. Risposte dirette e strumenti gratuiti.", { extra: guideCss, robots: GUIDE_ROBOTS }) + top("") + `
-<main id="top"><div class="wrap"><article class="article">
-<h1>Guide per organizzare il matrimonio</h1>
-<p class="t-lead">Risposte dirette alle domande che arrivano mentre si organizza: quando, quanto, in che ordine. Ogni guida rimanda a uno strumento gratuito.</p>
-<h2>Strumenti</h2>
-<ul class="rows"><li><span class="rows__name"><a href="/scadenze-matrimonio">Calcolatore delle scadenze del matrimonio</a><small>Inserite la data e vedete il giorno di 20 attività, dalla location ai saldi.</small></span></li></ul>
-<h2>Tempi e scadenze</h2>
-<ul class="rows">${GUIDES.map((g) => `<li><span class="rows__name"><a href="/guide/${g.slug}">${g.h1}</a><small>${g.desc}</small></span></li>`).join("")}</ul>
-</article></div></main>` + foot());
+// Indice delle guide a card (scelta di Felice): etichetta, titolo, due righe, foto in fondo alla card; la card intera è il link
+const guideCard = ({ href, cat, h, p, media, span }) => `
+          <article class="card guide-card ${span}">
+            <p class="t-label">${cat}</p>
+            <h3><a href="${href}">${h}</a></h3>
+            <p>${p}</p>
+            <div class="guide-card__media">${media}</div>
+          </article>`;
+const HUB_CARDS = [{ href: "/scadenze-matrimonio", cat: "Strumento gratuito", h: "Calcolatore delle scadenze del matrimonio", p: "Inserite la data e vedete il giorno di 20 attività, dalla location ai saldi dei fornitori.", media: shot("scadenze") },
+  ...GUIDES.map((g) => ({ href: `/guide/${g.slug}`, cat: g.cat, h: g.h1, p: g.desc, media: pic(g.img, { sizes: "(min-width: 1024px) 33vw, 100vw" }) }))];
+const hubSpan = (n, i) => n % 3 === 0 ? "span-4" : n % 3 === 2 && i >= n - 2 ? "span-6" : n % 3 === 1 && i >= n - 4 ? "span-6" : "span-4";
+write("guide.html", head("Guide per organizzare il matrimonio | Nozze in Ordine", "Guide pratiche per organizzare il matrimonio: tempi, documenti, budget, invitati e tavoli. Risposte dirette e strumenti gratuiti.", { robots: GUIDE_ROBOTS, extra: `<style>
+#guide { padding-top: calc(var(--nav) + var(--s-8)); }
+.guide-card .t-label { margin: 0 0 var(--s-3); color: var(--muted); }
+.guide-card h3 a { color: inherit; text-decoration: none; }
+.guide-card h3 a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.guide-card:has(a:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-card:hover h3 a { color: var(--action); }
+.guide-card__media { margin-top: auto; padding-top: var(--s-6); }
+.guide-card__media img { display: block; width: 100%; aspect-ratio: 3 / 2; height: auto; object-fit: cover; border-radius: calc(var(--c-r) - 8px); }
+@media (max-width: 1023px) { .guide-card { grid-column: 1 / -1; } }
+@media (min-width: 640px) and (max-width: 1023px) { .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .guide-card { grid-column: auto; } }
+</style>` }) + top("") + `
+<main id="top">
+  <section class="section" id="guide" aria-labelledby="hero-h">
+    <div class="wrap">
+      <div class="section-head"><h1 id="hero-h">Guide per organizzare il matrimonio</h1><p>Risposte dirette alle domande che arrivano mentre si organizza: quando, quanto, in che ordine. Ogni guida rimanda a uno strumento gratuito.</p></div>
+      <div class="grid guide-grid">${HUB_CARDS.map((c, i) => guideCard({ ...c, span: hubSpan(HUB_CARDS.length, i) })).join("")}
+      </div>
+    </div>
+  </section>
+</main>` + foot());
 
 /* =========================================================== PLANNER */
 write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale dei matrimoni", `Il gestionale per wedding planner: tutti i matrimoni in un unico spazio, con acconti, scadenze e portale per gli sposi. Da ${PREZZI.planner} € al mese.`.replace("€ €", "€")) + top("planner") + `
