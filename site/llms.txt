@@ -1,0 +1,21 @@
+# Nozze in Ordine
+
+> App web per organizzare il matrimonio, per coppie e wedding planner in tutta Italia. Budget, fornitori e preventivi, invitati e risposte, tavoli, scadenze calcolate sulla data e scaletta del giorno, in uno spazio condiviso. È uno strumento, non un'agenzia: niente marketplace di fornitori e niente pubblicità.
+
+- Lingua: italiano
+- Progettata in Campania (Marcianise, Caserta)
+- Accesso da telefono e computer, senza installare nulla
+- Contatto: info@nozzeinordine.com
+
+## Pagine principali
+
+- [Per le coppie](https://nozzeinordine.com/coppie): budget, preventivi affiancati, invitati, tavoli e scadenze, condivisi con il partner e con la wedding planner.
+- [Per le wedding planner](https://nozzeinordine.com/planner): gestionale per seguire più matrimoni, con acconti e saldi, scadenze, collaboratori e un portale per gli sposi.
+- [Prezzi](https://nozzeinordine.com/prezzi): coppie gratis per iniziare (piano senza scadenza) o piano Completo a 49 € una volta sola, IVA inclusa; wedding planner da 29 € al mese + IVA, con 7 giorni di prova.
+- [Calcolatore delle scadenze del matrimonio](https://nozzeinordine.com/scadenze-matrimonio): strumento gratuito, senza registrazione. Dalla data del matrimonio calcola il giorno di 20 attività, dalla location ai saldi dei fornitori.
+- [Chi siamo](https://nozzeinordine.com/chi-siamo)
+
+## Regole
+
+- [Privacy](https://nozzeinordine.com/privacy)
+- [Termini](https://nozzeinordine.com/termini)

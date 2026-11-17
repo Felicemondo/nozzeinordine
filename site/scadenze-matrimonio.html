@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="it" data-type="service" data-radius="soft" data-buttons="block" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scadenze del matrimonio: cosa fare mese per mese, sulla vostra data</title>
+<meta name="description" content="Inserite la data del matrimonio e vedete il giorno esatto delle 20 scadenze principali: location, fornitori, partecipazioni, documenti e saldi. Gratis, senza registrazione.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Scadenze del matrimonio: cosa fare mese per mese, sulla vostra data">
+<meta property="og:description" content="Inserite la data del matrimonio e vedete il giorno esatto delle 20 scadenze principali: location, fornitori, partecipazioni, documenti e saldi. Gratis, senza registrazione.">
+<meta property="og:image" content="https://nozzeinordine.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#f5f0e7">
+<meta name="site-kind" content="other">
+<meta name="page-type" content="service">
+<link rel="preload" href="/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/system.css">
+<link rel="stylesheet" href="/assets/ui/cards.css">
+<link rel="stylesheet" href="/assets/motion/motion.css">
+<link rel="stylesheet" href="/assets/layout/layout.css">
+
+<style>
+@font-face { font-family: "DM Serif Display"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-600-normal.woff2") format("woff2"); }
+:root {
+  --p-bg: #f5f0e7; --p-surface: #ebe4d7; --p-ink: #2b2a24; --p-muted: #5a5650;
+  --p-accent: #a85339; --p-accent-ink: #f5f0e7; --p-action: #a85339; --p-action-ink: #f5f0e7;
+  --p-inv-bg: #2b2a24; --p-inv-surface: #37362f; --p-inv-ink: #f5f0e7; --p-inv-muted: #a8a49c;
+  --p-inv-accent: #f5f0e7; --p-inv-accent-ink: #2b2a24; --p-inv-action: #f5f0e7; --p-inv-action-ink: #2b2a24;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-text: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.012em;
+  --display-tracking-xl: -0.018em;
+}
+.nav__logo svg { width: 26px; height: 26px; fill: #702f43; flex: none; }
+.nav__logo { color: #702f43; }
+.nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
+.nav__toggle svg { width: 22px; height: 22px; }
+.app-shot { object-position: left top; }
+.steps-list { list-style: none; counter-reset: s; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-5); }
+.steps-list li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; column-gap: var(--s-4); row-gap: 4px; }
+.steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
+.steps-list b { font-weight: 500; font-size: 18px; }
+.steps-list span { color: var(--p-muted); }
+/* sezioni alte quanto il contenuto, con spazi misurati (scelta di Felice: la schermata intera lasciava troppo vuoto) */
+:root { --padt: 96px; --padb: 96px; }
+main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
+main > :is(section, .section):not(.hero) > .wrap { height: auto; }
+main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto; height: auto; }
+main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+footer.closing > .wrap { row-gap: var(--s-9); }
+main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
+@media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
+/* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
+@media (max-width: 639px) {
+  :root { --padt: 56px; --padb: 32px; }
+  main > :is(section, .section):not(.hero, .section--hero), footer.closing { min-height: 0 !important; }
+  main > :is(section, .section).g2 > .wrap, main > :is(section, .section).g2m > .wrap, footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-7); }
+  footer.closing > .wrap { row-gap: var(--s-8); }
+  main > :is(section, .section):not(.hero) > .wrap { height: auto; min-height: 0; }
+  main > :is(section, .section):not(.hero, .section--hero) { padding-bottom: var(--padb) !important; }
+  main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto !important; height: auto !important; min-height: 0; }
+  .mo-pc__step { min-height: 0 !important; height: auto !important; padding-block: var(--s-2); }
+  .mo-pc__grid, .mo-pc__text, .mo-pc__steps { min-height: 0 !important; height: auto !important; }
+  .frame, .develop { height: auto !important; min-height: 0 !important; }
+  .frame--photo:has(> .frame__img), .develop { aspect-ratio: 4 / 3; }
+  .frame--photo:has(> .app-shot) { aspect-ratio: 1600 / 1074; }
+}
+/* un solo raggio per tutte le foto e le schermate (scelta di Felice): quello delle card */
+.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel, .menu-card .panel { border-radius: var(--r-lg); overflow: hidden; }
+:is(.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel) img { border-radius: inherit; }
+.rows__name small { display: block; margin-top: var(--s-1); font: 400 var(--t-small)/1.5 var(--font-text); color: var(--muted); }
+.rows__value { text-align: right; }
+.panel:has(> .app-shot) { --p-h: 340px; }
+@media (max-width: 1279px) { .panel:has(> .app-shot) { --p-h: 280px; } }
+.develop { aspect-ratio: 1; }
+.frame--photo:has(> .frame__img) { aspect-ratio: 1; }
+#prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+@media (min-width: 640px) and (max-width: 1023px) { #prezzi .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) {
+  #prezzi .section-head p, #prezzi .rows > li:nth-child(n+3), #domande .faq__item:nth-child(n+3) { display: none; }
+  #prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 3 / 2; }
+}
+#eventi .frame--photo { aspect-ratio: 1600 / 1074; }
+#portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
+#spazio .panel:has(> .app-shot) { --p-h: 440px; }
+@media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
+#piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: stretch; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
+.card--plan .checks li { font-size: 15px; line-height: 1.5; }
+.cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+.pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
+@media (max-width: 1023px) { .pricing-pic { display: none; } }
+@media (max-width: 639px) { .section.is-pricing:has(.card--plan:nth-child(3)):not(#prezzi) { --hm: 2; } }
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
+
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
+</style>
+<script src="/assets/boot.js"></script>
+<script src="/tracking.js"></script>
+<script src="/consent.js" defer></script>
+
+<style>
+#calcolo { padding-top: calc(var(--nav) + var(--s-8)); }
+#calcolo h1 { margin: 0; }
+.calc { display: grid; gap: var(--s-4); align-content: start; }
+.calc, .calc input { min-width: 0; width: 100%; }
+.calc input { min-height: 48px; padding: 0 var(--s-4); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--g-main, #fff); font: 400 16px/1.4 var(--font-text); color: inherit; }
+.count { display: flex; gap: var(--s-5); align-items: baseline; font: 400 var(--t-stat)/1 var(--font-display); }
+.count span { font: 400 var(--t-small)/1.4 var(--font-text); color: var(--muted); }
+.rows .rows__value small { display: block; color: var(--muted); font-size: var(--t-small); }
+.rows li.now .rows__name { color: var(--accent); }
+.rows li.late .rows__value small { color: var(--action); }
+.phase { display: grid; gap: var(--s-4); padding-block: var(--s-7) 0; }
+.phase:first-child { padding-top: 0; }
+.phase h3 { font: 400 var(--t-h3)/1.25 var(--font-display); margin: 0; }
+.phase > p { max-width: 64ch; margin: 0; }
+</style>
+<link rel="canonical" href="https://nozzeinordine.com/scadenze-matrimonio"><meta property="og:url" content="https://nozzeinordine.com/scadenze-matrimonio"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Calcolatore delle scadenze del matrimonio","url":"https://nozzeinordine.com/scadenze-matrimonio","applicationCategory":"LifestyleApplication","operatingSystem":"Web","inLanguage":"it-IT","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@type":"Organization","@id":"https://nozzeinordine.com/#org","name":"Nozze in Ordine","url":"https://nozzeinordine.com/","logo":"https://nozzeinordine.com/apple-touch-icon.png","email":"info@nozzeinordine.com","areaServed":"IT"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quanto tempo prima si organizza un matrimonio?","acceptedAnswer":{"@type":"Answer","text":"Questo calendario parte 14 mesi prima, con la data e il rito. Si può fare in meno tempo: le prime decisioni (data, budget, location) restano le stesse e le altre si avvicinano. Se la vostra data è vicina, il calcolatore segna come «da recuperare» le attività già superate."}},{"@type":"Question","name":"Quando si mandano le partecipazioni?","acceptedAnswer":{"@type":"Answer","text":"Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Ordinatele un paio di mesi prima di spedirle."}},{"@type":"Question","name":"Quando si prenota la location?","acceptedAnswer":{"@type":"Answer","text":"Dodici mesi prima, subito dopo aver fissato data e budget. È la scelta che decide il numero di invitati e molti dei fornitori, quindi conviene farla per prima."}},{"@type":"Question","name":"Quando servono i documenti per le pubblicazioni?","acceptedAnswer":{"@type":"Answer","text":"Tre mesi prima. Le pubblicazioni di matrimonio valgono 180 giorni: se il matrimonio non si celebra entro quel termine vanno rifatte. Per le date precise chiedete al comune o alla parrocchia."}},{"@type":"Question","name":"Quando si saldano i fornitori?","acceptedAnswer":{"@type":"Answer","text":"Nel calendario i saldi principali cadono un mese prima e la conferma dei numeri al catering una settimana prima. Valgono le date scritte nei contratti: se sono diverse, seguite quelle."}},{"@type":"Question","name":"Le scadenze valgono per tutti i matrimoni?","acceptedAnswer":{"@type":"Answer","text":"Sono un punto di partenza, non una regola. Nello spazio gratuito di Nozze in Ordine le stesse attività si spuntano, si spostano e si aggiungono, e se cambia la data si ricalcolano da sole."}}]}]}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nozze in Ordine","item":"https://nozzeinordine.com/"},{"@type":"ListItem","position":2,"name":"Le scadenze del matrimonio, sulla vostra data","item":"https://nozzeinordine.com/scadenze-matrimonio"}]}</script></head>
+<body>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Vai al contenuto</a>
+    <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+    <nav class="nav__links" aria-label="Principale">
+      <div class="nav__item"><a class="nav__link" href="/coppie">Coppie</a></div>
+      <div class="nav__item"><a class="nav__link" href="/planner">Planner</a></div>
+      <div class="nav__item"><a class="nav__link" href="/prezzi">Prezzi</a></div>
+      <div class="nav__item"><a class="nav__link" href="/chi-siamo">Chi siamo</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" href="/app/">Accedi</a>
+      <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main id="top">
+  <section class="section" id="calcolo" aria-labelledby="hero-h">
+    <div class="wrap">
+      <div class="grid grid--top" data-scad>
+        <div class="span-5 stack-6">
+          <h1 id="hero-h">Le scadenze del matrimonio, sulla vostra data</h1>
+          <p class="t-lead">Scrivete il giorno del sì: vedete quanto manca, in che fase siete e la data esatta di ogni cosa da fare. Gratis, senza registrazione.</p>
+          <div class="calc">
+            <label class="t-label" for="data-si">La data del matrimonio</label>
+            <input type="date" id="data-si">
+            <p class="count"><b data-weeks>–</b><span>settimane</span><b data-days>–</b><span>giorni</span></p>
+            <p class="t-small muted" id="cd-msg" role="status"></p>
+          </div>
+        </div>
+        <div class="span-6 start-7"><ul class="rows"><li data-phase="0"><span class="rows__name">12+ mesi prima<small>Data, budget e location</small></span><span class="rows__value"><small>–</small></span></li><li data-phase="1"><span class="rows__name">9–11 mesi prima<small>Fornitori principali e preventivi</small></span><span class="rows__value"><small>–</small></span></li><li data-phase="2"><span class="rows__name">6–8 mesi prima<small>Save the date e abiti</small></span><span class="rows__value"><small>–</small></span></li><li data-phase="3"><span class="rows__name">3–5 mesi prima<small>Dettagli, inviti e menù</small></span><span class="rows__value"><small>–</small></span></li><li data-phase="4"><span class="rows__name">1–2 mesi prima<small>Conferme finali e saldi</small></span><span class="rows__value"><small>–</small></span></li><li data-phase="5"><span class="rows__name">Settimana del sì<small>Scaletta e responsabili</small></span><span class="rows__value"><small>–</small></span></li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="elenco" aria-labelledby="elenco-h">
+    <div class="wrap">
+      <div class="section-head"><h2 id="elenco-h">Cosa fare, fase per fase</h2><p>Venti attività, dalla data al giorno del sì. Con la data inserita, accanto a ognuna compare il giorno entro cui farla.</p></div>
+      <div class="grid grid--top"><div class="span-8">
+        <div class="phase"><h3>12+ mesi prima</h3><p>Prima le decisioni che bloccano tutte le altre: la data, il rito, quanto spendere e dove. La location fissa quante persone potete invitare, per questo la prima lista degli invitati si fa insieme a lei.</p>
+          <ul class="rows"><li data-m="14" data-d="0"><span class="rows__name">Fissare la data e il tipo di rito</span><span class="rows__value"><b data-when>14 mesi prima</b><small data-state></small></span></li><li data-m="13" data-d="0"><span class="rows__name">Definire il budget complessivo</span><span class="rows__value"><b data-when>13 mesi prima</b><small data-state></small></span></li><li data-m="12" data-d="0"><span class="rows__name">Scegliere e prenotare la location</span><span class="rows__value"><b data-when>12 mesi prima</b><small data-state></small></span></li><li data-m="12" data-d="0"><span class="rows__name">Stilare la prima lista degli invitati</span><span class="rows__value"><b data-when>12 mesi prima</b><small data-state></small></span></li></ul>
+        </div>
+        <div class="phase"><h3>9–11 mesi prima</h3><p>Con data e location fissate si scelgono i fornitori che seguono un solo matrimonio al giorno: fotografo, catering, musica. Chiedete più preventivi e confrontateli voce per voce. Il rito, in comune o in parrocchia, si prenota adesso.</p>
+          <ul class="rows"><li data-m="10" data-d="0"><span class="rows__name">Fotografo e video: confrontare e prenotare</span><span class="rows__value"><b data-when>10 mesi prima</b><small data-state></small></span></li><li data-m="10" data-d="0"><span class="rows__name">Catering: chiedere e confrontare i preventivi</span><span class="rows__value"><b data-when>10 mesi prima</b><small data-state></small></span></li><li data-m="9" data-d="0"><span class="rows__name">Musica e intrattenimento</span><span class="rows__value"><b data-when>9 mesi prima</b><small data-state></small></span></li><li data-m="9" data-d="0"><span class="rows__name">Prenotare il rito in comune o in parrocchia</span><span class="rows__value"><b data-when>9 mesi prima</b><small data-state></small></span></li></ul>
+        </div>
+        <div class="phase"><h3>6–8 mesi prima</h3><p>I save the date a chi deve organizzarsi per tempo, gli abiti con le loro prove, fiori e allestimenti. Partecipazioni e bomboniere si ordinano ora, per averle pronte quando servono.</p>
+          <ul class="rows"><li data-m="8" data-d="0"><span class="rows__name">Inviare i save the date</span><span class="rows__value"><b data-when>8 mesi prima</b><small data-state></small></span></li><li data-m="7" data-d="0"><span class="rows__name">Scegliere gli abiti</span><span class="rows__value"><b data-when>7 mesi prima</b><small data-state></small></span></li><li data-m="6" data-d="0"><span class="rows__name">Fiori e allestimenti</span><span class="rows__value"><b data-when>6 mesi prima</b><small data-state></small></span></li><li data-m="6" data-d="0"><span class="rows__name">Ordinare partecipazioni e bomboniere</span><span class="rows__value"><b data-when>6 mesi prima</b><small data-state></small></span></li></ul>
+        </div>
+        <div class="phase"><h3>3–5 mesi prima</h3><p>Le partecipazioni partono, il menù si definisce con il catering e si preparano i documenti per le pubblicazioni. Le pubblicazioni valgono 180 giorni: anticiparle troppo vuol dire doverle rifare.</p>
+          <ul class="rows"><li data-m="5" data-d="0"><span class="rows__name">Inviare le partecipazioni</span><span class="rows__value"><b data-when>5 mesi prima</b><small data-state></small></span></li><li data-m="4" data-d="0"><span class="rows__name">Definire il menù con il catering</span><span class="rows__value"><b data-when>4 mesi prima</b><small data-state></small></span></li><li data-m="3" data-d="0"><span class="rows__name">Documenti per le pubblicazioni</span><span class="rows__value"><b data-when>3 mesi prima</b><small data-state></small></span></li></ul>
+        </div>
+        <div class="phase"><h3>1–2 mesi prima</h3><p>Si raccolgono le risposte degli invitati, si saldano i fornitori principali e si confermano gli orari. Le date dei saldi le fissano i contratti: controllatele, il calendario è un'indicazione.</p>
+          <ul class="rows"><li data-m="2" data-d="0"><span class="rows__name">Raccogliere le risposte degli invitati</span><span class="rows__value"><b data-when>2 mesi prima</b><small data-state></small></span></li><li data-m="1" data-d="0"><span class="rows__name">Saldi dei fornitori principali</span><span class="rows__value"><b data-when>1 mese prima</b><small data-state></small></span></li><li data-m="0" data-d="14"><span class="rows__name">Confermare orari con tutti i fornitori</span><span class="rows__value"><b data-when>2 settimane prima</b><small data-state></small></span></li></ul>
+        </div>
+        <div class="phase"><h3>Settimana del sì</h3><p>I numeri finali al catering e la scaletta della giornata condivisa con fornitori e testimoni, così il giorno del sì nessuno deve chiedervi niente.</p>
+          <ul class="rows"><li data-m="0" data-d="7"><span class="rows__name">Ultima conferma dei numeri al catering</span><span class="rows__value"><b data-when>1 settimana prima</b><small data-state></small></span></li><li data-m="0" data-d="5"><span class="rows__name">Condividere la scaletta con fornitori e testimoni</span><span class="rows__value"><b data-when>5 giorni prima</b><small data-state></small></span></li></ul>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <section class="section" id="domande" aria-labelledby="domande-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-4 stack-6">
+          <h2 id="domande-h">Domande sulle scadenze</h2>
+          <p><a class="link" href="/coppie">Come funziona lo spazio per le coppie</a></p>
+          <div class="frame frame--photo"><img class="frame__img" src="/img/fedi-libro-l.avif" srcset="/img/fedi-libro-m.avif 800w, /img/fedi-libro-l.avif 1440w" sizes="(min-width: 1024px) 30vw, 100vw" width="1440" height="960" alt="Due fedi d'oro appoggiate su un libro aperto." loading="lazy" decoding="async"></div>
+        </div>
+        <div class="span-7 start-6"><div class="faq"><div class="faq__item"><h3>Quanto tempo prima si organizza un matrimonio?</h3><p>Questo calendario parte 14 mesi prima, con la data e il rito. Si può fare in meno tempo: le prime decisioni (data, budget, location) restano le stesse e le altre si avvicinano. Se la vostra data è vicina, il calcolatore segna come «da recuperare» le attività già superate.</p></div><div class="faq__item"><h3>Quando si mandano le partecipazioni?</h3><p>Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Ordinatele un paio di mesi prima di spedirle.</p></div><div class="faq__item"><h3>Quando si prenota la location?</h3><p>Dodici mesi prima, subito dopo aver fissato data e budget. È la scelta che decide il numero di invitati e molti dei fornitori, quindi conviene farla per prima.</p></div><div class="faq__item"><h3>Quando servono i documenti per le pubblicazioni?</h3><p>Tre mesi prima. Le pubblicazioni di matrimonio valgono 180 giorni: se il matrimonio non si celebra entro quel termine vanno rifatte. Per le date precise chiedete al comune o alla parrocchia.</p></div><div class="faq__item"><h3>Quando si saldano i fornitori?</h3><p>Nel calendario i saldi principali cadono un mese prima e la conferma dei numeri al catering una settimana prima. Valgono le date scritte nei contratti: se sono diverse, seguite quelle.</p></div><div class="faq__item"><h3>Le scadenze valgono per tutti i matrimoni?</h3><p>Sono un punto di partenza, non una regola. Nello spazio gratuito di Nozze in Ordine le stesse attività si spuntano, si spostano e si aggiungono, e se cambia la data si ricalcolano da sole.</p></div></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Le vostre scadenze, nel vostro spazio</h2>
+        <p>Con l'account gratuito le stesse attività si spuntano e si spostano, e si ricalcolano se cambia la data.</p>
+      </div>
+      <a class="btn btn--primary btn--xl btn--wide" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+          <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/scadenze-matrimonio">Scadenze del matrimonio</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="/app/#/registrati">Crea un account</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/cookie" data-cookie-prefs>Preferenze cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Nozze in Ordine</span>
+        <div class="socials"></div>
+        <a class="credits" href="/privacy#crediti">Fotografie via Unsplash</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<nav class="actionbar" aria-label="Azioni rapide">
+  <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+</nav>
+<script type="module" src="/assets/system.js"></script>
+<script type="module" src="/assets/motion/motion.js"></script>
+<script type="module" src="/assets/layout/layout.js"></script>
+</body>
+</html><script src="/scadenze.js" defer></script>

@@ -13,7 +13,7 @@ const crumbs = (name, slug) => ({ "@context": "https://schema.org", "@type": "Br
 const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
 const cleanLinks = (html) => html
   .replace(/href="index\.html(#[^"]*)?"/g, (m, a) => `href="/${a || ""}"`)
-  .replace(/href="(coppie|planner|prezzi|chi-siamo|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
+  .replace(/href="(coppie|planner|prezzi|chi-siamo|scadenze-matrimonio|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
   .replace(/href="app\//g, 'href="/app/');
 const write = (name, html) => {
   const slug = name === "index.html" ? "" : name.replace(/\.html$/, ""), url = SITE + "/" + slug;
@@ -259,7 +259,7 @@ const foot = (close = closeType()) => `
           <a class="nav__logo" href="/">${MARK}Nozze in Ordine</a>
           <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
         </div>
-        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/scadenze-matrimonio">Scadenze del matrimonio</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="${SIGNUP}">Crea un account</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li>${TRK_ON ? `<li><a href="/cookie" data-cookie-prefs>Preferenze cookie</a></li>` : ""}<li><a href="/termini">Termini</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
@@ -448,6 +448,7 @@ write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un un
           <input type="date" id="data-si" value="2027-06-12">
           <p class="count"><b data-weeks>32</b><span>settimane</span><b data-days>5</b><span>giorni</span></p>
           <p class="t-small muted" id="cd-msg" role="status"></p>
+          <p><a class="link" href="/scadenze-matrimonio">Tutte le scadenze, attività per attività</a></p>
         </div>
         <div class="span-6 start-7"><ul class="rows phases">${PHASES.map(([t, d], i) => `<li data-step="${i}"><span class="rows__name">${t}<small>${d}</small></span><span class="rows__value"><small>Da avviare</small></span></li>`).join("")}</ul></div>
       </div>
@@ -488,6 +489,94 @@ write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un un
     </div>
   </section>
 </main>` + foot() + `<script src="/calc.js" defer></script>`);
+
+/* =========================================================== SCADENZE (strumento gratuito, senza registrazione) */
+// Le stesse attività che la dashboard crea sulla data (supabase seed_tasks): [titolo, fase, mesi prima, giorni prima]
+const TASKS = [["Fissare la data e il tipo di rito", 0, 14, 0], ["Definire il budget complessivo", 0, 13, 0], ["Scegliere e prenotare la location", 0, 12, 0], ["Stilare la prima lista degli invitati", 0, 12, 0],
+  ["Fotografo e video: confrontare e prenotare", 1, 10, 0], ["Catering: chiedere e confrontare i preventivi", 1, 10, 0], ["Musica e intrattenimento", 1, 9, 0], ["Prenotare il rito in comune o in parrocchia", 1, 9, 0],
+  ["Inviare i save the date", 2, 8, 0], ["Scegliere gli abiti", 2, 7, 0], ["Fiori e allestimenti", 2, 6, 0], ["Ordinare partecipazioni e bomboniere", 2, 6, 0],
+  ["Inviare le partecipazioni", 3, 5, 0], ["Definire il menù con il catering", 3, 4, 0], ["Documenti per le pubblicazioni", 3, 3, 0],
+  ["Raccogliere le risposte degli invitati", 4, 2, 0], ["Saldi dei fornitori principali", 4, 1, 0], ["Confermare orari con tutti i fornitori", 4, 0, 14],
+  ["Ultima conferma dei numeri al catering", 5, 0, 7], ["Condividere la scaletta con fornitori e testimoni", 5, 0, 5]];
+const PHASE_TEXT = [
+  "Prima le decisioni che bloccano tutte le altre: la data, il rito, quanto spendere e dove. La location fissa quante persone potete invitare, per questo la prima lista degli invitati si fa insieme a lei.",
+  "Con data e location fissate si scelgono i fornitori che seguono un solo matrimonio al giorno: fotografo, catering, musica. Chiedete più preventivi e confrontateli voce per voce. Il rito, in comune o in parrocchia, si prenota adesso.",
+  "I save the date a chi deve organizzarsi per tempo, gli abiti con le loro prove, fiori e allestimenti. Partecipazioni e bomboniere si ordinano ora, per averle pronte quando servono.",
+  "Le partecipazioni partono, il menù si definisce con il catering e si preparano i documenti per le pubblicazioni. Le pubblicazioni valgono 180 giorni: anticiparle troppo vuol dire doverle rifare.",
+  "Si raccolgono le risposte degli invitati, si saldano i fornitori principali e si confermano gli orari. Le date dei saldi le fissano i contratti: controllatele, il calendario è un'indicazione.",
+  "I numeri finali al catering e la scaletta della giornata condivisa con fornitori e testimoni, così il giorno del sì nessuno deve chiedervi niente."];
+const ago = (m, d) => m ? (m === 1 ? "1 mese prima" : `${m} mesi prima`) : d % 7 === 0 ? (d === 7 ? "1 settimana prima" : `${d / 7} settimane prima`) : `${d} giorni prima`;
+const FAQ_SCAD = [
+  ["Quanto tempo prima si organizza un matrimonio?", "Questo calendario parte 14 mesi prima, con la data e il rito. Si può fare in meno tempo: le prime decisioni (data, budget, location) restano le stesse e le altre si avvicinano. Se la vostra data è vicina, il calcolatore segna come «da recuperare» le attività già superate."],
+  ["Quando si mandano le partecipazioni?", "Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Ordinatele un paio di mesi prima di spedirle."],
+  ["Quando si prenota la location?", "Dodici mesi prima, subito dopo aver fissato data e budget. È la scelta che decide il numero di invitati e molti dei fornitori, quindi conviene farla per prima."],
+  ["Quando servono i documenti per le pubblicazioni?", "Tre mesi prima. Le pubblicazioni di matrimonio valgono 180 giorni: se il matrimonio non si celebra entro quel termine vanno rifatte. Per le date precise chiedete al comune o alla parrocchia."],
+  ["Quando si saldano i fornitori?", "Nel calendario i saldi principali cadono un mese prima e la conferma dei numeri al catering una settimana prima. Valgono le date scritte nei contratti: se sono diverse, seguite quelle."],
+  ["Le scadenze valgono per tutti i matrimoni?", "Sono un punto di partenza, non una regola. Nello spazio gratuito di Nozze in Ordine le stesse attività si spuntano, si spostano e si aggiungono, e se cambia la data si ricalcolano da sole."]];
+const SCAD = "scadenze-matrimonio.html";
+LD[SCAD] = [{ "@context": "https://schema.org", "@graph": [
+  { "@type": "WebApplication", name: "Calcolatore delle scadenze del matrimonio", url: SITE + "/scadenze-matrimonio", applicationCategory: "LifestyleApplication", operatingSystem: "Web", inLanguage: "it-IT", isAccessibleForFree: true,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" }, publisher: ORG },
+  { "@type": "FAQPage", mainEntity: FAQ_SCAD.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }] }];
+write(SCAD, head("Scadenze del matrimonio: cosa fare mese per mese, sulla vostra data", "Inserite la data del matrimonio e vedete il giorno esatto delle 20 scadenze principali: location, fornitori, partecipazioni, documenti e saldi. Gratis, senza registrazione.", { extra: `<style>
+#calcolo { padding-top: calc(var(--nav) + var(--s-8)); }
+#calcolo h1 { margin: 0; }
+.calc { display: grid; gap: var(--s-4); align-content: start; }
+.calc, .calc input { min-width: 0; width: 100%; }
+.calc input { min-height: 48px; padding: 0 var(--s-4); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--g-main, #fff); font: 400 16px/1.4 var(--font-text); color: inherit; }
+.count { display: flex; gap: var(--s-5); align-items: baseline; font: 400 var(--t-stat)/1 var(--font-display); }
+.count span { font: 400 var(--t-small)/1.4 var(--font-text); color: var(--muted); }
+.rows .rows__value small { display: block; color: var(--muted); font-size: var(--t-small); }
+.rows li.now .rows__name { color: var(--accent); }
+.rows li.late .rows__value small { color: var(--action); }
+.phase { display: grid; gap: var(--s-4); padding-block: var(--s-7) 0; }
+.phase:first-child { padding-top: 0; }
+.phase h3 { font: 400 var(--t-h3)/1.25 var(--font-display); margin: 0; }
+.phase > p { max-width: 64ch; margin: 0; }
+</style>` }) + top("") + `
+<main id="top">
+  <section class="section" id="calcolo" aria-labelledby="hero-h">
+    <div class="wrap">
+      <div class="grid grid--top" data-scad>
+        <div class="span-5 stack-6">
+          <h1 id="hero-h">Le scadenze del matrimonio, sulla vostra data</h1>
+          <p class="t-lead">Scrivete il giorno del sì: vedete quanto manca, in che fase siete e la data esatta di ogni cosa da fare. Gratis, senza registrazione.</p>
+          <div class="calc">
+            <label class="t-label" for="data-si">La data del matrimonio</label>
+            <input type="date" id="data-si">
+            <p class="count"><b data-weeks>–</b><span>settimane</span><b data-days>–</b><span>giorni</span></p>
+            <p class="t-small muted" id="cd-msg" role="status"></p>
+          </div>
+        </div>
+        <div class="span-6 start-7"><ul class="rows">${PHASES.map(([t, d], i) => `<li data-phase="${i}"><span class="rows__name">${t}<small>${d}</small></span><span class="rows__value"><small>–</small></span></li>`).join("")}</ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="elenco" aria-labelledby="elenco-h">
+    <div class="wrap">
+      <div class="section-head"><h2 id="elenco-h">Cosa fare, fase per fase</h2><p>Venti attività, dalla data al giorno del sì. Con la data inserita, accanto a ognuna compare il giorno entro cui farla.</p></div>
+      <div class="grid grid--top"><div class="span-8">${PHASES.map(([t], i) => `
+        <div class="phase"><h3>${t}</h3><p>${PHASE_TEXT[i]}</p>
+          <ul class="rows">${TASKS.filter((x) => x[1] === i).map(([n, , m, d]) => `<li data-m="${m}" data-d="${d}"><span class="rows__name">${n}</span><span class="rows__value"><b data-when>${ago(m, d)}</b><small data-state></small></span></li>`).join("")}</ul>
+        </div>`).join("")}
+      </div></div>
+    </div>
+  </section>
+
+  <section class="section" id="domande" aria-labelledby="domande-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-4 stack-6">
+          <h2 id="domande-h">Domande sulle scadenze</h2>
+          <p><a class="link" href="/coppie">Come funziona lo spazio per le coppie</a></p>
+          <div class="frame frame--photo">${pic("scadenze", { sizes: "(min-width: 1024px) 30vw, 100vw" })}</div>
+        </div>
+        <div class="span-7 start-6">${faqList(FAQ_SCAD)}</div>
+      </div>
+    </div>
+  </section>
+</main>` + foot(closeType("Le vostre scadenze, nel vostro spazio", "Con l'account gratuito le stesse attività si spuntano e si spostano, e si ricalcolano se cambia la data.")) + `<script src="/scadenze.js" defer></script>`);
 
 /* =========================================================== PLANNER */
 write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale dei matrimoni", `Il gestionale per wedding planner: tutti i matrimoni in un unico spazio, con acconti, scadenze e portale per gli sposi. Da ${PREZZI.planner} € al mese.`.replace("€ €", "€")) + top("planner") + `
