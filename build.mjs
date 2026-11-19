@@ -789,7 +789,7 @@ guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", published: "202
     ["Meglio un foglio Excel o un'app per il budget?", "Un foglio va bene finché lo tiene una persona sola. Quando il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file, calcola da sola quanto resta da pagare e ricorda le date di acconti e saldi."],
     ["Come si gestiscono acconti e saldi?", "Segnate per ogni fornitore importo e data dell'acconto e data del saldo, come scritto nel contratto. Mettete le date in fila per vedere in quali mesi si concentrano le uscite."]] });
 
-guide({ slug: "disposizione-tavoli-matrimonio", cat: "Invitati e tavoli", img: "invitati", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+guide({ slug: "disposizione-tavoli-matrimonio", cat: "Invitati e tavoli", img: "invitati", published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
   title: "Disposizione dei tavoli al matrimonio: come farla, passo per passo",
   desc: "Quando fare la disposizione dei tavoli del matrimonio, come dividere gli invitati, tavoli rotondi, rettangolari e imperiali, il tavolo degli sposi e il tableau.",
   h1: "Come fare la disposizione dei tavoli al matrimonio",
