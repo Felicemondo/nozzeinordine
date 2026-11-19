@@ -679,7 +679,7 @@ guide({ slug: "quando-si-danno-le-partecipazioni", cat: "Tempi e scadenze", img:
     ["Chi riceve il save the date va invitato?", "Sì. Il save the date è una promessa di invito: mandatelo solo a chi riceverà di sicuro la partecipazione."],
     ["Quanto prima chiedere la risposta?", "Uno o due mesi prima del matrimonio. Controllate entro quando il catering vuole il numero definitivo e lasciatevi qualche settimana per sollecitare chi non ha risposto."]] });
 
-guide({ slug: "documenti-matrimonio", cat: "Documenti", img: "coord", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+guide({ slug: "documenti-matrimonio", cat: "Documenti", img: "coord", published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
   title: "Documenti per il matrimonio civile e in chiesa: cosa serve e quando",
   desc: "Pubblicazioni in comune, documenti per la parrocchia, testimoni e casi particolari. Cosa preparare per il matrimonio civile e per quello in chiesa, e con quanto anticipo.",
   h1: "Quali documenti servono per sposarsi?",
