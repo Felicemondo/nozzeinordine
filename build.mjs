@@ -604,12 +604,13 @@ const guideCss = `<style>
 .article table { width: 100%; border-collapse: collapse; }
 .article :is(th, td) { text-align: left; vertical-align: top; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: 1px solid var(--line); }
 .article th { font-weight: 500; }
-.article td:nth-child(2) { white-space: nowrap; }
+.article table:has(th:nth-child(3)) td:nth-child(2) { white-space: nowrap; }
+.article td:first-child { min-width: 11ch; }
 .tool { display: grid; gap: var(--s-3); padding: var(--s-6); border-radius: var(--r-lg); background: var(--surface, #fff); border: 1px solid var(--line); margin-top: var(--s-6); }
 .tool h2 { margin: 0; }
 .tool p { margin: 0; }
 .related { display: grid; gap: var(--s-2); margin-top: var(--s-6); }
-@media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article td:nth-child(2) { white-space: normal; } }
+@media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article table:has(th:nth-child(3)) td:nth-child(2) { white-space: normal; } }
 </style>`;
 const GUIDES = [];
 const guide = ({ slug, cat, img, draft = false, title, desc, h1, answer, updated, updatedIso, published, body, faq, tool }) => {
@@ -625,7 +626,7 @@ const guide = ({ slug, cat, img, draft = false, title, desc, h1, answer, updated
 <p class="t-small muted">Aggiornata il ${updated}</p>
 <div class="answer"><p class="t-label">In breve</p>${answer}</div>
 ${body}
-<div class="tool"><h2>${tool.h}</h2><p>${tool.p}</p><p><a class="btn btn--primary" href="${tool.href}">${tool.btn}${ARROW}</a></p></div>
+<div class="tool"><h2>${tool.h}</h2><p>${tool.p}</p><p><a class="btn btn--primary" href="${tool.href}"${tool.download ? " download" : ""}>${tool.btn}${ARROW}</a></p>${tool.after || ""}</div>
 <h2>Domande frequenti</h2>
 ${faqList(faq)}
 </article></div></main>` + foot(closeType("Organizzate il matrimonio in un unico spazio", "Scadenze, invitati e risposte nello stesso posto. Il piano gratuito non scade e non serve la carta di credito.")));
@@ -733,6 +734,56 @@ guide({ slug: "documenti-matrimonio", cat: "Documenti", img: "coord", published:
     ["Si possono fare le pubblicazioni in un comune diverso da quello di residenza?", "No: si fanno nel comune di residenza di uno dei due, o di entrambi. Ci si può però sposare in un altro comune, che riceve la richiesta di celebrazione dal vostro."],
     ["Quanti testimoni servono per sposarsi?", "Due, maggiorenni e con un documento di identità, sia per il matrimonio civile sia per quello in chiesa."],
     ["Il certificato di battesimo scade?", "Per il matrimonio molte diocesi chiedono un certificato recente, rilasciato da pochi mesi. Chiedete al vostro parroco la validità richiesta prima di farlo emettere."]] });
+
+guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+  title: "Budget del matrimonio: come farlo, voce per voce (con modello Excel gratuito)",
+  desc: "Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi. Con un modello Excel gratuito da scaricare.",
+  h1: "Come fare il budget del matrimonio",
+  answer: `<p>Partite da <strong>quanto potete spendere in tutto</strong>, non da una media. Poi fissate il <strong>numero degli invitati</strong>, che muove tutte le voci pagate a persona, e dividete il totale tra le voci di spesa. Per ogni voce segnate la cifra prevista, il preventivo scelto, gli acconti e le date dei saldi: così vedete sempre quanto avete pagato e quanto manca.</p>`,
+  body: `
+<h2>1. Il totale, prima di tutto</h2>
+<p>Il budget parte da una cifra sola: quanto potete spendere senza indebitarvi o rinunciare ad altro. Decidetela insieme, e se le famiglie contribuiscono chiarite subito quanto e per cosa. Una cifra fissata all'inizio rende più semplici tutte le scelte dopo, perché ogni preventivo si confronta con quella.</p>
+<p>Del costo «medio» di un matrimonio è meglio non fidarsi troppo: cambia moltissimo con la zona, la stagione, il giorno della settimana e il numero di invitati. Conta quello che potete spendere voi.</p>
+
+<h2>2. Gli invitati muovono i conti</h2>
+<p>Catering, bomboniere, torta e spesso le partecipazioni si pagano a persona: ogni invitato in più fa crescere più voci insieme. Per questo una prima lista degli invitati, anche approssimativa, va fatta prima di chiedere i preventivi. Separate adulti e bambini, perché molti catering hanno un prezzo diverso per i menù dei più piccoli.</p>
+
+<h2>3. Le voci di spesa</h2>
+<p>Sono le stesse voci della dashboard di Nozze in Ordine e del modello qui sotto. Non tutte servono a tutti: togliete quelle che non vi riguardano.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Voce</th><th>Cosa comprende</th></tr></thead>
+<tbody>
+<tr><td>Location e ricevimento</td><td>Affitto della sala o della villa, servizi compresi, eventuali costi di allestimento della sala.</td></tr>
+<tr><td>Catering</td><td>Menù a persona, aperitivo, bevande, menù bambini e fornitori (fotografo, musicisti) se vanno sfamati.</td></tr>
+<tr><td>Fotografo e video</td><td>Servizio del giorno, eventuali foto prima del matrimonio, album e copie.</td></tr>
+<tr><td>Abiti e accessori</td><td>Abiti, modifiche, scarpe, accessori, trucco e capelli.</td></tr>
+<tr><td>Fiori e allestimenti</td><td>Bouquet, fiori per il rito e per i tavoli, decorazioni.</td></tr>
+<tr><td>Musica e intrattenimento</td><td>Musica per il rito e per la festa, animazione, eventuali diritti da pagare.</td></tr>
+<tr><td>Partecipazioni e stampa</td><td>Save the date, partecipazioni, buste, segnaposto, tableau, libretti.</td></tr>
+<tr><td>Bomboniere</td><td>Bomboniere, confetti, confezioni.</td></tr>
+<tr><td>Trasporti</td><td>Auto degli sposi, navette per gli invitati.</td></tr>
+<tr><td>Rito e documenti</td><td>Offerta alla parrocchia o tariffa del comune, marche da bollo, fedi. Vedi la <a href="/guide/documenti-matrimonio">guida ai documenti</a>.</td></tr>
+<tr><td>Viaggio di nozze</td><td>Viaggio, alloggi, assicurazione.</td></tr>
+<tr><td>Altre spese</td><td>Tutto il resto: regali ai testimoni, mance, imprevisti.</td></tr>
+</tbody></table></div>
+
+<h2>4. Previsto, preventivo, pagato</h2>
+<p>Per ogni voce tenete tre cifre. Il <strong>previsto</strong> è la parte del totale che decidete di darle all'inizio. Il <strong>preventivo scelto</strong> è quanto vi costa davvero il fornitore che avete scelto. Il <strong>già pagato</strong> è la somma di acconti e pagamenti fatti. La differenza tra preventivo e già pagato è quello che resta da pagare.</p>
+<p>Quando un preventivo supera il previsto, decidete subito da quale voce togliere la differenza. Se la rimandate, è facile sforare senza accorgersene.</p>
+
+<h2>5. Acconti e saldi, con le date</h2>
+<p>Quasi ogni fornitore chiede un acconto alla firma e il saldo vicino alla data o subito dopo. Segnate per ogni voce quanto è l'acconto, entro quando va pagato e la data del saldo, come scritto nel contratto. Mettendo in fila le date vedete in quali mesi si concentrano le uscite, e non vi trovate tre saldi nella stessa settimana.</p>
+
+<h2>6. Un margine per gli imprevisti</h2>
+<p>Qualcosa costerà più del previsto: un invitato in più, una modifica all'abito, un servizio dimenticato. Decidete all'inizio una quota del totale da tenere da parte e non assegnatela a nessuna voce. Se a fine matrimonio è avanzata, meglio.</p>`,
+  tool: { h: "Modello di budget gratuito", p: "Un foglio Excel con le 12 voci, le colonne previsto, preventivo, acconto, saldo e già pagato, e i totali che si calcolano da soli. Si apre anche con Google Fogli e Numbers. Nessuna cifra precompilata.", btn: "Scarica il modello Excel", href: "/download/budget-matrimonio.xlsx", download: true,
+    after: `<p class="t-small">Preferite non tenere un file? Nella dashboard gratuita il budget fa gli stessi conti, mostra i pagamenti mese per mese ed è condiviso con il partner. <a href="${SIGNUP}">Provatela</a>.</p>` },
+  faq: [
+    ["Quanto costa un matrimonio?", "Non c'è una cifra giusta: cambia con la zona, la stagione, il giorno, il numero di invitati e le vostre scelte. Partite da quanto potete spendere voi e dividetelo tra le voci, invece di inseguire una media."],
+    ["Qual è la voce che pesa di più?", "Di solito location e catering insieme, perché crescono con il numero degli invitati. Per questo la prima lista degli invitati va fatta prima di chiedere i preventivi."],
+    ["Quanto tenere da parte per gli imprevisti?", "Decidete una quota all'inizio e non assegnatela a nessuna voce. Più l'organizzazione è lunga e complessa, più conviene che sia ampia."],
+    ["Meglio un foglio Excel o un'app per il budget?", "Il foglio va bene se lo tiene una persona sola. Se il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file e ricorda le date dei pagamenti."],
+    ["Come si gestiscono acconti e saldi?", "Segnate per ogni fornitore importo e data dell'acconto e data del saldo, come scritto nel contratto. Mettete le date in fila per vedere in quali mesi si concentrano le uscite."]] });
 
 // Indice delle guide a card (scelta di Felice): etichetta, titolo, due righe, foto in fondo alla card; la card intera è il link
 const guideCard = ({ href, cat, h, p, media, span }) => `

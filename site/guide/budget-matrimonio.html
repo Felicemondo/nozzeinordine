@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="it" data-type="service" data-radius="soft" data-buttons="block" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Budget del matrimonio: come farlo, voce per voce (con modello Excel gratuito)</title>
+<meta name="description" content="Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi. Con un modello Excel gratuito da scaricare.">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Budget del matrimonio: come farlo, voce per voce (con modello Excel gratuito)">
+<meta property="og:description" content="Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi. Con un modello Excel gratuito da scaricare.">
+<meta property="og:image" content="https://nozzeinordine.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#f5f0e7">
+<meta name="site-kind" content="other">
+<meta name="page-type" content="service">
+<link rel="preload" href="/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/system.css">
+<link rel="stylesheet" href="/assets/ui/cards.css">
+<link rel="stylesheet" href="/assets/motion/motion.css">
+<link rel="stylesheet" href="/assets/layout/layout.css">
+
+<style>
+@font-face { font-family: "DM Serif Display"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/dm-sans-latin-600-normal.woff2") format("woff2"); }
+:root {
+  --p-bg: #f5f0e7; --p-surface: #ebe4d7; --p-ink: #2b2a24; --p-muted: #5a5650;
+  --p-accent: #a85339; --p-accent-ink: #f5f0e7; --p-action: #a85339; --p-action-ink: #f5f0e7;
+  --p-inv-bg: #2b2a24; --p-inv-surface: #37362f; --p-inv-ink: #f5f0e7; --p-inv-muted: #a8a49c;
+  --p-inv-accent: #f5f0e7; --p-inv-accent-ink: #2b2a24; --p-inv-action: #f5f0e7; --p-inv-action-ink: #2b2a24;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-text: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.012em;
+  --display-tracking-xl: -0.018em;
+}
+.nav__logo svg { width: 26px; height: 26px; fill: #702f43; flex: none; }
+.nav__logo { color: #702f43; }
+.nav__toggle { border: 0 !important; background: none !important; width: 44px; height: 44px; color: var(--p-ink); }
+.nav__toggle svg { width: 22px; height: 22px; }
+.app-shot { object-position: left top; }
+.steps-list { list-style: none; counter-reset: s; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-5); }
+.steps-list li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; column-gap: var(--s-4); row-gap: 4px; }
+.steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
+.steps-list b { font-weight: 500; font-size: 18px; }
+.steps-list span { color: var(--p-muted); }
+/* sezioni alte quanto il contenuto, con spazi misurati  */
+:root { --padt: 96px; --padb: 96px; }
+main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
+main > :is(section, .section):not(.hero) > .wrap { height: auto; }
+main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto; height: auto; }
+main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+footer.closing > .wrap { row-gap: var(--s-9); }
+main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
+@media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
+/* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti */
+@media (max-width: 639px) {
+  :root { --padt: 56px; --padb: 32px; }
+  main > :is(section, .section):not(.hero, .section--hero), footer.closing { min-height: 0 !important; }
+  main > :is(section, .section).g2 > .wrap, main > :is(section, .section).g2m > .wrap, footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-7); }
+  footer.closing > .wrap { row-gap: var(--s-8); }
+  main > :is(section, .section):not(.hero) > .wrap { height: auto; min-height: 0; }
+  main > :is(section, .section):not(.hero, .section--hero) { padding-bottom: var(--padb) !important; }
+  main > :is(section, .section):not(.hero) :is(.fill, .grid.fill, .frame--fill) { flex: 0 0 auto !important; height: auto !important; min-height: 0; }
+  .mo-pc__step { min-height: 0 !important; height: auto !important; padding-block: var(--s-2); }
+  .mo-pc__grid, .mo-pc__text, .mo-pc__steps { min-height: 0 !important; height: auto !important; }
+  .frame, .develop { height: auto !important; min-height: 0 !important; }
+  .frame--photo:has(> .frame__img), .develop { aspect-ratio: 4 / 3; }
+  .frame--photo:has(> .app-shot) { aspect-ratio: 1600 / 1074; }
+}
+/* un solo raggio per tutte le foto e le schermate quello delle card */
+.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel, .menu-card .panel { border-radius: var(--r-lg); overflow: hidden; }
+:is(.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel) img { border-radius: inherit; }
+.rows__name small { display: block; margin-top: var(--s-1); font: 400 var(--t-small)/1.5 var(--font-text); color: var(--muted); }
+.rows__value { text-align: right; }
+.panel:has(> .app-shot) { --p-h: 340px; }
+@media (max-width: 1279px) { .panel:has(> .app-shot) { --p-h: 280px; } }
+.develop { aspect-ratio: 1; }
+.frame--photo:has(> .frame__img) { aspect-ratio: 1; }
+#prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+@media (min-width: 640px) and (max-width: 1023px) { #prezzi .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) {
+  #prezzi .section-head p, #prezzi .rows > li:nth-child(n+3), #domande .faq__item:nth-child(n+3) { display: none; }
+  #prezzi .frame--photo, #domande .frame--photo { aspect-ratio: 3 / 2; }
+}
+#eventi .frame--photo { aspect-ratio: 1600 / 1074; }
+#portale .frame--photo, #planner .frame--photo:has(> .app-shot) { aspect-ratio: 1; }
+#spazio .panel:has(> .app-shot) { --p-h: 440px; }
+@media (max-width: 639px) { #spazio .panel:has(> .app-shot) { --p-h: 240px; } }
+.hero--split h1, .hero--photo h1 { font-size: clamp(36px, 4.2vw, 60px); hyphens: none; -webkit-hyphens: none; }
+#piani .frame--photo, #coppie .frame--photo, #domande .frame--photo { aspect-ratio: 4 / 3; }
+.card--plan { display: grid; grid-template-rows: auto auto auto 1fr auto; align-content: stretch; gap: var(--s-3); padding: var(--s-5) var(--s-6); }
+.card--plan .price { margin-block: var(--s-1); }
+.card--plan .price .t-stat { font-family: var(--font-display); }
+.card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
+.card--plan .checks li { font-size: 15px; line-height: 1.5; }
+.cards-foot { margin-top: var(--s-6); }
+/* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
+.pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
+@media (max-width: 1023px) { .pricing-pic { display: none; } }
+@media (max-width: 639px) { .section.is-pricing:has(.card--plan:nth-child(3)):not(#prezzi) { --hm: 2; } }
+#prezzi .card--plan > p.muted, #prezzi .card--plan .checks li:nth-child(n+4) { display: none; }
+@media (max-width: 639px) { #planner .stack-6 { padding-bottom: var(--s-6); } .hero--photo .hero__facts { display: none; } }
+
+@media (max-width: 639px) {
+  .card--plan { gap: var(--s-3); padding: var(--s-5); }
+  .section.is-pricing .section-head p { display: none; }
+  #prezzi .card--plan:nth-child(3) { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .card--plan.span-4 { grid-column: span 6; } .card--plan.span-4:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (max-width: 1023px) { #piani .frame--photo, #planner .frame--photo:has(> .app-shot), #portale .frame--photo { aspect-ratio: 3 / 2; } }
+@media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
+</style>
+<script src="/assets/boot.js"></script>
+<script src="/tracking.js"></script>
+<script src="/consent.js" defer></script>
+
+<style>
+.article { max-width: 68ch; display: grid; gap: var(--s-4); padding-block: calc(var(--nav) + var(--s-8)) var(--s-9); }
+.article h1 { font: 400 var(--t-h2)/1.1 var(--font-display); letter-spacing: var(--display-tracking); margin: 0; }
+.article h2 { font: 400 var(--t-h3)/1.25 var(--font-display); margin: var(--s-7) 0 0; }
+.article :is(p, li, td, th) { font-size: 16px; line-height: 1.7; }
+.article :is(ul, ol):not(.rows) { padding-left: 20px; display: grid; gap: var(--s-2); }
+.article ul:not(.rows) { list-style: disc; }
+.article ol { list-style: decimal; }
+.article ul.rows { padding-left: 0; }
+.article a:not(.btn) { color: var(--action); }
+.article .crumb { display: flex; gap: var(--s-2); font-size: var(--t-small); color: var(--muted); }
+.article .crumb a { color: inherit; }
+.answer { padding: var(--s-5) var(--s-6); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface, #fff); display: grid; gap: var(--s-2); }
+.answer p { margin: 0; }
+.table-wrap { overflow-x: auto; }
+.article table { width: 100%; border-collapse: collapse; }
+.article :is(th, td) { text-align: left; vertical-align: top; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: 1px solid var(--line); }
+.article th { font-weight: 500; }
+.article table:has(th:nth-child(3)) td:nth-child(2) { white-space: nowrap; }
+.article td:first-child { min-width: 11ch; }
+.tool { display: grid; gap: var(--s-3); padding: var(--s-6); border-radius: var(--r-lg); background: var(--surface, #fff); border: 1px solid var(--line); margin-top: var(--s-6); }
+.tool h2 { margin: 0; }
+.tool p { margin: 0; }
+.related { display: grid; gap: var(--s-2); margin-top: var(--s-6); }
+@media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article table:has(th:nth-child(3)) td:nth-child(2) { white-space: normal; } }
+</style>
+<link rel="canonical" href="https://nozzeinordine.com/guide/budget-matrimonio"><meta property="og:url" content="https://nozzeinordine.com/guide/budget-matrimonio"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="https://nozzeinordine.com/og.png"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","headline":"Come fare il budget del matrimonio","description":"Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi. Con un modello Excel gratuito da scaricare.","inLanguage":"it-IT","datePublished":"2026-11-19","dateModified":"2026-11-19","mainEntityOfPage":"https://nozzeinordine.com/guide/budget-matrimonio","author":{"@type":"Organization","@id":"https://nozzeinordine.com/#org","name":"Nozze in Ordine","url":"https://nozzeinordine.com/","logo":"https://nozzeinordine.com/apple-touch-icon.png","email":"info@nozzeinordine.com","areaServed":"IT"},"publisher":{"@type":"Organization","@id":"https://nozzeinordine.com/#org","name":"Nozze in Ordine","url":"https://nozzeinordine.com/","logo":"https://nozzeinordine.com/apple-touch-icon.png","email":"info@nozzeinordine.com","areaServed":"IT"},"image":"https://nozzeinordine.com/og.png"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quanto costa un matrimonio?","acceptedAnswer":{"@type":"Answer","text":"Non c'è una cifra giusta: cambia con la zona, la stagione, il giorno, il numero di invitati e le vostre scelte. Partite da quanto potete spendere voi e dividetelo tra le voci, invece di inseguire una media."}},{"@type":"Question","name":"Qual è la voce che pesa di più?","acceptedAnswer":{"@type":"Answer","text":"Di solito location e catering insieme, perché crescono con il numero degli invitati. Per questo la prima lista degli invitati va fatta prima di chiedere i preventivi."}},{"@type":"Question","name":"Quanto tenere da parte per gli imprevisti?","acceptedAnswer":{"@type":"Answer","text":"Decidete una quota all'inizio e non assegnatela a nessuna voce. Più l'organizzazione è lunga e complessa, più conviene che sia ampia."}},{"@type":"Question","name":"Meglio un foglio Excel o un'app per il budget?","acceptedAnswer":{"@type":"Answer","text":"Il foglio va bene se lo tiene una persona sola. Se il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file e ricorda le date dei pagamenti."}},{"@type":"Question","name":"Come si gestiscono acconti e saldi?","acceptedAnswer":{"@type":"Answer","text":"Segnate per ogni fornitore importo e data dell'acconto e data del saldo, come scritto nel contratto. Mettete le date in fila per vedere in quali mesi si concentrano le uscite."}}]}]}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nozze in Ordine","item":"https://nozzeinordine.com/"},{"@type":"ListItem","position":2,"name":"Guide","item":"https://nozzeinordine.com/guide"},{"@type":"ListItem","position":3,"name":"Come fare il budget del matrimonio","item":"https://nozzeinordine.com/guide/budget-matrimonio"}]}</script></head>
+<body>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Vai al contenuto</a>
+    <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+    <nav class="nav__links" aria-label="Principale">
+      <div class="nav__item"><a class="nav__link" href="/coppie">Coppie</a></div>
+      <div class="nav__item"><a class="nav__link" href="/planner">Planner</a></div>
+      <div class="nav__item"><a class="nav__link" href="/prezzi">Prezzi</a></div>
+      <div class="nav__item"><a class="nav__link" href="/guide" aria-current="page">Guide</a></div>
+      <div class="nav__item"><a class="nav__link" href="/chi-siamo">Chi siamo</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" href="/app/">Accedi</a>
+      <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main id="top"><div class="wrap"><article class="article">
+<nav class="crumb" aria-label="Percorso"><a href="/guide">Guide</a><span aria-hidden="true">›</span><span>Come fare il budget del matrimonio</span></nav>
+<h1>Come fare il budget del matrimonio</h1>
+<p class="t-small muted">Aggiornata il 19 novembre 2026</p>
+<div class="answer"><p class="t-label">In breve</p><p>Partite da <strong>quanto potete spendere in tutto</strong>, non da una media. Poi fissate il <strong>numero degli invitati</strong>, che muove tutte le voci pagate a persona, e dividete il totale tra le voci di spesa. Per ogni voce segnate la cifra prevista, il preventivo scelto, gli acconti e le date dei saldi: così vedete sempre quanto avete pagato e quanto manca.</p></div>
+
+<h2>1. Il totale, prima di tutto</h2>
+<p>Il budget parte da una cifra sola: quanto potete spendere senza indebitarvi o rinunciare ad altro. Decidetela insieme, e se le famiglie contribuiscono chiarite subito quanto e per cosa. Una cifra fissata all'inizio rende più semplici tutte le scelte dopo, perché ogni preventivo si confronta con quella.</p>
+<p>Del costo «medio» di un matrimonio è meglio non fidarsi troppo: cambia moltissimo con la zona, la stagione, il giorno della settimana e il numero di invitati. Conta quello che potete spendere voi.</p>
+
+<h2>2. Gli invitati muovono i conti</h2>
+<p>Catering, bomboniere, torta e spesso le partecipazioni si pagano a persona: ogni invitato in più fa crescere più voci insieme. Per questo una prima lista degli invitati, anche approssimativa, va fatta prima di chiedere i preventivi. Separate adulti e bambini, perché molti catering hanno un prezzo diverso per i menù dei più piccoli.</p>
+
+<h2>3. Le voci di spesa</h2>
+<p>Sono le stesse voci della dashboard di Nozze in Ordine e del modello qui sotto. Non tutte servono a tutti: togliete quelle che non vi riguardano.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Voce</th><th>Cosa comprende</th></tr></thead>
+<tbody>
+<tr><td>Location e ricevimento</td><td>Affitto della sala o della villa, servizi compresi, eventuali costi di allestimento della sala.</td></tr>
+<tr><td>Catering</td><td>Menù a persona, aperitivo, bevande, menù bambini e fornitori (fotografo, musicisti) se vanno sfamati.</td></tr>
+<tr><td>Fotografo e video</td><td>Servizio del giorno, eventuali foto prima del matrimonio, album e copie.</td></tr>
+<tr><td>Abiti e accessori</td><td>Abiti, modifiche, scarpe, accessori, trucco e capelli.</td></tr>
+<tr><td>Fiori e allestimenti</td><td>Bouquet, fiori per il rito e per i tavoli, decorazioni.</td></tr>
+<tr><td>Musica e intrattenimento</td><td>Musica per il rito e per la festa, animazione, eventuali diritti da pagare.</td></tr>
+<tr><td>Partecipazioni e stampa</td><td>Save the date, partecipazioni, buste, segnaposto, tableau, libretti.</td></tr>
+<tr><td>Bomboniere</td><td>Bomboniere, confetti, confezioni.</td></tr>
+<tr><td>Trasporti</td><td>Auto degli sposi, navette per gli invitati.</td></tr>
+<tr><td>Rito e documenti</td><td>Offerta alla parrocchia o tariffa del comune, marche da bollo, fedi. Vedi la <a href="/guide/documenti-matrimonio">guida ai documenti</a>.</td></tr>
+<tr><td>Viaggio di nozze</td><td>Viaggio, alloggi, assicurazione.</td></tr>
+<tr><td>Altre spese</td><td>Tutto il resto: regali ai testimoni, mance, imprevisti.</td></tr>
+</tbody></table></div>
+
+<h2>4. Previsto, preventivo, pagato</h2>
+<p>Per ogni voce tenete tre cifre. Il <strong>previsto</strong> è la parte del totale che decidete di darle all'inizio. Il <strong>preventivo scelto</strong> è quanto vi costa davvero il fornitore che avete scelto. Il <strong>già pagato</strong> è la somma di acconti e pagamenti fatti. La differenza tra preventivo e già pagato è quello che resta da pagare.</p>
+<p>Quando un preventivo supera il previsto, decidete subito da quale voce togliere la differenza. Se la rimandate, è facile sforare senza accorgersene.</p>
+
+<h2>5. Acconti e saldi, con le date</h2>
+<p>Quasi ogni fornitore chiede un acconto alla firma e il saldo vicino alla data o subito dopo. Segnate per ogni voce quanto è l'acconto, entro quando va pagato e la data del saldo, come scritto nel contratto. Mettendo in fila le date vedete in quali mesi si concentrano le uscite, e non vi trovate tre saldi nella stessa settimana.</p>
+
+<h2>6. Un margine per gli imprevisti</h2>
+<p>Qualcosa costerà più del previsto: un invitato in più, una modifica all'abito, un servizio dimenticato. Decidete all'inizio una quota del totale da tenere da parte e non assegnatela a nessuna voce. Se a fine matrimonio è avanzata, meglio.</p>
+<div class="tool"><h2>Modello di budget gratuito</h2><p>Un foglio Excel con le 12 voci, le colonne previsto, preventivo, acconto, saldo e già pagato, e i totali che si calcolano da soli. Si apre anche con Google Fogli e Numbers. Nessuna cifra precompilata.</p><p><a class="btn btn--primary" href="/download/budget-matrimonio.xlsx" download>Scarica il modello Excel<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a></p><p class="t-small">Preferite non tenere un file? Nella dashboard gratuita il budget fa gli stessi conti, mostra i pagamenti mese per mese ed è condiviso con il partner. <a href="/app/#/registrati">Provatela</a>.</p></div>
+<h2>Domande frequenti</h2>
+<div class="faq"><div class="faq__item"><h3>Quanto costa un matrimonio?</h3><p>Non c'è una cifra giusta: cambia con la zona, la stagione, il giorno, il numero di invitati e le vostre scelte. Partite da quanto potete spendere voi e dividetelo tra le voci, invece di inseguire una media.</p></div><div class="faq__item"><h3>Qual è la voce che pesa di più?</h3><p>Di solito location e catering insieme, perché crescono con il numero degli invitati. Per questo la prima lista degli invitati va fatta prima di chiedere i preventivi.</p></div><div class="faq__item"><h3>Quanto tenere da parte per gli imprevisti?</h3><p>Decidete una quota all'inizio e non assegnatela a nessuna voce. Più l'organizzazione è lunga e complessa, più conviene che sia ampia.</p></div><div class="faq__item"><h3>Meglio un foglio Excel o un'app per il budget?</h3><p>Il foglio va bene se lo tiene una persona sola. Se il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file e ricorda le date dei pagamenti.</p></div><div class="faq__item"><h3>Come si gestiscono acconti e saldi?</h3><p>Segnate per ogni fornitore importo e data dell'acconto e data del saldo, come scritto nel contratto. Mettete le date in fila per vedere in quali mesi si concentrano le uscite.</p></div></div>
+</article></div></main>
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Organizzate il matrimonio in un unico spazio</h2>
+        <p>Scadenze, invitati e risposte nello stesso posto. Il piano gratuito non scade e non serve la carta di credito.</p>
+      </div>
+      <a class="btn btn--primary btn--xl btn--wide" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0.00,0.00 L31.00,0.00 L31.00,10.02 A22,22 0 0 0 10.02,31.00 L0.00,31.00 Z"/><path d="M64.00,0.00 L33.00,0.00 L33.00,10.02 A22,22 0 0 1 53.98,31.00 L64.00,31.00 Z"/><path d="M0.00,64.00 L31.00,64.00 L31.00,53.98 A22,22 0 0 1 10.02,33.00 L0.00,33.00 Z"/><path d="M64.00,64.00 L33.00,64.00 L33.00,53.98 A22,22 0 0 0 53.98,33.00 L64.00,33.00 Z"/><path d="M20,32 A12,12 0 1 0 44,32 A12,12 0 1 0 20,32 Z"/></svg>Nozze in Ordine</a>
+          <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/guide">Guide</a></li><li><a href="/scadenze-matrimonio">Scadenze del matrimonio</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="/app/#/registrati">Crea un account</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li><li><a href="/cookie" data-cookie-prefs>Preferenze cookie</a></li><li><a href="/termini">Termini</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Nozze in Ordine</span>
+        <div class="socials"></div>
+        <a class="credits" href="/privacy#crediti">Fotografie via Unsplash</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<nav class="actionbar" aria-label="Azioni rapide">
+  <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis</a>
+</nav>
+<script type="module" src="/assets/system.js"></script>
+<script type="module" src="/assets/motion/motion.js"></script>
+<script type="module" src="/assets/layout/layout.js"></script>
+</body>
+</html>
