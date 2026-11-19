@@ -739,7 +739,7 @@ guide({ slug: "documenti-matrimonio", cat: "Documenti", img: "coord", published:
     ["Quanti testimoni servono per sposarsi?", "Due, maggiorenni e con un documento di identità, sia per il matrimonio civile sia per quello in chiesa."],
     ["Il certificato di battesimo scade?", "Per il matrimonio molte diocesi chiedono un certificato recente, rilasciato da pochi mesi. Chiedete al vostro parroco la validità richiesta prima di farlo emettere."]] });
 
-guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
   title: "Budget del matrimonio: come farlo, voce per voce",
   desc: "Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi con le date, e un margine per gli imprevisti.",
   h1: "Come fare il budget del matrimonio",
