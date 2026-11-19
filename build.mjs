@@ -125,7 +125,7 @@ const pageCss = `<style>
 .steps-list li::before { content: counter(s); grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 20px/1 var(--font-display); }
 .steps-list b { font-weight: 500; font-size: 18px; }
 .steps-list span { color: var(--p-muted); }
-/* sezioni alte quanto il contenuto, con spazi misurati (scelta di Felice: la schermata intera lasciava troppo vuoto) */
+/* sezioni alte quanto il contenuto, con spazi misurati  */
 :root { --padt: 96px; --padb: 96px; }
 main > :is(section, .section):not(.hero, [data-moment="pinned-chapters"]), footer.closing { height: auto !important; min-height: 0 !important; }
 main > :is(section, .section):not(.hero) > .wrap { height: auto; }
@@ -134,7 +134,7 @@ main > :is(section, .section).g2 > .wrap { grid-template-rows: auto auto; row-ga
 footer.closing > .wrap { row-gap: var(--s-9); }
 main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) * .75); }
 @media (max-width: 1023px) { :root { --padt: 72px; --padb: 64px; } }
-/* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti (scelta di Felice: la schermata intera per sezione lasciava troppo vuoto) */
+/* telefono: sezioni alte quanto il loro contenuto, con spazi più stretti */
 @media (max-width: 639px) {
   :root { --padt: 56px; --padb: 32px; }
   main > :is(section, .section):not(.hero, .section--hero), footer.closing { min-height: 0 !important; }
@@ -149,7 +149,7 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
   .frame--photo:has(> .frame__img), .develop { aspect-ratio: 4 / 3; }
   .frame--photo:has(> .app-shot) { aspect-ratio: 1600 / 1074; }
 }
-/* un solo raggio per tutte le foto e le schermate (scelta di Felice): quello delle card */
+/* un solo raggio per tutte le foto e le schermate quello delle card */
 .hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel, .menu-card .panel { border-radius: var(--r-lg); overflow: hidden; }
 :is(.hero__media, .frame, .develop, .mo-pc__visuals, .mo-pc__visual, .panel) img { border-radius: inherit; }
 .rows__name small { display: block; margin-top: var(--s-1); font: 400 var(--t-small)/1.5 var(--font-text); color: var(--muted); }
@@ -752,7 +752,7 @@ write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale d
       <div class="grid grid--top fill">
         <div class="span-5 stack-6">
           <h2 id="lavoro-h">Dall'incarico firmato al giorno del sì</h2>
-          <p>Nozze in Ordine non trova clienti e non organizza eventi: ti dà un posto ordinato in cui lavorare. Lo progetta in Campania Felice Mondo, UX/UI designer.</p>
+          <p>Nozze in Ordine non trova clienti e non organizza eventi: ti dà un posto ordinato in cui lavorare.</p>
         </div>
         <div class="frame frame--photo span-6 start-7">${pic("coord")}</div>
       </div>
@@ -811,7 +811,7 @@ const TITOLARE = { nome: "Felice Mondo", sede: "Marcianise (CE), Italia", piva: 
 const AGGIORNATO = "15 novembre 2026";
 const MAILTO = `<a href="mailto:${TITOLARE.email}">${TITOLARE.email}</a>`;
 /* =========================================================== CHI SIAMO */
-write("chi-siamo.html", head("Chi siamo: Nozze in Ordine, app per organizzare il matrimonio", "Nozze in Ordine è un'app per organizzare il matrimonio, progettata in Campania da Felice Mondo, UX/UI designer. Uno strumento, non un'agenzia: niente pubblicità e niente marketplace.") + top("chi-siamo") + `
+write("chi-siamo.html", head("Chi siamo: Nozze in Ordine, app per organizzare il matrimonio", "Nozze in Ordine è un'app per organizzare il matrimonio, progettata in Campania per coppie e wedding planner. Uno strumento, non un'agenzia: niente pubblicità e niente marketplace.") + top("chi-siamo") + `
 <main id="top">${heroPhoto({ k: "heroChi", pos: "0% 55%", posPhone: "30% 55%", calm: "right",
   h1: "Chi c'è dietro Nozze in Ordine",
   lead: "Un'app per organizzare il matrimonio, progettata in Campania per coppie e wedding planner di tutta Italia.",
