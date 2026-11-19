@@ -612,13 +612,13 @@ const guideCss = `<style>
 @media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article td:nth-child(2) { white-space: normal; } }
 </style>`;
 const GUIDES = [];
-const guide = ({ slug, cat, img, title, desc, h1, answer, updated, updatedIso, published, body, faq, tool }) => {
+const guide = ({ slug, cat, img, draft = false, title, desc, h1, answer, updated, updatedIso, published, body, faq, tool }) => {
   const name = `guide/${slug}.html`;
-  GUIDES.push({ slug, cat, img, h1, desc });
+  if (!draft) GUIDES.push({ slug, cat, img, h1, desc }); // le bozze sono online solo all'indirizzo diretto, noindex, fuori da indice, sitemap e llms.txt
   LD[name] = [{ "@context": "https://schema.org", "@graph": [
     { "@type": "Article", headline: h1, description: desc, inLanguage: "it-IT", datePublished: published, dateModified: updatedIso, mainEntityOfPage: SITE + "/guide/" + slug, author: ORG, publisher: ORG, image: SITE + "/og.png" },
     { "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }] }];
-  write(name, head(title, desc, { extra: guideCss, robots: GUIDE_ROBOTS }) + top("guide") + `
+  write(name, head(title, desc, { extra: guideCss, robots: draft ? "noindex, follow" : GUIDE_ROBOTS }) + top("guide") + `
 <main id="top"><div class="wrap"><article class="article">
 <nav class="crumb" aria-label="Percorso"><a href="/guide">Guide</a><span aria-hidden="true">›</span><span>${h1.replace(/\?$/, "")}</span></nav>
 <h1>${h1}</h1>
@@ -678,6 +678,61 @@ guide({ slug: "quando-si-danno-le-partecipazioni", cat: "Tempi e scadenze", img:
     ["Si possono mandare le partecipazioni su WhatsApp?", "Sì: conta che arrivino in tempo e che sia chiaro entro quando rispondere. Per i parenti che non usano il telefono, o per chi ci tiene, meglio anche la carta."],
     ["Chi riceve il save the date va invitato?", "Sì. Il save the date è una promessa di invito: mandatelo solo a chi riceverà di sicuro la partecipazione."],
     ["Quanto prima chiedere la risposta?", "Uno o due mesi prima del matrimonio. Controllate entro quando il catering vuole il numero definitivo e lasciatevi qualche settimana per sollecitare chi non ha risposto."]] });
+
+guide({ slug: "documenti-matrimonio", cat: "Documenti", img: "coord", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+  title: "Documenti per il matrimonio civile e in chiesa: cosa serve e quando",
+  desc: "Pubblicazioni in comune, documenti per la parrocchia, testimoni e casi particolari. Cosa preparare per il matrimonio civile e per quello in chiesa, e con quanto anticipo.",
+  h1: "Quali documenti servono per sposarsi?",
+  answer: `<p><strong>Matrimonio civile:</strong> si chiedono le pubblicazioni all'ufficio di stato civile del comune di residenza di uno dei due, con un documento di identità. Le pubblicazioni restano affisse 8 giorni; ci si può sposare dal 4° giorno successivo ed <strong>entro 180 giorni</strong>, altrimenti vanno rifatte.</p>
+<p><strong>Matrimonio in chiesa con effetti civili:</strong> in parrocchia servono il certificato di battesimo (e di cresima, se non è annotata), l'attestato del corso prematrimoniale e i documenti civili. Dopo il colloquio, il parroco vi consegna la richiesta di pubblicazioni da portare in comune.</p>`,
+  body: `
+<p>Le regole di fondo valgono in tutta Italia, ma moduli, appuntamenti e tempi di attesa cambiano da comune a comune e da diocesi a diocesi. Usate questa guida per sapere cosa chiedere, e fatevi confermare i dettagli dall'ufficio di stato civile e dalla parrocchia.</p>
+
+<h2>I passaggi, in una tabella</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Cosa</th><th>Quando</th><th>Dove</th></tr></thead>
+<tbody>
+<tr><td>Fissare la data della cerimonia</td><td>9–12 mesi prima</td><td>Comune (sala o luogo del rito) o parrocchia</td></tr>
+<tr><td>Iscriversi al corso prematrimoniale</td><td>Appena fissata la data</td><td>Parrocchia o diocesi: i corsi hanno un calendario fisso</td></tr>
+<tr><td>Raccogliere i documenti e fare il colloquio con il parroco</td><td>Circa 3 mesi prima</td><td>Parrocchia</td></tr>
+<tr><td>Chiedere le pubblicazioni</td><td>Entro 180 giorni dal matrimonio</td><td>Comune di residenza</td></tr>
+<tr><td>Affissione delle pubblicazioni</td><td>8 giorni</td><td>Albo del comune (di entrambi, se avete residenze diverse)</td></tr>
+<tr><td>Celebrazione</td><td>Dal 4° giorno dopo la fine delle pubblicazioni</td><td>Comune o chiesa</td></tr>
+</tbody></table></div>
+<p>Nel <a href="/scadenze-matrimonio">calendario delle scadenze</a> di Nozze in Ordine la prenotazione del rito cade 9 mesi prima e i documenti per le pubblicazioni 3 mesi prima: abbastanza presto per non rincorrere gli uffici, abbastanza tardi da restare nei 180 giorni.</p>
+
+<h2>Matrimonio civile</h2>
+<p>Si comincia dall'ufficio di stato civile del comune dove risiede almeno uno dei due. Di solito si prende un appuntamento e ci si presenta insieme con un documento di identità valido. Gran parte dei dati (nascita, residenza, cittadinanza, stato libero) il comune li controlla da sé; chiedete comunque all'ufficio cosa portare, perché alcuni chiedono moduli o marche da bollo.</p>
+<p>Dopo la richiesta, il comune affigge le pubblicazioni all'albo online per 8 giorni. Se abitate in comuni diversi, le pubblicazioni si fanno in entrambi. Da quel momento avete 180 giorni per sposarvi: se il termine passa, le pubblicazioni si considerano non avvenute e vanno rifatte (articolo 99 del Codice civile).</p>
+<p>Ci si può sposare anche in un comune diverso da quello di residenza: le pubblicazioni si fanno comunque dove abitate, poi il vostro comune chiede a quello scelto di celebrare il matrimonio. Prenotate per tempo la sala o il luogo, perché le date più richieste finiscono presto.</p>
+
+<h2>Matrimonio in chiesa (concordatario)</h2>
+<p>È il matrimonio religioso che vale anche per lo Stato. Il primo passo è parlare con il parroco della parrocchia di uno dei due, anche se vi sposate altrove: è lui che segue la pratica.</p>
+<ul>
+<li><strong>Certificato di battesimo</strong> per uso matrimonio, da chiedere alla parrocchia dove siete stati battezzati. Molte diocesi lo vogliono recente: chiedete la validità.</li>
+<li><strong>Certificato di cresima</strong>, solo se la cresima non risulta già annotata su quello di battesimo.</li>
+<li><strong>Attestato del corso prematrimoniale</strong>, rilasciato alla fine del corso.</li>
+<li><strong>Documenti civili</strong> richiesti dalla parrocchia, spesso un certificato contestuale di nascita, residenza, cittadinanza e stato libero.</li>
+</ul>
+<p>Con i documenti in regola si fa il colloquio con il parroco. Il parroco vi consegna la richiesta di pubblicazioni da portare in comune e, nello stesso periodo, fa le pubblicazioni canoniche in parrocchia. Finite quelle civili, il comune rilascia il certificato di avvenute pubblicazioni, che riportate al parroco.</p>
+<p>Se vi sposate in una chiesa diversa dalla vostra parrocchia, il parroco trasmette la pratica a quella della celebrazione: avvisatelo subito di dove vi sposate.</p>
+
+<h2>Testimoni</h2>
+<p>Servono due testimoni, sia per il matrimonio civile sia per quello in chiesa, maggiorenni e con un documento di identità valido. Comunicate i loro dati al comune o alla parrocchia nei tempi che vi indicano.</p>
+
+<h2>Casi particolari</h2>
+<ul>
+<li><strong>Uno dei due è straniero:</strong> di solito serve un nulla osta al matrimonio rilasciato dalle autorità del suo Paese, a volte tradotto e legalizzato. I tempi possono essere lunghi: muovetevi per primi su questo.</li>
+<li><strong>Matrimonio precedente:</strong> chi è divorziato o vedovo deve indicarlo; per il rito religioso la situazione va discussa con il parroco prima di fissare la data.</li>
+<li><strong>Residenza all'estero:</strong> le pubblicazioni passano dal consolato o dall'ultimo comune di residenza in Italia. Chiedete al consolato.</li>
+</ul>`,
+  tool: { h: "Le scadenze dei documenti sulla vostra data", p: "Inserite il giorno del sì: il calcolatore vi dice quando prenotare il rito, quando preparare i documenti e tutte le altre scadenze principali.", btn: "Calcola le scadenze", href: "/scadenze-matrimonio" },
+  faq: [
+    ["Quanto durano le pubblicazioni di matrimonio?", "Restano affisse all'albo del comune per 8 giorni. Dal quarto giorno dopo la fine ci si può sposare, ed entro 180 giorni: dopo vanno rifatte."],
+    ["Quanto tempo prima si fanno le pubblicazioni?", "Non più di 180 giorni prima del matrimonio. Molti comuni chiedono un appuntamento qualche settimana prima: chiedete i tempi all'ufficio di stato civile e partite con i documenti circa 3 mesi prima."],
+    ["Si possono fare le pubblicazioni in un comune diverso da quello di residenza?", "No: si fanno nel comune di residenza di uno dei due, o di entrambi. Ci si può però sposare in un altro comune, che riceve la richiesta di celebrazione dal vostro."],
+    ["Quanti testimoni servono per sposarsi?", "Due, maggiorenni e con un documento di identità, sia per il matrimonio civile sia per quello in chiesa."],
+    ["Il certificato di battesimo scade?", "Per il matrimonio molte diocesi chiedono un certificato recente, rilasciato da pochi mesi. Chiedete al vostro parroco la validità richiesta prima di farlo emettere."]] });
 
 // Indice delle guide a card (scelta di Felice): etichetta, titolo, due righe, foto in fondo alla card; la card intera è il link
 const guideCard = ({ href, cat, h, p, media, span }) => `
