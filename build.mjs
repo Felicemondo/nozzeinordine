@@ -611,6 +611,8 @@ const guideCss = `<style>
 .tool { display: grid; gap: var(--s-3); padding: var(--s-6); border-radius: var(--r-lg); background: var(--surface, #fff); border: 1px solid var(--line); margin-top: var(--s-6); }
 .tool h2 { margin: 0; }
 .tool p { margin: 0; }
+.tool-shot { margin-top: var(--s-3); aspect-ratio: 1600 / 1074; }
+.tool-shot img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
 .related { display: grid; gap: var(--s-2); margin-top: var(--s-6); }
 @media (max-width: 639px) { .answer, .tool { padding: var(--s-5); } .article table:has(th:nth-child(3)) td:nth-child(2) { white-space: normal; } }
 </style>`;
@@ -738,8 +740,8 @@ guide({ slug: "documenti-matrimonio", cat: "Documenti", img: "coord", published:
     ["Il certificato di battesimo scade?", "Per il matrimonio molte diocesi chiedono un certificato recente, rilasciato da pochi mesi. Chiedete al vostro parroco la validità richiesta prima di farlo emettere."]] });
 
 guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
-  title: "Budget del matrimonio: come farlo, voce per voce (con modello Excel gratuito)",
-  desc: "Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi. Con un modello Excel gratuito da scaricare.",
+  title: "Budget del matrimonio: come farlo, voce per voce",
+  desc: "Come impostare il budget del matrimonio: il totale, gli invitati, le 12 voci di spesa, acconti e saldi con le date, e un margine per gli imprevisti.",
   h1: "Come fare il budget del matrimonio",
   answer: `<p>Partite da <strong>quanto potete spendere in tutto</strong>, non da una media. Poi fissate il <strong>numero degli invitati</strong>, che muove tutte le voci pagate a persona, e dividete il totale tra le voci di spesa. Per ogni voce segnate la cifra prevista, il preventivo scelto, gli acconti e le date dei saldi: così vedete sempre quanto avete pagato e quanto manca.</p>`,
   body: `
@@ -751,7 +753,7 @@ guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", draft: true, pu
 <p>Catering, bomboniere, torta e spesso le partecipazioni si pagano a persona: ogni invitato in più fa crescere più voci insieme. Per questo una prima lista degli invitati, anche approssimativa, va fatta prima di chiedere i preventivi. Separate adulti e bambini, perché molti catering hanno un prezzo diverso per i menù dei più piccoli.</p>
 
 <h2>3. Le voci di spesa</h2>
-<p>Sono le stesse voci della dashboard di Nozze in Ordine e del modello qui sotto. Non tutte servono a tutti: togliete quelle che non vi riguardano.</p>
+<p>Sono le stesse voci che trovate già pronte nella dashboard di Nozze in Ordine. Non tutte servono a tutti: togliete quelle che non vi riguardano.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Voce</th><th>Cosa comprende</th></tr></thead>
 <tbody>
@@ -778,13 +780,13 @@ guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", draft: true, pu
 
 <h2>6. Un margine per gli imprevisti</h2>
 <p>Qualcosa costerà più del previsto: un invitato in più, una modifica all'abito, un servizio dimenticato. Decidete all'inizio una quota del totale da tenere da parte e non assegnatela a nessuna voce. Se a fine matrimonio è avanzata, meglio.</p>`,
-  tool: { h: "Modello di budget gratuito", p: "Un foglio Excel con le 12 voci, le colonne previsto, preventivo, acconto, saldo e già pagato, e i totali che si calcolano da soli. Si apre anche con Google Fogli e Numbers. Nessuna cifra precompilata.", btn: "Scarica il modello Excel", href: "/download/budget-matrimonio.xlsx", download: true,
-    after: `<p class="t-small">Preferite non tenere un file? Nella dashboard gratuita il budget fa gli stessi conti, mostra i pagamenti mese per mese ed è condiviso con il partner. <a href="${SIGNUP}">Provatela</a>.</p>` },
+  tool: { h: "Il budget, già impostato", p: "Nella dashboard gratuita le 12 voci sono pronte: per ognuna previsto, preventivo, acconto e saldo con le date, e quanto resta da pagare. I pagamenti si vedono mese per mese e il budget è condiviso con il partner.", btn: "Crea il budget gratis", href: SIGNUP,
+    after: `<div class="frame frame--photo tool-shot">${shot("budget")}</div>` },
   faq: [
     ["Quanto costa un matrimonio?", "Non c'è una cifra giusta: cambia con la zona, la stagione, il giorno, il numero di invitati e le vostre scelte. Partite da quanto potete spendere voi e dividetelo tra le voci, invece di inseguire una media."],
     ["Qual è la voce che pesa di più?", "Di solito location e catering insieme, perché crescono con il numero degli invitati. Per questo la prima lista degli invitati va fatta prima di chiedere i preventivi."],
     ["Quanto tenere da parte per gli imprevisti?", "Decidete una quota all'inizio e non assegnatela a nessuna voce. Più l'organizzazione è lunga e complessa, più conviene che sia ampia."],
-    ["Meglio un foglio Excel o un'app per il budget?", "Il foglio va bene se lo tiene una persona sola. Se il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file e ricorda le date dei pagamenti."],
+    ["Meglio un foglio Excel o un'app per il budget?", "Un foglio va bene finché lo tiene una persona sola. Quando il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file, calcola da sola quanto resta da pagare e ricorda le date di acconti e saldi."],
     ["Come si gestiscono acconti e saldi?", "Segnate per ogni fornitore importo e data dell'acconto e data del saldo, come scritto nel contratto. Mettete le date in fila per vedere in quali mesi si concentrano le uscite."]] });
 
 // Indice delle guide a card (scelta di Felice): etichetta, titolo, due righe, foto in fondo alla card; la card intera è il link
