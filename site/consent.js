@@ -46,9 +46,9 @@
 
   var css = ".nio-cc{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:560px;margin-left:auto;background:#fffdfa;color:#2b2a24;border:1px solid #d8cdbb;border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(43,42,36,.18);font:15px/1.5 'DM Sans',Arial,sans-serif}" +
     ".nio-cc h2{font:600 16px/1.3 'DM Sans',Arial,sans-serif;margin:0 0 6px}.nio-cc p{margin:0 0 12px;color:#5a5650;font-size:14px}.nio-cc a{color:#386070}" +
-    ".nio-cc .r{display:flex;flex-wrap:wrap;gap:8px}.nio-cc button{flex:1 1 140px;min-height:44px;padding:8px 14px;border-radius:2px;font:600 14px 'DM Sans',Arial,sans-serif;cursor:pointer;border:1px solid #a85339;background:#fffdfa;color:#a85339}" +
-    ".nio-cc button.p{background:#a85339;color:#fffdfa}.nio-cc button.l{flex:0 0 auto;border:0;background:none;color:#386070;text-decoration:underline;padding:8px 4px}" +
-    ".nio-cc label{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;font-size:14px}.nio-cc label input{margin-top:3px;width:18px;height:18px;accent-color:#a85339}.nio-cc label small{display:block;color:#5a5650}" +
+    ".nio-cc .r{display:flex;flex-wrap:wrap;gap:8px}.nio-cc button{flex:1 1 140px;min-height:44px;padding:8px 14px;border-radius:2px;font:600 14px 'DM Sans',Arial,sans-serif;cursor:pointer;border:1px solid #702f43;background:#fffdfa;color:#702f43}" +
+    ".nio-cc button.p{background:#702f43;color:#fffdfa}.nio-cc button.l{flex:0 0 auto;border:0;background:none;color:#386070;text-decoration:underline;padding:8px 4px}" +
+    ".nio-cc label{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;font-size:14px}.nio-cc label input{margin-top:3px;width:18px;height:18px;accent-color:#702f43}.nio-cc label small{display:block;color:#5a5650}" +
     "@media (max-width:640px){.nio-cc{left:8px;right:8px;bottom:8px;padding:14px}}";
 
   function banner(prefill) {

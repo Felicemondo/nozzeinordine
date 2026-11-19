@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const OUT = dirname(fileURLToPath(import.meta.url));
 
 // Colori da brand/tokens.css
-const C = { ground: "#F5F0E7", tile: "#FBF8F2", laid: "#EBE4D6", grout: "#DCD2BF", ink: "#25241F", muted: "#514C45", accent: "#702F43", action: "#A9533B", blu: "#5F8794", bluInk: "#386070", terra: "#B75F45", olive: "#465044" };
+const C = { ground: "#F5F0E7", tile: "#FBF8F2", laid: "#EBE4D6", grout: "#DCD2BF", ink: "#25241F", muted: "#514C45", accent: "#702F43", action: "#702F43", blu: "#5F8794", bluInk: "#386070", terra: "#B75F45", olive: "#465044" };
 const SANS = "Arial,Helvetica,sans-serif", SERIF = "Georgia,'Times New Roman',serif";
 const SITE = "https://nozzeinordine.com";
 
