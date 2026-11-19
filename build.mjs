@@ -789,6 +789,54 @@ guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", published: "202
     ["Meglio un foglio Excel o un'app per il budget?", "Un foglio va bene finché lo tiene una persona sola. Quando il budget è condiviso con il partner o con la wedding planner, un'app evita le versioni diverse dello stesso file, calcola da sola quanto resta da pagare e ricorda le date di acconti e saldi."],
     ["Come si gestiscono acconti e saldi?", "Segnate per ogni fornitore importo e data dell'acconto e data del saldo, come scritto nel contratto. Mettete le date in fila per vedere in quali mesi si concentrano le uscite."]] });
 
+guide({ slug: "disposizione-tavoli-matrimonio", cat: "Invitati e tavoli", img: "invitati", draft: true, published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+  title: "Disposizione dei tavoli al matrimonio: come farla, passo per passo",
+  desc: "Quando fare la disposizione dei tavoli del matrimonio, come dividere gli invitati, tavoli rotondi, rettangolari e imperiali, il tavolo degli sposi e il tableau.",
+  h1: "Come fare la disposizione dei tavoli al matrimonio",
+  answer: `<p>La disposizione dei tavoli si fa <strong>dopo la data limite per le risposte</strong>, quando sapete chi viene davvero. Partite dai <strong>gruppi</strong> (famiglie e amici di ciascuno), scegliete con la location <strong>forma e numero dei tavoli</strong>, sistemate prima il tavolo degli sposi e le famiglie, poi gli amici. Con menù e allergie segnati invitato per invitato, il catering sa cosa servire a ogni tavolo.</p>`,
+  body: `
+<h2>1. Quando farla</h2>
+<p>Una bozza si può iniziare presto, ma la disposizione vera si fa sulle risposte: chi ha detto di no libera un posto, chi non ha ancora risposto va sollecitato. Fissate sulla partecipazione una data limite per le risposte (ne parliamo nella <a href="/guide/quando-si-danno-le-partecipazioni">guida alle partecipazioni</a>) e chiedete alla location e al catering entro quando vogliono la disposizione definitiva.</p>
+<p>Tenetevi qualche giorno di margine: all'ultimo arrivano sempre un ritiro o un accompagnatore in più.</p>
+
+<h2>2. Dividete gli invitati in gruppi</h2>
+<p>Prima di pensare ai tavoli, mettete ogni invitato in un gruppo: famiglia della sposa, famiglia dello sposo, amici di ciascuno, amici comuni, colleghi. Tenete insieme i nuclei: una coppia o una famiglia con bambini siedono vicine. I gruppi diventano quasi da soli i primi tavoli.</p>
+
+<h2>3. Forma e numero dei tavoli</h2>
+<p>Quanti tavoli e di che forma ve lo dice la sala: chiedete alla location la pianta, quanti posti ha ogni tavolo e dove vanno pista, buffet e musica.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Tavolo</th><th>Quando sceglierlo</th></tr></thead>
+<tbody>
+<tr><td>Rotondo</td><td>Il più diffuso: tutti si vedono e si parla con l'intero tavolo. Si adatta bene a gruppi già formati.</td></tr>
+<tr><td>Rettangolare</td><td>Sfrutta meglio sale lunghe e strette; si parla soprattutto con chi sta di fronte e di fianco.</td></tr>
+<tr><td>Imperiale</td><td>Un unico tavolo lungo, o poche file, per un clima conviviale. Gli invitati si mescolano di più, ma conta molto chi siede accanto a chi.</td></tr>
+<tr><td>Tavolo degli sposi</td><td>Solo gli sposi, oppure con i testimoni. Di solito i posti stanno su un lato, rivolti verso la sala.</td></tr>
+</tbody></table></div>
+<p>Contate anche seggioloni e passeggini: occupano spazio vicino al tavolo.</p>
+
+<h2>4. Il tavolo degli sposi e le famiglie</h2>
+<p>Sistemate prima il tavolo degli sposi, in una posizione da cui si vede tutta la sala. Accanto o di fronte mettete i genitori e i parenti più stretti; nonni e anziani lontano dalle casse della musica e vicino all'uscita o ai servizi.</p>
+<p>Secondo il galateo più diffuso la sposa siede alla destra dello sposo. Se i genitori sono separati, o in famiglia ci sono tensioni, non c'è una regola: meglio due tavoli vicini che un tavolo scomodo per tutti.</p>
+
+<h2>5. Gli amici, i colleghi, i bambini</h2>
+<p>Per gli amici funziona chi si conosce già, con qualche persona di raccordo nei tavoli misti: chi viene da solo sta meglio accanto a qualcuno che conosce almeno di vista. I colleghi possono stare insieme.</p>
+<p>Per i bambini ci sono due strade: con i genitori, oppure a un tavolo dei bambini con animazione, se la location lo prevede. In entrambi i casi segnate chi ha il menù bambini.</p>
+
+<h2>6. Menù e allergie, tavolo per tavolo</h2>
+<p>Il catering deve sapere non solo quanti menù vegetariani o senza glutine servire, ma anche a quali tavoli. Segnate menù, intolleranze e allergie per ogni invitato, non per famiglia, e consegnate al catering l'elenco tavolo per tavolo.</p>
+
+<h2>7. Il tableau</h2>
+<p>Il tableau è il cartellone all'ingresso della sala con i tavoli e i nomi di chi ci siede. Si prepara per ultimo, sulla disposizione definitiva: ogni cambio dopo la stampa costa tempo e denaro. Ordinate i nomi in modo che ognuno si trovi in fretta, per tavolo o in ordine alfabetico.</p>`,
+  tool: { h: "La sala, in pianta", p: "Nella dashboard disegnate la sala con tavoli rotondi, rettangolari, imperiali e il tavolo degli sposi, e toccate un posto per scegliere chi ci siede. Gli invitati sono già divisi in gruppi con risposte, menù e allergie, e i posti di chi non ha ancora risposto restano provvisori. L'elenco invitati è nel piano gratuito; sala e tavoli sono nel piano Completo.", btn: "Iniziate gratis", href: SIGNUP,
+    after: `<div class="frame frame--photo tool-shot">${shot("sala")}</div>` },
+  faq: [
+    ["Quando si fa la disposizione dei tavoli del matrimonio?", "Dopo la data limite per le risposte, quando sapete chi viene. Chiedete alla location e al catering entro quando la vogliono definitiva e tenetevi qualche giorno di margine."],
+    ["Quante persone per tavolo al matrimonio?", "Dipende dai tavoli della location: chiedete la pianta e quanti posti ha ogni tavolo. Spesso i tavoli rotondi hanno da 8 a 12 posti, ma decide la sala."],
+    ["Chi siede al tavolo degli sposi?", "Gli sposi da soli oppure con i testimoni, a seconda di come preferite. Genitori e parenti stretti stanno di solito ai tavoli più vicini."],
+    ["Dove siede la sposa al tavolo degli sposi?", "Secondo il galateo più diffuso alla destra dello sposo. È un'usanza, non un obbligo."],
+    ["Cosa fare con chi non ha ancora risposto?", "Sollecitatelo prima di chiudere la disposizione. Intanto potete dargli un posto provvisorio, da liberare se non viene."],
+    ["Meglio tavoli rotondi o imperiali?", "I rotondi aiutano la conversazione in gruppi già formati; l'imperiale crea un clima più conviviale ma chiede più attenzione a chi siede accanto a chi. Decide anche la forma della sala."]] });
+
 // Indice delle guide a card (scelta di Felice): etichetta, titolo, due righe, foto in fondo alla card; la card intera è il link
 const guideCard = ({ href, cat, h, p, media, span }) => `
           <article class="card guide-card ${span}">
