@@ -225,7 +225,7 @@ ${extra}
 </head>
 <body>`;
 
-const NAV = [["coppie", "Coppie"], ["planner", "Planner"], ["prezzi", "Prezzi"], ["chi-siamo", "Chi siamo"]];
+const NAV = [["coppie", "Coppie"], ["planner", "Planner"], ["prezzi", "Prezzi"], ["guide", "Guide"], ["chi-siamo", "Chi siamo"]];
 const top = (cur) => `
 <header class="nav nav--centre">
   <div class="wrap nav__bar">
@@ -262,7 +262,7 @@ const foot = (close = closeType()) => `
           <a class="nav__logo" href="/">${MARK}Nozze in Ordine</a>
           <p class="footer__lede">Un'app per organizzare il matrimonio, per coppie e wedding planner, in tutta Italia.</p>
         </div>
-        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/scadenze-matrimonio">Scadenze del matrimonio</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Prodotto</h3><ul><li><a href="/coppie">Per le coppie</a></li><li><a href="/planner">Per le planner</a></li><li><a href="/prezzi">Prezzi</a></li><li><a href="/guide">Guide</a></li><li><a href="/scadenze-matrimonio">Scadenze del matrimonio</a></li><li><a href="/chi-siamo">Chi siamo</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Dashboard</h3><ul><li><a href="/app/">Accedi</a></li><li><a href="${SIGNUP}">Crea un account</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Regole</h3><ul><li><a href="/privacy">Privacy</a></li><li><a href="/cookie">Cookie</a></li>${TRK_ON ? `<li><a href="/cookie" data-cookie-prefs>Preferenze cookie</a></li>` : ""}<li><a href="/termini">Termini</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Contatti</h3><ul><li><a href="mailto:info@nozzeinordine.com">Scrivici</a></li></ul></div>
@@ -511,7 +511,7 @@ const PHASE_TEXT = [
 const ago = (m, d) => m ? (m === 1 ? "1 mese prima" : `${m} mesi prima`) : d % 7 === 0 ? (d === 7 ? "1 settimana prima" : `${d / 7} settimane prima`) : `${d} giorni prima`;
 const FAQ_SCAD = [
   ["Quanto tempo prima si organizza un matrimonio?", "Questo calendario parte 14 mesi prima, con la data e il rito. Si può fare in meno tempo: le prime decisioni (data, budget, location) restano le stesse e le altre si avvicinano. Se la vostra data è vicina, il calcolatore segna come «da recuperare» le attività già superate."],
-  ["Quando si mandano le partecipazioni?", "Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Il calendario fa ordinare le partecipazioni un mese prima di spedirle: chiedete alla tipografia quanto tempo le serve."],
+  ["Quando si mandano le partecipazioni?", "Nel calendario le partecipazioni partono 5 mesi prima e i save the date 8 mesi prima, utili soprattutto per chi viene da lontano. Il calendario fa ordinare le partecipazioni un mese prima di spedirle: chiedete alla tipografia quanto tempo le serve. Tempi ed eccezioni nella <a href='/guide/quando-si-danno-le-partecipazioni'>guida alle partecipazioni</a>."],
   ["Quando si prenota la location?", "Dodici mesi prima, subito dopo aver fissato data e budget. È la scelta che decide il numero di invitati e molti dei fornitori, quindi conviene farla per prima."],
   ["Quando servono i documenti per le pubblicazioni?", "Tre mesi prima. Le pubblicazioni di matrimonio valgono 180 giorni: se il matrimonio non si celebra entro quel termine vanno rifatte. Per le date precise chiedete al comune o alla parrocchia."],
   ["Quando si saldano i fornitori?", "Nel calendario i saldi principali cadono un mese prima e la conferma dei numeri al catering una settimana prima. Valgono le date scritte nei contratti: se sono diverse, seguite quelle."],
@@ -536,7 +536,7 @@ write(SCAD, head("Scadenze del matrimonio: cosa fare mese per mese, sulla vostra
 .phase:first-child { padding-top: 0; }
 .phase h3 { font: 400 var(--t-h3)/1.25 var(--font-display); margin: 0; }
 .phase > p { max-width: 64ch; margin: 0; }
-</style>` }) + top("") + `
+</style>` }) + top("guide") + `
 <main id="top">
   <section class="section" id="calcolo" aria-labelledby="hero-h">
     <div class="wrap">
@@ -584,7 +584,7 @@ write(SCAD, head("Scadenze del matrimonio: cosa fare mese per mese, sulla vostra
 /* =========================================================== GUIDE */
 // Ogni guida risponde a una ricerca reale e porta a una funzione dell'app. Felice le rivede prima che vadano su Google:
 // finché GUIDE_LIVE è false le pagine sono online ma noindex, fuori dalla sitemap e senza link dal resto del sito.
-const GUIDE_LIVE = false;
+const GUIDE_LIVE = true;
 const GUIDE_ROBOTS = GUIDE_LIVE ? "" : "noindex, follow";
 const guideCss = `<style>
 .article { max-width: 68ch; display: grid; gap: var(--s-4); padding-block: calc(var(--nav) + var(--s-8)) var(--s-9); }
@@ -618,7 +618,7 @@ const guide = ({ slug, cat, img, title, desc, h1, answer, updated, updatedIso, p
   LD[name] = [{ "@context": "https://schema.org", "@graph": [
     { "@type": "Article", headline: h1, description: desc, inLanguage: "it-IT", datePublished: published, dateModified: updatedIso, mainEntityOfPage: SITE + "/guide/" + slug, author: ORG, publisher: ORG, image: SITE + "/og.png" },
     { "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }] }];
-  write(name, head(title, desc, { extra: guideCss, robots: GUIDE_ROBOTS }) + top("") + `
+  write(name, head(title, desc, { extra: guideCss, robots: GUIDE_ROBOTS }) + top("guide") + `
 <main id="top"><div class="wrap"><article class="article">
 <nav class="crumb" aria-label="Percorso"><a href="/guide">Guide</a><span aria-hidden="true">›</span><span>${h1.replace(/\?$/, "")}</span></nav>
 <h1>${h1}</h1>
@@ -701,7 +701,7 @@ write("guide.html", head("Guide per organizzare il matrimonio | Nozze in Ordine"
 .guide-card__media img { display: block; width: 100%; aspect-ratio: 3 / 2; height: auto; object-fit: cover; border-radius: calc(var(--c-r) - 8px); }
 @media (max-width: 1023px) { .guide-card { grid-column: 1 / -1; } }
 @media (min-width: 640px) and (max-width: 1023px) { .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .guide-card { grid-column: auto; } }
-</style>` }) + top("") + `
+</style>` }) + top("guide") + `
 <main id="top">
   <section class="section" id="guide" aria-labelledby="hero-h">
     <div class="wrap">
@@ -989,5 +989,41 @@ legalPage({ file: "termini.html", title: "Termini di servizio | Nozze in Ordine"
 <p>Si applica la legge italiana. Se siete consumatori, è competente il giudice del luogo in cui risiedete o avete domicilio e potete rivolgervi a un organismo di risoluzione alternativa delle controversie. Se usate il servizio per la vostra attività professionale, è competente in via esclusiva il Foro di Santa Maria Capua Vetere.</p>
 <h2>14. Contatti</h2>
 <p>Per qualsiasi domanda su questi termini: ${MAILTO}.</p>` });
+
+/* =========================================================== SITEMAP E LLMS.TXT (generati: ogni guida entra da sola) */
+const PAGES = ["", "coppie", "planner", "prezzi", "guide", "scadenze-matrimonio", "chi-siamo", "privacy", "cookie", "termini"]
+  .concat(GUIDE_LIVE ? GUIDES.map((g) => "guide/" + g.slug) : []).filter((u) => GUIDE_LIVE || u !== "guide");
+writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${PAGES.map((u) => `  <url><loc>${SITE}/${u}</loc></url>`).join("\n")}
+</urlset>
+`);
+writeFileSync(join(OUT, "llms.txt"), `# Nozze in Ordine
+
+> App web per organizzare il matrimonio, per coppie e wedding planner in tutta Italia. Budget, fornitori e preventivi, invitati e risposte, tavoli, scadenze calcolate sulla data e scaletta del giorno, in uno spazio condiviso. È uno strumento, non un'agenzia: niente marketplace di fornitori e niente pubblicità.
+
+- Lingua: italiano
+- Progettata in Campania (Marcianise, Caserta)
+- Accesso da telefono e computer, senza installare nulla
+- Contatto: info@nozzeinordine.com
+
+## Pagine principali
+
+- [Per le coppie](${SITE}/coppie): budget, preventivi affiancati, invitati, tavoli e scadenze, condivisi con il partner e con la wedding planner.
+- [Per le wedding planner](${SITE}/planner): gestionale per seguire più matrimoni, con acconti e saldi, scadenze, collaboratori e un portale per gli sposi.
+- [Prezzi](${SITE}/prezzi): coppie gratis per iniziare (piano senza scadenza) o piano Completo a ${PREZZI.completo} una volta sola, IVA inclusa; wedding planner da ${PREZZI.planner} al mese + IVA, con ${PREZZI.prova} giorni di prova.
+- [Calcolatore delle scadenze del matrimonio](${SITE}/scadenze-matrimonio): strumento gratuito, senza registrazione. Dalla data del matrimonio calcola il giorno di 20 attività, dalla location ai saldi dei fornitori.
+- [Chi siamo](${SITE}/chi-siamo)
+${GUIDE_LIVE ? `
+## Guide
+
+- [Tutte le guide](${SITE}/guide)
+${GUIDES.map((g) => `- [${g.h1}](${SITE}/guide/${g.slug}): ${g.desc}`).join("\n")}
+` : ""}
+## Regole
+
+- [Privacy](${SITE}/privacy)
+- [Termini](${SITE}/termini)
+`);
 
 console.log("pagine scritte in", OUT);
