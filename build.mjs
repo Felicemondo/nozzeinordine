@@ -837,6 +837,45 @@ guide({ slug: "disposizione-tavoli-matrimonio", cat: "Invitati e tavoli", img: "
     ["Cosa fare con chi non ha ancora risposto?", "Sollecitatelo prima di chiudere la disposizione. Intanto potete dargli un posto provvisorio, da liberare se non viene."],
     ["Meglio tavoli rotondi o imperiali?", "I rotondi aiutano la conversazione in gruppi già formati; l'imperiale crea un clima più conviviale ma chiede più attenzione a chi siede accanto a chi. Decide anche la forma della sala."]] });
 
+// Checklist: le stesse 20 attività del calendario (TASKS), con un rimando alle guide dove serve
+const CHECK_LINKS = { "Definire il budget complessivo": "/guide/budget-matrimonio", "Inviare i save the date": "/guide/quando-si-danno-le-partecipazioni",
+  "Inviare le partecipazioni": "/guide/quando-si-danno-le-partecipazioni", "Documenti per le pubblicazioni": "/guide/documenti-matrimonio",
+  "Prenotare il rito in comune o in parrocchia": "/guide/documenti-matrimonio", "Raccogliere le risposte degli invitati": "/guide/disposizione-tavoli-matrimonio" };
+guide({ slug: "checklist-matrimonio", cat: "Tempi e scadenze", img: "bosco", published: "2026-11-19", updatedIso: "2026-11-19", updated: "19 novembre 2026",
+  title: "Checklist del matrimonio: tutte le cose da fare, fase per fase",
+  desc: "La lista delle cose da fare per organizzare il matrimonio, da 14 mesi prima alla settimana del sì: data, budget, location, fornitori, inviti, documenti, saldi e conferme.",
+  h1: "Checklist del matrimonio: cosa fare e quando",
+  answer: `<p>Si parte <strong>12–14 mesi prima</strong> con data, rito, budget, location e prima lista degli invitati. Tra 9 e 11 mesi si prenotano fotografo, catering, musica e il rito; tra 6 e 8 mesi save the date, abiti, fiori, partecipazioni e bomboniere. Negli ultimi 5 mesi partono gli inviti, si fanno menù e pubblicazioni, si raccolgono le risposte, si saldano i fornitori e si conferma tutto.</p>`,
+  body: `
+<p>Sono le 20 attività che Nozze in Ordine usa per costruire il calendario di ogni matrimonio, divise in sei fasi. I tempi sono un punto di partenza: se il matrimonio è più vicino, le prime decisioni restano le stesse e le altre si stringono. Per avere il giorno preciso di ognuna sulla vostra data usate il <a href="/scadenze-matrimonio">calcolatore delle scadenze</a>.</p>
+${PHASES.map(([when, what], i) => `
+<h2>${when}: ${what.toLowerCase()}</h2>
+<p>${PHASE_TEXT[i]}</p>
+<ul>${TASKS.filter((x) => x[1] === i).map(([n, , m, d]) => `<li>${CHECK_LINKS[n] ? `<a href="${CHECK_LINKS[n]}">${n}</a>` : n} <span class="muted">· ${ago(m, d)}</span></li>`).join("")}</ul>`).join("")}
+
+<h2>Le cose che si dimenticano più spesso</h2>
+<ul>
+<li>le fedi, da ordinare con il tempo per misure e incisioni;</li>
+<li>il corso prematrimoniale, se vi sposate in chiesa: i corsi hanno un calendario fisso;</li>
+<li>i dati dei testimoni per il comune o la parrocchia;</li>
+<li>la prova di trucco e capelli;</li>
+<li>la lista nozze o le indicazioni per il regalo;</li>
+<li>gli alloggi per chi viene da lontano;</li>
+<li>un piano in caso di pioggia, se rito o ricevimento sono all'aperto;</li>
+<li>i pasti per i fornitori che lavorano tutto il giorno, da concordare con il catering.</li>
+</ul>
+
+<h2>Civile o in chiesa: cosa cambia</h2>
+<p>La checklist è la stessa. Per il matrimonio in chiesa si aggiungono il corso prematrimoniale, i certificati di battesimo e cresima e il colloquio con il parroco; per entrambi servono le pubblicazioni in comune, che valgono 180 giorni. Tutti i passaggi sono nella <a href="/guide/documenti-matrimonio">guida ai documenti</a>.</p>`,
+  tool: { h: "La checklist, da spuntare", p: "Nella dashboard gratuita le 20 attività compaiono già sulla vostra data. Si spuntano, si spostano e se ne aggiungono altre, e se cambia la data si ricalcolano da sole. Il partner vede la stessa lista.", btn: "Create la vostra checklist", href: SIGNUP,
+    after: `<div class="frame frame--photo tool-shot">${shot("scadenze")}</div>` },
+  faq: [
+    ["Quanto tempo prima si inizia a organizzare un matrimonio?", "Il calendario di Nozze in Ordine parte 14 mesi prima, con la data e il rito. Si può fare in meno tempo: le prime decisioni (data, budget, location) restano le stesse e le altre si avvicinano."],
+    ["Qual è la prima cosa da fare?", "Fissare la data e il tipo di rito, poi il budget complessivo e la location. La location decide quanti invitati potete avere e da lì dipendono quasi tutte le altre scelte."],
+    ["Cosa fare nell'ultimo mese prima del matrimonio?", "Saldare i fornitori principali secondo i contratti, confermare gli orari con tutti, dare al catering i numeri definitivi e condividere la scaletta della giornata con fornitori e testimoni."],
+    ["La checklist cambia per il matrimonio civile?", "Poco: senza il rito religioso non servono corso prematrimoniale e certificati della parrocchia. Le pubblicazioni in comune servono in entrambi i casi."],
+    ["Come si tiene la checklist in due?", "Con una lista condivisa, in cui ognuno vede cosa è fatto e cosa manca. Nella dashboard di Nozze in Ordine la checklist è condivisa con il partner e, con il piano Completo, anche con la wedding planner."]] });
+
 // Indice delle guide a card (scelta di Felice): etichetta, titolo, due righe, foto in fondo alla card; la card intera è il link
 const guideCard = ({ href, cat, h, p, media, span }) => `
           <article class="card guide-card ${span}">
