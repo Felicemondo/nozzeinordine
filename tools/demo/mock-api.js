@@ -258,6 +258,8 @@
 
     requestPlan: async function () {},
     trackUnlock: async function () {},
+    myPlanRequests: async function () { return []; },
+    listPurchases: async function () { return []; },
     listUnlockClicks: async function () { return []; },
     listPlanRequests: async function () { return []; },
     setPlanRequestStatus: async function () {},
