@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nozze in Ordine per le coppie: il matrimonio in un unico spazio</title>
-<meta name="description" content="Budget, preventivi, invitati, tavoli e scadenze del matrimonio in un posto condiviso in due. Piano gratuito senza scadenza, Completo a 49 € una volta sola.">
+<meta name="description" content="Budget, preventivi, invitati, tavoli e scadenze del matrimonio in un posto condiviso in due. Piano gratuito senza scadenza, Pass Tableau a 19 €, Completo a 49 €.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Nozze in Ordine per le coppie: il matrimonio in un unico spazio">
-<meta property="og:description" content="Budget, preventivi, invitati, tavoli e scadenze del matrimonio in un posto condiviso in due. Piano gratuito senza scadenza, Completo a 49 € una volta sola.">
+<meta property="og:description" content="Budget, preventivi, invitati, tavoli e scadenze del matrimonio in un posto condiviso in due. Piano gratuito senza scadenza, Pass Tableau a 19 €, Completo a 49 €.">
 <meta property="og:image" content="https://nozzeinordine.com/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -100,6 +100,7 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
 .card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
 .card--plan .checks li { font-size: 15px; line-height: 1.5; }
 .cards-foot { margin-top: var(--s-6); }
+.upgrade-line { margin-top: var(--s-6); text-align: center; font-weight: 500; }
 /* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
 .pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
 @media (max-width: 1023px) { .pricing-pic { display: none; } }
@@ -156,10 +157,10 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
     <div class="wrap"><div class="hero-text">
       <div class="hero__text">
         <h1 id="hero-h">Il vostro matrimonio in un'app</h1>
-        <p class="hero__lead">Budget, preventivi, invitati, tavoli e scadenze in uno spazio condiviso. Gratis, o Completo a 49 € una volta sola.</p>
+        <p class="hero__lead">Budget, preventivi, invitati, tavoli e scadenze in uno spazio condiviso. Gratis, Pass Tableau a 19 € o Completo a 49 €, una volta sola.</p>
         <div class="btn-row"><a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="/prezzi">Vedi i prezzi</a></div>
       </div>
-      <dl class="hero__facts"><div><dt>Gratis</dt><dd>Senza scadenza</dd></div><div><dt>Completo</dt><dd>49 € una volta sola</dd></div><div><dt>Invitati</dt><dd>50 con il Gratis</dd></div><div><dt>Dove</dt><dd>In tutta Italia</dd></div></dl>
+      <dl class="hero__facts"><div><dt>Gratis</dt><dd>Senza scadenza</dd></div><div><dt>Pass Tableau</dt><dd>19 € una volta sola</dd></div><div><dt>Completo</dt><dd>49 € una volta sola</dd></div><div><dt>Invitati</dt><dd>50 con il Gratis</dd></div></dl>
     </div></div>
   </section>
 
@@ -197,30 +198,47 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
     </div>
   </section>
 
+  <section class="section" id="tableau" aria-labelledby="tableau-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="tableau-h">Il tableau, anche con 150 invitati</h2>
+          <p>Disegnate la sala con tavoli rotondi, rettangolari, imperiali e il tavolo degli sposi, poi toccate un posto per scegliere chi ci siede. Menù e allergie restano legati a ogni invitato.</p>
+          <p>Quando avete finito stampate il tableau per gli ospiti e la scheda per catering e location. Con il piano Gratis lo provate fino a 3 tavoli; con il Pass Tableau, 19 € una volta sola, non ci sono limiti.</p>
+          <p><a class="link" href="/tableau">Come funziona il tableau</a></p>
+        </div>
+        <div class="frame span-6 start-7"><img class="frame__img app-shot" src="/img/app-sala-l.avif" srcset="/img/app-sala-m.avif 800w, /img/app-sala-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1074" alt="La dashboard di Nozze in Ordine: invitati e tavoli, con i conteggi delle risposte e la sala in pianta." loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
+      <div class="section-head"><h2 id="piani-h">Gratis, Pass Tableau o Completo</h2><p>Si paga una volta sola, IVA inclusa, e vale per un matrimonio: i nomi degli sposi si fissano all'attivazione. <a class="link" href="/prezzi">Confronta i piani</a></p></div>
       <div class="grid grid--top">
-        <div class="span-4 stack-6">
-          <h2 id="piani-h">Gratis o Completo</h2>
-          <p>Il Completo costa 49 € una volta sola, IVA inclusa, e vale per un matrimonio: i nomi degli sposi si fissano all'attivazione.</p>
-          <p><a class="link" href="/prezzi">Confronta i piani</a></p>
-          <div class="frame frame--photo pricing-pic"><img class="frame__img" src="/img/fedi-libro-l.avif" srcset="/img/fedi-libro-m.avif 800w, /img/fedi-libro-l.avif 1440w" sizes="(min-width: 1024px) 30vw, 100vw" width="1440" height="960" alt="Due fedi d'oro appoggiate su un libro aperto." loading="lazy" decoding="async"></div>
-        </div>
-          <article class="card card--plan span-4 start-5">
+          <article class="card card--plan span-4">
             <h3>Gratis</h3>
             <p class="muted">Per iniziare a mettere ordine</p>
             <p class="price"><span class="t-stat">0 €</span><span class="muted">senza scadenza</span></p>
-            <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Condiviso con il partner</li></ul>
+            <ul class="checks"><li>Scadenze sulla data</li><li>Budget e pagamenti</li><li>50 invitati, 3 fornitori</li><li>Anteprima del tableau, fino a 3 tavoli</li><li>Condiviso con il partner</li></ul>
             <a class="btn btn--secondary" href="/app/#/registrati">Apri lo spazio gratuito</a>
           </article>
-          <article class="card card--plan span-4 start-9 is-featured">
+          <article class="card card--plan span-4">
+            <h3>Pass Tableau</h3>
+            <p class="muted">Per i tavoli, IVA inclusa</p>
+            <p class="price"><span class="t-stat">19 €</span><span class="muted">una volta sola</span></p>
+            <ul class="checks"><li>Invitati illimitati</li><li>Tavoli e sala in pianta senza limiti</li><li>Stampa del tableau per gli ospiti</li><li>Scheda per catering e location, con menù e allergie</li></ul>
+            <a class="btn btn--secondary" href="/app/#/registrati">Prova il tableau gratis</a>
+          </article>
+          <article class="card card--plan span-4 is-featured">
             <h3>Completo</h3>
             <p class="muted">Per un matrimonio, IVA inclusa</p>
             <p class="price"><span class="t-stat">49 €</span><span class="muted">una volta sola</span></p>
-            <ul class="checks"><li>Invitati e fornitori illimitati</li><li>Preventivi affiancati</li><li>Tavoli e sala in pianta</li><li>Programma del giorno</li></ul>
+            <ul class="checks"><li>Tutto il Pass Tableau</li><li>Fornitori illimitati</li><li>Preventivi affiancati</li><li>Programma del giorno</li><li>Dal Pass Tableau: 30 €</li></ul>
             <a class="btn btn--primary" href="/app/#/registrati">Inizia gratis<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           </article>
       </div>
+      <p class="upgrade-line">Avete già il Pass Tableau? Passate al Completo con 30 €.</p>
     </div>
   </section>
 

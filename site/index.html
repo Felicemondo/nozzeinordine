@@ -100,6 +100,7 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
 .card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
 .card--plan .checks li { font-size: 15px; line-height: 1.5; }
 .cards-foot { margin-top: var(--s-6); }
+.upgrade-line { margin-top: var(--s-6); text-align: center; font-weight: 500; }
 /* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
 .pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
 @media (max-width: 1023px) { .pricing-pic { display: none; } }
@@ -179,7 +180,7 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
       <div class="grid">
           <article class="card card--row card--open span-6">
             <h3>Mette ai tavoli gli invitati del matrimonio</h3>
-            <p>Gruppi, risposte e menù, poi la sala in pianta con un nome su ogni posto.</p>
+            <p>Gruppi, risposte e menù, poi la sala in pianta con un nome su ogni posto. <a class="link" href="/tableau">Il tableau</a></p>
             <div class="panel"><img class="frame__img app-shot" src="/img/app-sala-l.avif" srcset="/img/app-sala-m.avif 800w, /img/app-sala-l.avif 1600w" sizes="(min-width: 1024px) 50vw, 100vw" width="1600" height="1074" alt="La dashboard di Nozze in Ordine: invitati e tavoli, con i conteggi delle risposte e la sala in pianta." loading="lazy" decoding="async"></div>
           </article>
           <article class="card card--row card--open span-6">

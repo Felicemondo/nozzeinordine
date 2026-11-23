@@ -13,7 +13,7 @@ const crumbs = (name, slug) => ({ "@context": "https://schema.org", "@type": "Br
 const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
 const cleanLinks = (html) => html
   .replace(/href="index\.html(#[^"]*)?"/g, (m, a) => `href="/${a || ""}"`)
-  .replace(/href="(coppie|planner|prezzi|chi-siamo|scadenze-matrimonio|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
+  .replace(/href="(coppie|tableau|planner|prezzi|chi-siamo|scadenze-matrimonio|privacy|cookie|termini)\.html(#[^"]*)?"/g, (m, s, a) => `href="/${s}${a || ""}"`)
   .replace(/href="app\//g, 'href="/app/');
 const write = (name, html) => {
   const slug = name === "index.html" ? "" : name.replace(/\.html$/, ""), url = SITE + "/" + slug;
@@ -21,7 +21,7 @@ const write = (name, html) => {
   const title = h1.replace(/<[^>]+>/g, "").replace(/\.$/, "");
   const trail = slug.startsWith("guide/") ? { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Nozze in Ordine", item: SITE + "/" }, { "@type": "ListItem", position: 2, name: "Guide", item: SITE + "/guide" }, { "@type": "ListItem", position: 3, name: title, item: url }] } : crumbs(title, slug);
   const blocks = (LD[name] || []).concat(slug ? [trail] : []);
-  const seo = `<link rel="canonical" href="${url}"><meta property="og:url" content="${url}"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="${SITE}/og.png">${blocks.map(ld).join("")}`;
+  const seo = `<link rel="canonical" href="${url}"><meta property="og:url" content="${url}"><meta property="og:site_name" content="Nozze in Ordine"><meta property="og:locale" content="it_IT"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nozze in Ordine: organizzare il matrimonio in un unico spazio"><meta name="twitter:image" content="${SITE}/${(html.match(/property="og:image" content="https:\/\/nozzeinordine\.com\/([^"]+)"/) || [])[1] || "og.png"}">${blocks.map(ld).join("")}`;
   mkdirSync(dirname(join(OUT, name)), { recursive: true });
   writeFileSync(join(OUT, name), cleanLinks(html).replace("</head>", seo + "</head>"));
 };
@@ -178,6 +178,7 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
 .card--plan .checks { list-style: none; padding: 0; margin: var(--s-2) 0 var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
 .card--plan .checks li { font-size: 15px; line-height: 1.5; }
 .cards-foot { margin-top: var(--s-6); }
+.upgrade-line { margin-top: var(--s-6); text-align: center; font-weight: 500; }
 /* in home le card sono il riassunto: chi e il quarto punto stanno nella pagina prezzi */
 .pricing-pic { aspect-ratio: 4 / 3; margin-top: var(--s-4); }
 @media (max-width: 1023px) { .pricing-pic { display: none; } }
@@ -195,7 +196,7 @@ main > section:not(.hero) + section:not(.hero) { padding-top: calc(var(--padt) *
 @media (max-width: 639px) { .panel:has(> .app-shot) { --p-h: 220px; } }
 </style>`;
 
-const head = (title, desc, { moments = [], extra = "", robots = "" } = {}) => `<!doctype html>
+const head = (title, desc, { moments = [], extra = "", robots = "", og = "og.png" } = {}) => `<!doctype html>
 <html lang="it" data-type="service" data-radius="soft" data-buttons="block" data-motion>
 <head>
 <meta charset="utf-8">
@@ -205,7 +206,7 @@ const head = (title, desc, { moments = [], extra = "", robots = "" } = {}) => `<
 <meta property="og:type" content="website">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${desc}">
-<meta property="og:image" content="https://nozzeinordine.com/og.png">
+<meta property="og:image" content="https://nozzeinordine.com/${og}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -334,9 +335,11 @@ const planCard = ({ name, who, price, per = "", items, btn, href, featured = fal
           </article>`;
 const PLAN = {
   gratis: { name: "Gratis", who: "Per iniziare a mettere ordine", price: "0 €", per: "senza scadenza", btn: "Apri lo spazio gratuito", href: SIGNUP,
-    items: ["Scadenze sulla data", "Budget e pagamenti", "50 invitati, 3 fornitori", "Condiviso con il partner"] },
+    items: ["Scadenze sulla data", "Budget e pagamenti", "50 invitati, 3 fornitori", "Anteprima del tableau, fino a 3 tavoli", "Condiviso con il partner"] },
+  tableau: { name: "Pass Tableau", who: "Per i tavoli, IVA inclusa", price: "19 €", per: "una volta sola", btn: "Prova il tableau gratis", href: SIGNUP,
+    items: ["Invitati illimitati", "Tavoli e sala in pianta senza limiti", "Stampa del tableau per gli ospiti", "Scheda per catering e location, con menù e allergie"] },
   completo: { name: "Completo", who: "Per un matrimonio, IVA inclusa", price: "49 €", per: "una volta sola", btn: "Inizia gratis", href: SIGNUP, featured: true,
-    items: ["Invitati e fornitori illimitati", "Preventivi affiancati", "Tavoli e sala in pianta", "Programma del giorno"] },
+    items: ["Tutto il Pass Tableau", "Fornitori illimitati", "Preventivi affiancati", "Programma del giorno", "Dal Pass Tableau: 30 €"] },
   planner: { name: "Planner", who: "Per chi lavora in proprio", price: "29 €", per: "al mese + IVA", btn: "Prova Planner 7 giorni", href: SIGNUP,
     items: ["5 matrimoni attivi", "Portale per gli sposi", "Acconti e saldi per evento", "Note riservate"] },
   team: { name: "Team", who: "Per chi lavora con collaboratori", price: "59 €", per: "al mese + IVA", btn: "Prova Team 7 giorni", href: SIGNUP, featured: true,
@@ -348,13 +351,15 @@ const faqList = (items) => `<div class="faq">${items.map(([q, a]) => `<div class
 const rows = (items) => `<ul class="rows">${items.map(([n, s, v]) => `<li><span class="rows__name">${n}<small>${s}</small></span><span class="rows__value">${v}</span></li>`).join("")}</ul>`;
 
 /* =========================================================== PREZZI (dati) */
-const PREZZI = { completo: "49 €", planner: "29 €", team: "59 €", eventiPlanner: 5, eventiTeam: 15, collabTeam: 3, prova: 7 };
+const PREZZI = { tableau: "19 €", upgrade: "30 €", completo: "49 €", planner: "29 €", team: "59 €", eventiPlanner: 5, eventiTeam: 15, collabTeam: 3, prova: 7 };
 const faq = [["Devo inserire una carta di credito per iniziare?", "No. Vi registrate con email e password. Il piano gratuito per le coppie non scade, e la prova per le planner non chiede la carta."],
   ["Il piano Completo è un abbonamento?", `No. Sono ${PREZZI.completo} una volta sola, per tutto il matrimonio: un matrimonio si organizza una volta.`],
+  ["Il Pass Tableau è un abbonamento?", `No. Sono ${PREZZI.tableau} una volta sola, IVA inclusa, per il tableau di un matrimonio. Per le coppie non ci sono abbonamenti.`],
+  ["Posso passare al Completo dopo il Pass Tableau?", `Sì. Dallo stesso account passate al Completo pagando la differenza: ${PREZZI.upgrade}. I tavoli e gli invitati restano dove sono.`],
   ["Posso usare il piano Completo per più matrimoni?", "No. Il Completo vale per un solo matrimonio e i nomi degli sposi si fissano all'attivazione, senza poterli cambiare. Chi organizza matrimoni per lavoro trova i piani per le wedding planner."],
   ["Cosa conta come matrimonio attivo?", "Un matrimonio la cui data non è ancora passata. Quelli conclusi restano consultabili e non occupano posti nel piano."],
   [`Cosa succede alla fine dei ${PREZZI.prova} giorni di prova?`, "Scegli un piano oppure ti fermi. Non parte nessun addebito senza il tuo consenso."],
-  ["I prezzi comprendono l'IVA?", `Per le coppie sì: ${PREZZI.completo} è il prezzo finale. Per le wedding planner i canoni sono IVA esclusa.`],
+  ["I prezzi comprendono l'IVA?", `Per le coppie sì: ${PREZZI.tableau} e ${PREZZI.completo} sono prezzi finali. Per le wedding planner i canoni sono IVA esclusa.`],
   ["Come si paga?", "I pagamenti online non sono ancora attivi: in questa fase di lancio l'accesso è gratuito. Prima di attivarli vi scriviamo per email, e nessun piano a pagamento parte senza il vostro consenso."],
   ["Cosa succede ai miei dati?", `Li usiamo per farvi funzionare lo spazio e per rispondervi. Non li vendiamo e non li cediamo. I dettagli sono nella <a href="privacy.html">pagina privacy</a>.`]];
 const euro = (s) => s.replace(/[^0-9,]/g, "").replace(",", ".");
@@ -381,7 +386,7 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
         <div class="grid">${card("Tiene il budget voce per voce", "Previsto, pagato e da pagare per ogni fornitore, con la data del prossimo pagamento.", shot("budget"))}${card("Calcola le scadenze del matrimonio", "Inserite il giorno del sì e trovate le attività già ordinate, mese per mese.", shot("scadenze"))}
         </div>
       </div>
-      <div class="grid">${card("Mette ai tavoli gli invitati del matrimonio", "Gruppi, risposte e menù, poi la sala in pianta con un nome su ogni posto.", shot("sala"))}${card("Prepara il programma del matrimonio", "Orari e responsabili della giornata, da stampare per fornitori e famiglie.", shot("scaletta"))}
+      <div class="grid">${card("Mette ai tavoli gli invitati del matrimonio", 'Gruppi, risposte e menù, poi la sala in pianta con un nome su ogni posto. <a class="link" href="/tableau">Il tableau</a>', shot("sala"))}${card("Prepara il programma del matrimonio", "Orari e responsabili della giornata, da stampare per fornitori e famiglie.", shot("scaletta"))}
       </div>
     </div>
   </section>
@@ -430,7 +435,7 @@ write("index.html", head("Nozze in Ordine: l'app per organizzare il matrimonio",
 
 /* =========================================================== COPPIE */
 const PHASES = [["12+ mesi prima", "Data, budget e location"], ["9–11 mesi prima", "Fornitori principali e preventivi"], ["6–8 mesi prima", "Save the date e abiti"], ["3–5 mesi prima", "Dettagli, inviti e menù"], ["1–2 mesi prima", "Conferme finali e saldi"], ["Settimana del sì", "Scaletta e responsabili"]];
-write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un unico spazio", `Budget, preventivi, invitati, tavoli e scadenze del matrimonio in un posto condiviso in due. Piano gratuito senza scadenza, Completo a ${PREZZI.completo} una volta sola.`, { extra: `<style>
+write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un unico spazio", `Budget, preventivi, invitati, tavoli e scadenze del matrimonio in un posto condiviso in due. Piano gratuito senza scadenza, Pass Tableau a ${PREZZI.tableau}, Completo a ${PREZZI.completo}.`, { extra: `<style>
 #scadenze .calc { display: grid; gap: var(--s-4); align-content: start; }
 #scadenze .calc, #scadenze .calc input { min-width: 0; width: 100%; }
 #scadenze .calc input { min-height: 48px; padding: 0 var(--s-4); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--g-main, #fff); font: 400 16px/1.4 var(--font-text); color: inherit; }
@@ -440,9 +445,9 @@ write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un un
 </style>` }) + top("coppie") + `
 <main id="top">${heroPhoto({ k: "heroCoppie", pos: "62% 55%", posPhone: "72% 55%",
   h1: "Il vostro matrimonio in un'app",
-  lead: `Budget, preventivi, invitati, tavoli e scadenze in uno spazio condiviso. Gratis, o Completo a ${PREZZI.completo} una volta sola.`,
+  lead: `Budget, preventivi, invitati, tavoli e scadenze in uno spazio condiviso. Gratis, Pass Tableau a ${PREZZI.tableau} o Completo a ${PREZZI.completo}, una volta sola.`,
   a: primary(), b: secondary("Vedi i prezzi", "/prezzi"),
-  facts: [["Gratis", "Senza scadenza"], ["Completo", `${PREZZI.completo} una volta sola`], ["Invitati", "50 con il Gratis"], ["Dove", "In tutta Italia"]] })}
+  facts: [["Gratis", "Senza scadenza"], ["Pass Tableau", `${PREZZI.tableau} una volta sola`], ["Completo", `${PREZZI.completo} una volta sola`], ["Invitati", "50 con il Gratis"]] })}
 
   <section class="section" id="scadenze" aria-labelledby="scadenze-h">
     <div class="wrap">
@@ -468,16 +473,26 @@ write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un un
     </div>
   </section>
 
+  <section class="section" id="tableau" aria-labelledby="tableau-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h2 id="tableau-h">Il tableau, anche con 150 invitati</h2>
+          <p>Disegnate la sala con tavoli rotondi, rettangolari, imperiali e il tavolo degli sposi, poi toccate un posto per scegliere chi ci siede. Menù e allergie restano legati a ogni invitato.</p>
+          <p>Quando avete finito stampate il tableau per gli ospiti e la scheda per catering e location. Con il piano Gratis lo provate fino a 3 tavoli; con il Pass Tableau, ${PREZZI.tableau} una volta sola, non ci sono limiti.</p>
+          <p><a class="link" href="/tableau">Come funziona il tableau</a></p>
+        </div>
+        <div class="frame span-6 start-7">${shot("sala")}</div>
+      </div>
+    </div>
+  </section>
+
   <section class="section is-pricing" id="piani" aria-labelledby="piani-h">
     <div class="wrap">
-      <div class="grid grid--top">
-        <div class="span-4 stack-6">
-          <h2 id="piani-h">Gratis o Completo</h2>
-          <p>Il Completo costa 49 € una volta sola, IVA inclusa, e vale per un matrimonio: i nomi degli sposi si fissano all'attivazione.</p>
-          <p><a class="link" href="/prezzi">Confronta i piani</a></p>
-          <div class="frame frame--photo pricing-pic">${pic("scadenze", { sizes: "(min-width: 1024px) 30vw, 100vw" })}</div>
-        </div>${planCard({ ...PLAN.gratis, span: "span-4 start-5" })}${planCard({ ...PLAN.completo, span: "span-4 start-9" })}
+      <div class="section-head"><h2 id="piani-h">Gratis, Pass Tableau o Completo</h2><p>Si paga una volta sola, IVA inclusa, e vale per un matrimonio: i nomi degli sposi si fissano all'attivazione. <a class="link" href="/prezzi">Confronta i piani</a></p></div>
+      <div class="grid grid--top">${planCard(PLAN.gratis)}${planCard(PLAN.tableau)}${planCard(PLAN.completo)}
       </div>
+      <p class="upgrade-line">Avete già il Pass Tableau? Passate al Completo con ${PREZZI.upgrade}.</p>
     </div>
   </section>
 
@@ -494,6 +509,110 @@ write("coppie.html", head("Nozze in Ordine per le coppie: il matrimonio in un un
     </div>
   </section>
 </main>` + foot() + `<script src="/calc.js" defer></script>`);
+
+
+/* =========================================================== TABLEAU (pagina d'arrivo dei reel: prima il telefono, una sola promessa, niente menu) */
+const FAQ_TAB = [
+  ["Che forme di tavolo posso usare?", "Rotondi e rettangolari da 6 a 12 posti, imperiali da 40 a 100 posti e il tavolo degli sposi. Ogni tavolo ha il suo nome, che finisce sul tableau stampato."],
+  ["Posso segnare allergie e menù?", "Sì, per ogni invitato: menù (standard, vegetariano, vegano, senza carne, senza pesce), i 14 allergeni principali e una nota libera. La scheda per il catering li riporta tavolo per tavolo, con i totali."],
+  ["Come si stampa il tableau?", "Dalla pagina dei tavoli scegliete «Stampa ed esporta»: il tableau per gli ospiti (tavolo per tavolo e in ordine alfabetico) oppure la scheda per catering e location con la pianta della sala. Dalla finestra di stampa potete salvarli come PDF."],
+  ["Quanti invitati posso inserire?", `Con il piano Gratis fino a 50 invitati e 3 tavoli, per provare. Con il Pass Tableau invitati e tavoli sono illimitati.`],
+  ["Il Pass Tableau è un abbonamento?", `No: ${PREZZI.tableau} una volta sola, IVA inclusa, per un matrimonio. Se poi volete anche fornitori, preventivi e programma del giorno, passate al Completo con ${PREZZI.upgrade}.`],
+  ["Come si paga?", "I pagamenti online non sono ancora attivi: in questa fase di lancio l'accesso è gratuito. Prima di attivarli vi scriviamo per email, e nessun piano a pagamento parte senza il vostro consenso."]];
+LD["tableau.html"] = [{ "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Nozze in Ordine · Tableau", applicationCategory: "LifestyleApplication", operatingSystem: "Web", url: SITE + "/tableau",
+    offers: [{ "@type": "Offer", name: "Pass Tableau", price: euro(PREZZI.tableau), priceCurrency: "EUR", description: "Tavoli, sala in pianta e stampa del tableau, una volta sola, IVA inclusa" }] },
+  { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQ_TAB.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) }];
+const topMin = `
+<header class="nav nav--centre nav--min">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Vai al contenuto</a>
+    <a class="nav__logo" href="/">${MARK}Nozze in Ordine</a>
+    <div class="nav__actions"><a class="btn btn--primary" href="${SIGNUP}">Prova gratis</a></div>
+  </div>
+</header>`;
+write("tableau.html", head("Tableau del matrimonio: tavoli, sala e stampa in una sera", `Il tableau del matrimonio pronto stasera, anche con 150 invitati: importate la lista, trascinate i tavoli, stampate. Prova gratis, poi ${PREZZI.tableau} una volta sola.`, { og: "og-tableau.jpg", extra: `<style>
+.nav--min .nav__bar { display: flex; justify-content: space-between; align-items: center; }
+.tb-hero { padding-top: calc(var(--padt) * .6); }
+.tb-hero h1 { font-size: clamp(36px, 5vw, 64px); line-height: 1.05; hyphens: none; }
+.tb-hero .lead { font-size: 19px; color: var(--p-muted); max-width: 34ch; }
+.tb-price { display: flex; gap: var(--s-3); align-items: baseline; flex-wrap: wrap; }
+.tb-price b { font: 400 32px/1 var(--font-display); color: #702f43; }
+.tb-price span { color: var(--p-muted); }
+.tb-shot { border-radius: var(--r-lg); overflow: hidden; border: 1px solid rgba(0,0,0,.08); }
+.tb-shot img { display: block; width: 100%; height: auto; }
+.tb-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-6); list-style: none; padding: 0; margin: 0; counter-reset: s; }
+.tb-steps li { counter-increment: s; display: grid; gap: var(--s-2); }
+.tb-steps li::before { content: counter(s); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--p-surface); color: #702f43; font: 400 22px/1 var(--font-display); }
+.tb-steps b { font-size: 20px; font-weight: 500; }
+.tb-steps span { color: var(--p-muted); }
+.tb-plan { max-width: 520px; }
+.tb-hero .grid > *, #come .tb-steps > *, #pass .grid > * { min-width: 0; }
+.tb-shot { max-width: 100%; }
+@media (max-width: 639px) {
+  .tb-hero h1 { font-size: 38px; }
+  .tb-steps { grid-template-columns: 1fr; gap: var(--s-5); }
+  .tb-steps li { grid-template-columns: 44px 1fr; column-gap: var(--s-4); }
+  .tb-steps li::before { grid-row: span 2; }
+}
+</style>` }) + topMin + `
+<main id="top">
+  <section class="section tb-hero" aria-labelledby="hero-h">
+    <div class="wrap">
+      <div class="grid grid--top fill">
+        <div class="span-5 stack-6">
+          <h1 id="hero-h">Il tableau pronto stasera, anche con 150 invitati</h1>
+          <p class="lead">Importate la lista, trascinate i tavoli, stampate. Menù e allergie di ogni invitato arrivano al catering già divisi per tavolo.</p>
+          <div class="btn-row">${primary("Prova gratis")}</div>
+          <p class="tb-price"><b>${PREZZI.tableau}</b><span>una volta sola, IVA inclusa. Prova gratis fino a 3 tavoli, senza carta.</span></p>
+        </div>
+        <div class="tb-shot span-7">${shot("sala", false)}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="come" aria-labelledby="come-h">
+    <div class="wrap">
+      <div class="section-head"><h2 id="come-h">Tre passaggi</h2></div>
+      <ol class="tb-steps">
+        <li><b>Importate</b><span>La lista da un file Excel salvato in CSV, oppure un invitato alla volta, con gruppo, menù e allergie.</span></li>
+        <li><b>Trascinate</b><span>Disegnate la sala con i tavoli della location e toccate un posto per scegliere chi ci siede. Funziona anche dal telefono.</span></li>
+        <li><b>Stampate</b><span>Il tableau per gli ospiti e la scheda per catering e location, con pianta, menù, allergie, bambini e seggiolini.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section is-pricing" id="pass" aria-labelledby="pass-h">
+    <div class="wrap">
+      <div class="section-head"><h2 id="pass-h">Un prezzo, una volta sola</h2></div>
+      <div class="grid grid--top">${planCard({ ...PLAN.tableau, btn: "Prova gratis", featured: true, span: "span-6 tb-plan" })}
+        <div class="span-5 start-8 stack-4"><p>Con il piano Gratis provate il tableau fino a 3 tavoli e 50 invitati, senza scadenza. Quando vi serve tutta la sala, il Pass Tableau sblocca invitati e tavoli illimitati e le stampe.</p>
+          <p>Nessun abbonamento. Lo stesso account vale anche per budget e scadenze del matrimonio.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="domande" aria-labelledby="domande-h">
+    <div class="wrap">
+      <div class="section-head"><h2 id="domande-h">Domande sul tableau</h2></div>
+      <div class="grid grid--top"><div class="span-6">${faqList(FAQ_TAB.slice(0, 3))}</div><div class="span-6">${faqList(FAQ_TAB.slice(3))}</div></div>
+    </div>
+  </section>
+</main>
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">${closeType("Il vostro tableau, stasera", `Prova gratis fino a 3 tavoli. Poi ${PREZZI.tableau} una volta sola.`).replace(MAIN + ARROW, "Prova gratis" + ARROW)}
+    <div class="footer__legal">
+      <span>&copy; 2026 Nozze in Ordine</span>
+      <span><a href="/privacy">Privacy</a> · <a href="/cookie">Cookie</a>${TRK_ON ? ` · <a href="/cookie" data-cookie-prefs>Preferenze cookie</a>` : ""} · <a href="/termini">Termini</a></span>
+    </div>
+  </div>
+</footer>
+<nav class="actionbar" aria-label="Azioni rapide">
+  <a class="btn btn--primary" href="${SIGNUP}">Prova gratis</a>
+</nav>
+<script type="module" src="/assets/system.js"></script>
+<script type="module" src="/assets/motion/motion.js"></script>
+<script type="module" src="/assets/layout/layout.js"></script>
+</body></html>`);
 
 /* =========================================================== SCADENZE (strumento gratuito, senza registrazione) */
 // Le stesse attività che la dashboard crea sulla data (supabase seed_tasks): [titolo, fase, mesi prima, giorni prima]
@@ -827,7 +946,7 @@ guide({ slug: "disposizione-tavoli-matrimonio", cat: "Invitati e tavoli", img: "
 
 <h2>7. Il tableau</h2>
 <p>Il tableau è il cartellone all'ingresso della sala con i tavoli e i nomi di chi ci siede. Si prepara per ultimo, sulla disposizione definitiva: ogni cambio dopo la stampa costa tempo e denaro. Ordinate i nomi in modo che ognuno si trovi in fretta, per tavolo o in ordine alfabetico.</p>`,
-  tool: { h: "La sala, in pianta", p: "Nella dashboard disegnate la sala con tavoli rotondi, rettangolari, imperiali e il tavolo degli sposi, e toccate un posto per scegliere chi ci siede. Gli invitati sono già divisi in gruppi con risposte, menù e allergie, e i posti di chi non ha ancora risposto restano provvisori. L'elenco invitati è nel piano gratuito; sala e tavoli sono nel piano Completo.", btn: "Iniziate gratis", href: SIGNUP,
+  tool: { h: "La sala, in pianta", p: "Nella dashboard disegnate la sala con tavoli rotondi, rettangolari, imperiali e il tavolo degli sposi, e toccate un posto per scegliere chi ci siede. Gli invitati sono già divisi in gruppi con risposte, menù e allergie, e i posti di chi non ha ancora risposto restano provvisori. Con il piano gratuito provate la sala fino a 3 tavoli; con il Pass Tableau i tavoli sono illimitati e il tableau si stampa.", btn: "Iniziate gratis", href: SIGNUP,
     after: `<div class="frame frame--photo tool-shot">${shot("sala")}</div>` },
   faq: [
     ["Quando si fa la disposizione dei tavoli del matrimonio?", "Dopo la data limite per le risposte, quando sapete chi viene. Chiedete alla location e al catering entro quando la vogliono definitiva e tenetevi qualche giorno di margine."],
@@ -960,27 +1079,24 @@ write("planner.html", head("Nozze in Ordine per le wedding planner: gestionale d
 /* =========================================================== PREZZI */
 LD["prezzi.html"] = [{ "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Nozze in Ordine", applicationCategory: "BusinessApplication", operatingSystem: "Web", url: SITE + "/prezzi",
   offers: [{ "@type": "Offer", name: "Gratis", price: "0", priceCurrency: "EUR", description: "Per le coppie, senza limiti di tempo" },
+    { "@type": "Offer", name: "Pass Tableau", price: euro(PREZZI.tableau), priceCurrency: "EUR", description: "Per le coppie: tavoli, sala in pianta e stampa del tableau, una volta sola, IVA inclusa" },
     { "@type": "Offer", name: "Completo", price: euro(PREZZI.completo), priceCurrency: "EUR", description: "Per le coppie: una volta sola, per un matrimonio, IVA inclusa" },
     { "@type": "Offer", name: "Planner", price: euro(PREZZI.planner), priceCurrency: "EUR", description: `Per wedding planner: canone mensile IVA esclusa, fino a ${PREZZI.eventiPlanner} matrimoni attivi` },
     { "@type": "Offer", name: "Team", price: euro(PREZZI.team), priceCurrency: "EUR", description: `Per wedding planner: canone mensile IVA esclusa, fino a ${PREZZI.eventiTeam} matrimoni attivi e ${PREZZI.collabTeam} collaboratori` }] },
   { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a.replace(/<[^>]+>/g, "") } })) }];
-write("prezzi.html", head("Prezzi di Nozze in Ordine per coppie e wedding planner", `Coppie: gratis per iniziare, ${PREZZI.completo} una volta sola per il piano Completo. Wedding planner: da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.`) + top("prezzi") + `
+write("prezzi.html", head("Prezzi di Nozze in Ordine per coppie e wedding planner", `Coppie: gratis per iniziare, Pass Tableau a ${PREZZI.tableau} o Completo a ${PREZZI.completo}, una volta sola. Wedding planner: da ${PREZZI.planner} al mese, con ${PREZZI.prova} giorni di prova.`) + top("prezzi") + `
 <main id="top">${heroPhoto({ k: "heroPrezzi", pos: "70% 60%", posPhone: "78% 60%",
   h1: "Prezzi per coppie e planner",
-  lead: `Coppie: gratis o ${PREZZI.completo} una volta sola. Planner: da ${PREZZI.planner} al mese, IVA esclusa, con ${PREZZI.prova} giorni di prova.`,
+  lead: `Coppie: gratis, Pass Tableau a ${PREZZI.tableau} o Completo a ${PREZZI.completo}, una volta sola. Planner: da ${PREZZI.planner} al mese, IVA esclusa, con ${PREZZI.prova} giorni di prova.`,
   a: primary(), b: secondary("Confronta i piani", "#coppie"),
-  facts: [["Gratis", "0 €, senza scadenza"], ["Completo", `${PREZZI.completo} una volta`], ["Planner", `Da ${PREZZI.planner} al mese`], ["Studio", "Su richiesta"]] })}
+  facts: [["Gratis", "0 €, senza scadenza"], ["Pass Tableau", `${PREZZI.tableau} una volta`], ["Completo", `${PREZZI.completo} una volta`], ["Planner", `Da ${PREZZI.planner} al mese`]] })}
 
   <section class="section is-pricing" id="coppie" aria-labelledby="coppie-h">
     <div class="wrap">
-      <div class="grid grid--top">
-        <div class="span-4 stack-6">
-          <h2 id="coppie-h">Per le coppie. <span class="muted">IVA inclusa.</span></h2>
-          <p>Un pagamento unico per matrimonio, perché l'organizzazione dura il tempo che serve e poi finisce. Potete restare sul Gratis quanto volete.</p>
-          <p><a class="link" href="/coppie">Vedi la pagina per le coppie</a></p>
-          <div class="frame frame--photo pricing-pic">${pic("prezzi", { sizes: "(min-width: 1024px) 30vw, 100vw" })}</div>
-        </div>${planCard({ ...PLAN.gratis, span: "span-4 start-5" })}${planCard({ ...PLAN.completo, span: "span-4 start-9" })}
+      <div class="section-head"><h2 id="coppie-h">Per le coppie. <span class="muted">IVA inclusa.</span></h2><p>Un pagamento unico, mai un abbonamento: l'organizzazione dura il tempo che serve e poi finisce. Potete restare sul Gratis quanto volete. <a class="link" href="/coppie">Vedi la pagina per le coppie</a></p></div>
+      <div class="grid grid--top">${planCard(PLAN.gratis)}${planCard(PLAN.tableau)}${planCard(PLAN.completo)}
       </div>
+      <p class="upgrade-line">Avete già il Pass Tableau? Passate al Completo con ${PREZZI.upgrade}.</p>
     </div>
   </section>
 
@@ -995,7 +1111,7 @@ write("prezzi.html", head("Prezzi di Nozze in Ordine per coppie e wedding planne
   <section class="section" id="domande" style="--hm: 2" aria-labelledby="domande-h">
     <div class="wrap">
       <div class="section-head"><h2 id="domande-h">Domande sui prezzi</h2></div>
-      <div class="grid grid--top fill"><div class="span-6">${faqList([faq[0], faq[1], faq[5], faq[6]])}</div>
+      <div class="grid grid--top fill"><div class="span-6">${faqList([faq[0], faq[2], faq[3], faq[1]])}${faqList([faq[7], faq[8]])}</div>
         <div class="frame frame--photo span-6 start-7">${pic("cambia")}</div></div>
     </div>
   </section>
@@ -1152,12 +1268,13 @@ legalPage({ file: "termini.html", title: "Termini di servizio | Nozze in Ordine"
 <p>Per registrarvi dovete avere almeno 18 anni e indicare dati veri. L'account è personale: custodite le credenziali e avvisateci se pensate che qualcun altro le stia usando. Chi invitate in un matrimonio vede e modifica ciò che il suo ruolo prevede.</p>
 <h2>4. Piani e prezzi</h2>
 <ul><li><strong>Gratis</strong> (coppie): senza limiti di tempo, con i limiti di funzioni indicati nella <a href="prezzi.html">pagina prezzi</a>.</li>
+<li><strong>Pass Tableau</strong> (coppie): ${PREZZI.tableau}, IVA inclusa, una volta sola. Vale per un solo matrimonio e sblocca invitati illimitati, tavoli e sala senza limiti e le stampe dei tavoli. Si può passare al Completo pagando ${PREZZI.upgrade}. Valgono le stesse regole del Completo sui nomi degli sposi e sull'uso personale.</li>
 <li><strong>Completo</strong> (coppie): ${PREZZI.completo}, IVA inclusa, una volta sola. Vale per un solo matrimonio. I nomi degli sposi si fissano all'attivazione e non possono essere cambiati. È riservato all'uso personale: non può essere usato da chi organizza matrimoni per lavoro.</li>
 <li><strong>Planner</strong> e <strong>Team</strong> (professionisti): canone mensile di ${PREZZI.planner} e ${PREZZI.team}, IVA esclusa, con i limiti di matrimoni attivi e collaboratori indicati nella pagina prezzi. Un matrimonio è attivo finché la sua data non è passata. La prova gratuita dura ${PREZZI.prova} giorni.</li>
 <li><strong>Studio</strong>: condizioni e prezzo concordati per iscritto.</li></ul>
 <p>In questa fase di lancio i pagamenti non sono attivi e l'accesso è gratuito. Nessun piano a pagamento parte senza il vostro consenso espresso. Prima di attivare i pagamenti vi scriviamo per email; per i canoni mensili, ogni variazione di prezzo è comunicata con almeno 30 giorni di anticipo e potete disdire prima che si applichi.</p>
 <h2>5. Recesso e disdetta</h2>
-<p><strong>Coppie (consumatori).</strong> Avete 14 giorni dall'acquisto del piano Completo per ripensarci, senza dare spiegazioni: scrivete a ${MAILTO} e rimborsiamo l'importo pagato entro 14 giorni, con lo stesso mezzo di pagamento. Restano fermi tutti i diritti che il Codice del consumo riconosce, compresa la garanzia legale di conformità.</p>
+<p><strong>Coppie (consumatori).</strong> Avete 14 giorni dall'acquisto del Pass Tableau o del piano Completo per ripensarci, senza dare spiegazioni: scrivete a ${MAILTO} e rimborsiamo l'importo pagato entro 14 giorni, con lo stesso mezzo di pagamento. Restano fermi tutti i diritti che il Codice del consumo riconosce, compresa la garanzia legale di conformità.</p>
 <p><strong>Wedding planner (professionisti).</strong> Potete disdire il canone in qualsiasi momento: la disdetta ha effetto alla fine del mese già pagato, senza rimborso della parte restante.</p>
 <h2>6. Uso corretto</h2>
 <p>Non è consentito usare il servizio per scopi illeciti, inserire dati che non avete il diritto di trattare, tentare di accedere a matrimoni o account altrui, aggirare i limiti dei piani o rivendere l'accesso. In caso di violazione possiamo sospendere l'account, avvisandovi e dandovi modo di rimediare quando la situazione lo consente.</p>
@@ -1188,7 +1305,7 @@ legalPage({ file: "termini.html", title: "Termini di servizio | Nozze in Ordine"
 <p>Per qualsiasi domanda su questi termini: ${MAILTO}.</p>` });
 
 /* =========================================================== SITEMAP E LLMS.TXT (generati: ogni guida entra da sola) */
-const PAGES = ["", "coppie", "planner", "prezzi", "guide", "scadenze-matrimonio", "chi-siamo", "privacy", "cookie", "termini"]
+const PAGES = ["", "coppie", "tableau", "planner", "prezzi", "guide", "scadenze-matrimonio", "chi-siamo", "privacy", "cookie", "termini"]
   .concat(GUIDE_LIVE ? GUIDES.map((g) => "guide/" + g.slug) : []).filter((u) => GUIDE_LIVE || u !== "guide");
 writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -1208,7 +1325,8 @@ writeFileSync(join(OUT, "llms.txt"), `# Nozze in Ordine
 
 - [Per le coppie](${SITE}/coppie): budget, preventivi affiancati, invitati, tavoli e scadenze, condivisi con il partner e con la wedding planner.
 - [Per le wedding planner](${SITE}/planner): gestionale per seguire più matrimoni, con acconti e saldi, scadenze, collaboratori e un portale per gli sposi.
-- [Prezzi](${SITE}/prezzi): coppie gratis per iniziare (piano senza scadenza) o piano Completo a ${PREZZI.completo} una volta sola, IVA inclusa; wedding planner da ${PREZZI.planner} al mese + IVA, con ${PREZZI.prova} giorni di prova.
+- [Prezzi](${SITE}/prezzi): coppie gratis per iniziare (piano senza scadenza), Pass Tableau a ${PREZZI.tableau} o piano Completo a ${PREZZI.completo}, una volta sola, IVA inclusa; wedding planner da ${PREZZI.planner} al mese + IVA, con ${PREZZI.prova} giorni di prova.
+- [Tableau del matrimonio](${SITE}/tableau): sala in pianta, invitati ai tavoli con menù e allergie, stampa del tableau e scheda per il catering. Prova gratuita fino a 3 tavoli, poi Pass Tableau a ${PREZZI.tableau} una volta sola.
 - [Calcolatore delle scadenze del matrimonio](${SITE}/scadenze-matrimonio): strumento gratuito, senza registrazione. Dalla data del matrimonio calcola il giorno di 20 attività, dalla location ai saldi dei fornitori.
 - [Chi siamo](${SITE}/chi-siamo)
 ${GUIDE_LIVE ? `
