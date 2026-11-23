@@ -1531,6 +1531,14 @@
       var rows = [["Nome", "Età", "Gruppo", "Nucleo", "Risposta", "Menù", "Intolleranze e allergie", "Tavolo", "Posto", "Note"]].concat(guests.map(function (x) { return [x.name, LABEL.age[x.age_band] || "", groupLabel(w, x.guest_group), x.household, LABEL.rsvp[x.rsvp], LABEL.menu[x.menu] || x.menu, allergyText(x), byId[x.table_id] ? byId[x.table_id].name : "", x.seat_number || "", x.notes]; }));
       download("invitati-" + w.title.replace(/\W+/g, "-").toLowerCase() + ".csv", rows);
     }
+    async function printMenu() {
+      if (!R.print) return unlock(w, "stampa", "Stampare il tableau", TXT_T);
+      var r = await dialog("Stampa ed esporta", h("div", { class: "dlg-body" }, h("p", { class: "dlg-text" }, "Scegliete cosa preparare. Dalla finestra di stampa potete anche salvarlo come PDF.")), [
+        h("button", { class: "btn soft", value: "csv" }, "File CSV (Excel)"),
+        h("button", { class: "btn soft", value: "cat", disabled: !tables.length }, "Scheda per catering e location"),
+        h("button", { class: "btn primary", value: "tab", disabled: !seated.length }, "Tableau per gli ospiti")]);
+      if (r.value === "csv") csv(); else if (r.value === "cat") printCatering(w, guests, tables); else if (r.value === "tab") printTableau(w, guests, tables);
+    }
     var pct = guests.length ? (g.si / guests.length * 100).toFixed(1).replace(".", ",") + "% del totale" : null;
     var stats = kpis([
       kpi("Totale invitati", String(guests.length), w.guests_expected ? "obiettivo " + w.guests_expected + " · è una stima" : "persone registrate"),
@@ -1683,7 +1691,7 @@
       }))) : empty("Ancora nessun tavolo", "Aggiungete i tavoli dalla sala: qui li vedrete uno per uno, posto per posto.", btn("Aggiungi tavolo", newTable, "primary", "plus"), "table");
 
     var head = pageHead("Invitati e tavoli", g.si + " vengono · " + g.in_attesa + " in attesa · " + g.no + " non vengono" + (w.guests_expected ? " · obiettivo " + w.guests_expected : ""),
-      [guests.length ? btn("Esporta CSV", csv, "ghost", R.print ? null : "lock") : null, addTable, addGuest()]);
+      [guests.length ? btn("Stampa ed esporta", printMenu, "ghost", R.print ? "printer" : "lock") : null, addTable, addGuest()]);
     return [head, stats, tabs, tab === "elenco" ? elenco : tab === "tavoli" ? cards : sala];
   }
 
@@ -1804,11 +1812,72 @@
         h("table", null, h("thead", null, h("tr", null, ["Ora", "Momento", "Dove", "Chi coordina"].map(function (c) { return h("th", null, c); }))),
           h("tbody", null, list.map(function (x) { return h("tr", null, h("td", null, String(x.start_time).slice(0, 5)), h("td", null, x.title), h("td", null, x.place || "—"), h("td", null, x.owner || "—")); }))));
     }));
+    printSheet(sheet);
+  }
+  // Stampa (o "Salva come PDF") di un foglio preparato apposta: la dashboard sparisce, resta il foglio.
+  function printSheet(sheet) {
+    sheet.classList.add("print-sheet");
     document.body.append(sheet); document.body.classList.add("printing");
     var done = function () { sheet.remove(); document.body.classList.remove("printing"); window.removeEventListener("afterprint", done); };
     window.addEventListener("afterprint", done);
     window.print();
     setTimeout(function () { if (!matchMedia("print").matches) done(); }, 1000);
+  }
+  /* ---- stampe dei tavoli: il tableau per gli ospiti e la scheda per catering e location ---- */
+  function tableOrder(tables) {
+    return tables.slice().sort(function (a, b) { return (a.kind === "sposi" ? 0 : 1) - (b.kind === "sposi" ? 0 : 1) || a.name.localeCompare(b.name, "it", { numeric: true }); });
+  }
+  function seatedAt(guests, t) { return guests.filter(function (x) { return x.table_id === t.id && x.rsvp !== "no"; }).sort(function (a, b) { return (a.seat_number || 0) - (b.seat_number || 0); }); }
+  function sheetHead(w, title) { return [h("h1", null, title), h("p", { class: "ps-sub" }, w.title + (w.wedding_date ? " · " + fmtDate(w.wedding_date, true) : "") + (w.city ? " · " + w.city : ""))]; }
+  function printTableau(w, guests, tables) {
+    var list = tableOrder(tables).filter(function (t) { return seatedAt(guests, t).length; });
+    var alpha = guests.filter(function (x) { return x.table_id && x.rsvp !== "no"; }).sort(function (a, b) { return a.name.localeCompare(b.name, "it"); });
+    var byId = {}; tables.forEach(function (t) { byId[t.id] = t; });
+    printSheet(h("div", { class: "ps-tableau" },
+      h("section", null, sheetHead(w, "Tableau"), h("div", { class: "ps-tables" }, list.map(function (t) {
+        return h("article", { class: "ps-table" }, h("h2", null, t.name), h("ul", null, seatedAt(guests, t).map(function (x) { return h("li", null, x.name); })));
+      }))),
+      h("section", null, sheetHead(w, "Cercate il vostro nome"), h("ul", { class: "ps-alpha" }, alpha.map(function (x) { return h("li", null, h("span", null, x.name), h("b", null, byId[x.table_id].name)); })))));
+  }
+  function hallPlan(guests, tables) {
+    var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+    var el = function (tag, attrs, text) { var e = document.createElementNS(NS, tag); Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); }); if (text != null) e.textContent = text; return e; };
+    svg.setAttribute("viewBox", "0 0 " + HALL_W + " " + HALL_H); svg.setAttribute("class", "ps-plan"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Pianta della sala");
+    svg.append(el("rect", { x: 1, y: 1, width: HALL_W - 2, height: HALL_H - 2, fill: "none", stroke: "#999", "stroke-width": 2 }));
+    tables.forEach(function (t) {
+      var g = tableGeometry(t), cx = t.pos_x / 100 * HALL_W, cy = t.pos_y / 100 * HALL_H, n = seatedAt(guests, t).length;
+      svg.append(t.shape === "rotondo" && t.kind !== "sposi" ? el("circle", { cx: cx, cy: cy, r: g.w / 2, fill: "#fff", stroke: "#333", "stroke-width": 3 })
+        : el("rect", { x: cx - g.w / 2, y: cy - g.h / 2, width: g.w, height: g.h, rx: 6, fill: "#fff", stroke: "#333", "stroke-width": 3 }));
+      svg.append(el("text", { x: cx, y: cy - 4, "text-anchor": "middle", "font-size": 22, "font-weight": 700 }, t.name));
+      svg.append(el("text", { x: cx, y: cy + 22, "text-anchor": "middle", "font-size": 18 }, n + "/" + t.seats));
+    });
+    return svg;
+  }
+  function printCatering(w, guests, tables) {
+    var coming = guests.filter(function (x) { return x.rsvp !== "no"; }), ages = { adulto: 0, bambino: 0, under3: 0 }, menus = {}, allergies = {};
+    coming.forEach(function (x) {
+      ages[x.age_band] = (ages[x.age_band] || 0) + 1; menus[x.menu] = (menus[x.menu] || 0) + 1;
+      (x.allergies || []).forEach(function (a) { if (a !== "altro") allergies[a] = (allergies[a] || 0) + 1; });
+    });
+    var unseated = coming.filter(function (x) { return !x.table_id; }), waiting = coming.filter(function (x) { return x.rsvp === "in_attesa"; }).length;
+    var kv = function (rows) { return h("table", { class: "ps-kv" }, h("tbody", null, rows.map(function (r) { return h("tr", null, h("th", null, r[0]), h("td", null, String(r[1]))); }))); };
+    var guestRows = function (list) {
+      return h("table", null, h("thead", null, h("tr", null, ["Posto", "Nome", "Età", "Menù", "Allergie e intolleranze"].map(function (c) { return h("th", null, c); }))),
+        h("tbody", null, list.map(function (x) { return h("tr", null, h("td", null, x.seat_number || "—"), h("td", null, x.name + (x.rsvp === "in_attesa" ? " (in attesa)" : "")), h("td", null, LABEL.age[x.age_band] || ""), h("td", null, LABEL.menu[x.menu] || x.menu || ""), h("td", { class: allergyText(x) ? "ps-al" : null }, allergyText(x) || "—")); })));
+    };
+    printSheet(h("div", { class: "ps-catering" },
+      h("section", null, sheetHead(w, "Scheda per catering e location"),
+        h("p", { class: "ps-sub" }, "Persone attese: " + coming.length + (waiting ? " (di cui " + waiting + " ancora in attesa di risposta)" : "") + ". Aggiornata al " + fmtDate(todayIso(), true) + "."),
+        h("div", { class: "ps-cols" },
+          h("div", null, h("h2", null, "Persone"), kv([["Adulti", ages.adulto], ["Bambini", ages.bambino], ["Bambini sotto i 3 anni", ages.under3], ["Seggiolini (sotto i 3 anni)", ages.under3], ["Tavoli", tables.length]])),
+          h("div", null, h("h2", null, "Menù"), kv(Object.keys(menus).map(function (k) { return [LABEL.menu[k] || k, menus[k]]; }))),
+          h("div", null, h("h2", null, "Allergie e intolleranze"), Object.keys(allergies).length ? kv(Object.keys(allergies).map(function (k) { return [allergyLabel(k), allergies[k]]; })) : h("p", null, "Nessuna segnalata."))),
+        h("h2", null, "Pianta della sala"), hallPlan(guests, tables)),
+      tableOrder(tables).map(function (t) {
+        var list = seatedAt(guests, t);
+        return list.length ? h("section", { class: "ps-keep" }, h("h2", null, t.name + " · " + list.length + " su " + t.seats + " posti"), guestRows(list)) : null;
+      }),
+      unseated.length ? h("section", { class: "ps-keep" }, h("h2", null, "Senza posto assegnato · " + unseated.length), guestRows(unseated)) : null));
   }
   async function timelineView(w) {
     if (!rights(w).timeline) return planLock(w, "Programma del giorno", "Orari, luoghi e responsabili della giornata, da esportare e stampare per fornitori e collaboratori.", "programma");
