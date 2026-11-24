@@ -459,20 +459,93 @@
     return h("a", { href: "#/" + href, class: "nav-a" + (active ? " on" : ""), "aria-current": active ? "page" : null }, icon(ic), h("span", null, label));
   }
   /* ---- piani: i limiti li applica il database, qui si spiegano e si chiede il passaggio ---- */
-  var PLAN = { gratis: "Gratis", completo: "Completo", planner: "Planner", prova: "Prova gratuita", team: "Team", studio: "Studio", libero: "Senza limiti" };
+  var PLAN = { gratis: "Gratis", tableau: "Pass Tableau", completo: "Completo", planner: "Planner", prova: "Prova gratuita", team: "Team", studio: "Studio", libero: "Senza limiti" };
   var PLAN_CAPS = { prova: [15, 3], planner: [5, 0], team: [15, 3] };
+  /* Matrice dei diritti per piano del matrimonio: l'unico punto dell'interfaccia che decide cosa si può fare.
+     Gli stessi limiti li applica il database (migrazione pass_tableau): qui servono a spiegarli prima dell'errore.
+     null = senza limite. Prezzi per le coppie: Pass 19 €, Completo 49 €, dal Pass al Completo 30 €. */
+  var RIGHTS = {
+    gratis:   { guests: 50,   tables: 3,    vendors: 3,    quotes: 1,    print: false, timeline: false, invitePlanner: false },
+    tableau:  { guests: null, tables: null, vendors: 3,    quotes: 1,    print: true,  timeline: false, invitePlanner: false },
+    completo: { guests: null, tables: null, vendors: null, quotes: null, print: true,  timeline: true,  invitePlanner: true },
+    planner:  { guests: null, tables: null, vendors: null, quotes: null, print: true,  timeline: true,  invitePlanner: true }
+  };
+  function rights(w) { return RIGHTS[(w && w.plan) || "completo"] || RIGHTS.completo; }
   function isGratis(w) { return !!w && w.plan === "gratis"; }
   function askPlan(plan, w) {
     return attempt(function () { return api.requestPlan(plan, w ? w.id : null); }, "Richiesta inviata. Ti scriviamo per email con i prossimi passi.").catch(function () {});
   }
-  function planLock(w, title, text) {
-    return [pageHead(title, null), panel("Incluso nel piano Completo", text, null, h("div", { class: "btn-row" },
-      canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary") : null, linkBtn("/prezzi", "Vedi i piani", "soft")))];
+  // Il piano che sblocca una funzione, partendo dal piano attuale
+  function nextPlan(w, feature) { return isGratis(w) && /^(invitati|tavoli|stampa|esporta)$/.test(feature) ? "tableau" : "completo"; }
+  function unlockLabel(w, feature) {
+    var p = nextPlan(w, feature);
+    return p === "tableau" ? "Sblocca il tableau · 19 €" : w && w.plan === "tableau" ? "Passa al Completo · +30 €" : "Sblocca con il Completo · 49 €";
+  }
+  // "Sblocca": registra l'interesse (unlock_clicks), poi spiega il piano e lo fa chiedere. I pagamenti non sono ancora attivi.
+  async function unlock(w, feature, title, text) {
+    api.trackUnlock(w ? w.id : null, feature).catch(function () {});
+    var p = nextPlan(w, feature), up = w && w.plan === "tableau";
+    var price = p === "tableau" ? "Pass Tableau · 19 € una tantum, IVA inclusa" : up ? "Dal Pass Tableau al Completo · 30 €" : "Completo · 49 € una tantum, IVA inclusa";
+    var r = await dialog(title, h("div", { class: "dlg-body" }, h("p", { class: "dlg-text" }, text), h("p", { class: "dlg-text" }, h("b", null, price), ". Nessun abbonamento.")), [
+      h("a", { class: "btn ghost", href: "#/m/" + w.id + "/piano", onclick: function () { var d = this.closest("dialog"); if (d) d.close("no"); } }, "Il vostro piano"),
+      canEdit(w) ? h("button", { class: "btn primary", value: "ok" }, p === "tableau" ? "Chiedi il Pass Tableau" : "Chiedi il piano Completo") : null]);
+    if (r.value === "ok") askPlan(p, w);
+  }
+  function unlockBtn(w, feature, title, text, cls) { return btn(unlockLabel(w, feature), function () { unlock(w, feature, title, text); }, cls || "primary", "lock"); }
+  function planLock(w, title, text, feature) {
+    var up = w && w.plan === "tableau";
+    return [pageHead(title, null), panel(up ? "Incluso nel piano Completo · dal Pass +30 €" : "Incluso nel piano Completo", text, null, h("div", { class: "btn-row" },
+      canEdit(w) ? unlockBtn(w, feature || "altro", title, text) : null, linkBtn("#/m/" + w.id + "/piano", "Il vostro piano", "soft")))];
   }
   function gratisBanner(w) {
+    var tab = w.plan === "tableau";
     return h("div", { class: "alert info" }, icon("lock"), h("div", null,
-      h("p", null, h("b", null, "Piano Gratis"), " · fino a 50 invitati e 3 fornitori. Tavoli, programma del giorno, confronto dei preventivi e invito alla wedding planner sono nel piano Completo."),
-      h("div", { class: "btn-row" }, canEdit(w) ? btn("Chiedi il piano Completo", function () { askPlan("completo", w); }, "primary sm") : null, linkBtn("/prezzi", "Vedi i piani", "soft sm"))));
+      tab ? h("p", null, h("b", null, "Pass Tableau"), " · invitati e tavoli senza limiti, stampa ed esportazione del tableau. Fornitori illimitati, preventivi affiancati e programma del giorno sono nel Completo: dal Pass ci passate con 30 €.")
+        : h("p", null, h("b", null, "Piano Gratis"), " · fino a 50 invitati, 3 fornitori e un'anteprima del tableau con 3 tavoli. Con il Pass Tableau (19 €) invitati e tavoli sono illimitati e il tableau si stampa."),
+      h("div", { class: "btn-row" }, canEdit(w) ? unlockBtn(w, tab ? "altro" : "tavoli", tab ? "Passate al Completo" : "Il tableau completo", tab ? "Fornitori illimitati, preventivi affiancati e programma del giorno." : "Invitati illimitati, tavoli e sala senza limiti, stampa ed esportazione del tableau.", "primary sm") : null,
+        linkBtn("#/m/" + w.id + "/piano", "Il vostro piano", "soft sm"))));
+  }
+  /* ---- il piano della coppia: cosa ha, cosa può sbloccare, a che punto è la richiesta ---- */
+  // Offerte per le coppie (linea prezzi C). Mai abbonamenti. Gli sconti solo a tempo: { price: "39 €", until: "2027-01-31", note: "..." }.
+  var COUPLE_OFFERS = {
+    tableau: { name: "Pass Tableau", price: "19 €", items: ["Invitati illimitati", "Tavoli e sala in pianta senza limiti", "Stampa del tableau per gli ospiti", "Scheda per catering e location"] },
+    completo: { name: "Completo", price: "49 €", upgrade: "30 €", items: ["Tutto il Pass Tableau", "Fornitori illimitati", "Preventivi affiancati", "Programma del giorno", "Invito alla wedding planner"] }
+  };
+  var PROMO = {}; // es. { completo: { price: "39 €", until: "2027-01-31" } }
+  function promo(k) { var p = PROMO[k]; return p && p.until >= todayIso() ? p : null; }
+  async function planView(w) {
+    if (w.plan === "planner") return [pageHead("Il vostro piano", null), panel("Seguito dalla vostra wedding planner", "Il piano di questo matrimonio è della planner: per voi lo spazio è gratuito, senza limiti.", null, null)];
+    var res = await Promise.all([api.myPlanRequests(w.id).catch(function () { return []; }), api.listPurchases(w.id).catch(function () { return []; }),
+      api.list("guests", w.id), api.list("seating_tables", w.id), api.list("vendors", w.id)]);
+    var reqs = res[0], buys = res[1], R = rights(w), cur = w.plan, edit = canEdit(w);
+    var pending = function (k) { return reqs.filter(function (x) { return x.plan === k && x.stato === "nuova"; })[0]; };
+    var use = function (label, n, max) { return h("div", null, h("dt", null, label), h("dd", null, max == null ? String(n) + " · senza limiti" : n + " su " + max)); };
+    var current = panel("Piano " + PLAN[cur], cur === "gratis" ? "Senza scadenza. Potete restare sul Gratis quanto volete." : (w.plan_since ? "Attivo dal " + fmtDate(w.plan_since, true) + ". " : "") + "Pagato una volta sola, vale per questo matrimonio.", badge(PLAN[cur], cur === "gratis" ? "plain" : "solid-bord"),
+      h("dl", { class: "kv" }, use("Invitati", res[2].length, R.guests), use("Tavoli", res[3].length, R.tables), use("Fornitori", res[4].length, R.vendors),
+        h("div", null, h("dt", null, "Stampa ed esportazione del tableau"), h("dd", null, R.print ? "incluse" : "no")),
+        h("div", null, h("dt", null, "Programma del giorno"), h("dd", null, R.timeline ? "incluso" : "no"))));
+    function offer(k) {
+      var o = COUPLE_OFFERS[k], up = k === "completo" && cur === "tableau", pr = promo(k), wait = pending(k);
+      var price = up ? o.upgrade : pr ? pr.price : o.price;
+      return h("article", { class: "panel plan-offer" + (k === "tableau" && cur === "gratis" ? " best" : "") },
+        h("h2", { class: "serif" }, up ? "Passa al Completo" : o.name),
+        h("p", { class: "plan-price" }, h("b", null, price), h("span", null, up ? " la differenza, una volta sola" : " una volta sola, IVA inclusa"),
+          pr && !up ? h("small", null, "Invece di " + o.price + ", fino al " + fmtDate(pr.until, true)) : null),
+        h("ul", { class: "checks" }, o.items.map(function (i) { return h("li", null, icon("check"), i); })),
+        wait ? h("p", { class: "muted small" }, icon("clock"), " Richiesta inviata il " + fmtDate(wait.created_at, true) + ": vi scriviamo per email.")
+          : edit ? btn(up ? "Chiedi il passaggio · " + price : "Chiedi il " + o.name + " · " + price, async function () {
+              api.trackUnlock(w.id, k === "tableau" ? "tavoli" : "altro").catch(function () {});
+              await askPlan(k, w); render(); }, k === "tableau" && cur === "gratis" || up ? "primary" : "soft") : null);
+    }
+    var offers = cur === "gratis" ? ["tableau", "completo"] : cur === "tableau" ? ["completo"] : [];
+    var done = buys.filter(function (b) { return b.status === "paid" || b.status === "refunded"; });
+    return [pageHead("Il vostro piano", "Cosa include il vostro spazio e cosa potete sbloccare. Per le coppie non ci sono abbonamenti."),
+      current,
+      offers.length ? h("div", { class: "plan-offers" }, offers.map(offer)) : panel("Avete tutto", "Il piano Completo include ogni funzione per le coppie.", null, null),
+      offers.length ? h("p", { class: "muted small" }, icon("info"), " I pagamenti online non sono ancora attivi: la richiesta ci arriva e vi scriviamo per email con i passi per attivare il piano. Nessun addebito parte senza il vostro consenso.") : null,
+      done.length ? panel("Acquisti", null, null, h("ul", { class: "plain-list" }, done.map(function (b) {
+        return h("li", null, h("b", null, PLAN[b.product] || (b.product === "upgrade_completo" ? "Passaggio al Completo" : b.product)), h("span", { class: "muted" }, fmtDate(b.created_at, true) + " · " + eur(b.amount_cents / 100) + (b.status === "refunded" ? " · rimborsato" : "")));
+      }))) : null];
   }
   function planPanel() {
     var me = state.me, p = me.plan || "libero", caps = PLAN_CAPS[p], today = new Date().toISOString().slice(0, 10);
@@ -490,6 +563,7 @@
       ["invitati", "Invitati e tavoli", "users"], ["scaletta", "Programma del giorno", "calendar"], ["impostazioni", "Dati del matrimonio", "file"]];
     // collaboratori e note riservate sono strumenti della planner
     if (isPlannerHere(w)) items.splice(7, 0, ["persone", "Collaboratori", "userplus"]), items.push(["note", "Note riservate", "note"]);
+    else if (w.plan !== "planner") items.push(["piano", "Il vostro piano", "lock"]);
     return items;
   }
   function weddingSelect(wid) {
@@ -1233,7 +1307,10 @@
         w.vendor_categories = list;
       }, "Categoria aggiunta.");
     }, "ghost", "plus");
-    var addVendor = function () { return btn("Aggiungi fornitore", function () { vendorDialog(w, null, cats); }, "primary", "plus"); };
+    var R = rights(w), TXT_C = "Fornitori illimitati, più preventivi per fornitore affiancati e il programma del giorno.";
+    var addVendor = function () { return btn("Aggiungi fornitore", function () {
+      if (R.vendors != null && vendors.length >= R.vendors) return unlock(w, "fornitori", "Il vostro piano arriva a " + R.vendors + " fornitori", TXT_C);
+      vendorDialog(w, null, cats); }, "primary", "plus"); };
 
     function quoteItem(v, q) {
       return h("li", { class: "quote-item" },
@@ -1259,6 +1336,7 @@
           qs.length ? h("ul", { class: "quote-list" }, qs.map(function (q) { return quoteItem(v, q); })) : h("p", { class: "muted small" }, "Nessun costo inserito."),
           h("p", { class: "vendor-total" }, h("span", null, qs.length > 1 ? "Totale dei " + qs.length + " preventivi" : "Totale"), h("b", null, eur(totalOf(v)))),
           ro || archive ? null : h("button", { class: "add-row", type: "button", onclick: function () {
+            if (R.quotes != null && qs.length >= R.quotes) return unlock(w, "preventivi", "Più preventivi affiancati", TXT_C);
             editDialog("Nuovo preventivo per " + v.name, F.quotes, null, "Aggiungi", function (d) { d.wedding_id = w.id; d.vendor_id = v.id; return api.insert("quotes", d); }, "Preventivo aggiunto.");
           } }, "+ Aggiungi un preventivo")),
         ro ? null : h("footer", { class: "vendor-foot" },
@@ -1468,11 +1546,6 @@
 
   async function guestsView(w, sub) {
     if (sub === "importa") return importView(w);
-    if (isGratis(w) && sub !== "elenco") {
-      var lk = planLock(w, "Invitati e tavoli", "La sala in pianta, i tavoli da 8 a 12 posti e un nome su ogni posto. L'elenco degli invitati resta disponibile, fino a 50 persone.");
-      lk.splice(1, 0, subTabs("m/" + w.id + "/invitati", [["", "La sala"], ["elenco", "Elenco invitati"], ["tavoli", "Tavolo per tavolo"]], sub === "tavoli" ? "tavoli" : ""));
-      return lk;
-    }
     var res = await Promise.all([api.list("guests", w.id), api.list("seating_tables", w.id)]);
     var guests = res[0], tables = res[1], tab = sub === "elenco" || sub === "tavoli" ? sub : "";
     state.hc[w.id] = headcount(guests);
@@ -1486,14 +1559,28 @@
     var coming = guests.filter(function (x) { return x.rsvp !== "no"; }), waiting = coming.filter(function (x) { return !x.table_id; }), seated = guests.filter(function (x) { return x.table_id; });
     var seatsTotal = tables.reduce(function (a, t) { return a + t.seats; }, 0);
     var at = function (t, n) { return guests.filter(function (x) { return x.table_id === t.id && x.seat_number === n; })[0]; };
-    var addGuest = function () { return btn("Aggiungi invitato", function () { guestDialog(w, null); }, "primary", "plus"); };
+    var R = rights(w), TXT_T = "Invitati illimitati, tavoli e sala in pianta senza limiti, stampa ed esportazione del tableau e il PDF per catering e location.";
+    var guestsFull = R.guests != null && guests.length >= R.guests, tablesFull = R.tables != null && tables.length >= R.tables;
+    var addGuest = function () { return btn("Aggiungi invitato", function () {
+      if (guestsFull) return unlock(w, "invitati", "Avete più di " + R.guests + " invitati", "Sbloccate il tableau completo a 19 €: " + TXT_T.charAt(0).toLowerCase() + TXT_T.slice(1));
+      guestDialog(w, null); }, "primary", "plus"); };
     var newTable = function () {
+      if (tablesFull) return unlock(w, "tavoli", "L'anteprima arriva a " + R.tables + " tavoli", TXT_T);
       tableDialog(null, function (d) { var pos = freeSpot(tables); d.pos_x = pos[0]; d.pos_y = pos[1]; d.wedding_id = w.id; return api.insert("seating_tables", d); }).then(function (d) { if (d) { toast("Tavolo aggiunto alla sala."); render(); } });
     };
     var addTable = btn("Aggiungi tavolo", newTable, "soft", "table");
     function csv() {
+      if (!R.print) return unlock(w, "esporta", "Esportare il tableau", TXT_T);
       var rows = [["Nome", "Età", "Gruppo", "Nucleo", "Risposta", "Menù", "Intolleranze e allergie", "Tavolo", "Posto", "Note"]].concat(guests.map(function (x) { return [x.name, LABEL.age[x.age_band] || "", groupLabel(w, x.guest_group), x.household, LABEL.rsvp[x.rsvp], LABEL.menu[x.menu] || x.menu, allergyText(x), byId[x.table_id] ? byId[x.table_id].name : "", x.seat_number || "", x.notes]; }));
       download("invitati-" + w.title.replace(/\W+/g, "-").toLowerCase() + ".csv", rows);
+    }
+    async function printMenu() {
+      if (!R.print) return unlock(w, "stampa", "Stampare il tableau", TXT_T);
+      var r = await dialog("Stampa ed esporta", h("div", { class: "dlg-body" }, h("p", { class: "dlg-text" }, "Scegliete cosa preparare. Dalla finestra di stampa potete anche salvarlo come PDF.")), [
+        h("button", { class: "btn soft", value: "csv" }, "File CSV (Excel)"),
+        h("button", { class: "btn soft", value: "cat", disabled: !tables.length }, "Scheda per catering e location"),
+        h("button", { class: "btn primary", value: "tab", disabled: !seated.length }, "Tableau per gli ospiti")]);
+      if (r.value === "csv") csv(); else if (r.value === "cat") printCatering(w, guests, tables); else if (r.value === "tab") printTableau(w, guests, tables);
     }
     var pct = guests.length ? (g.si / guests.length * 100).toFixed(1).replace(".", ",") + "% del totale" : null;
     var stats = kpis([
@@ -1583,6 +1670,8 @@
     var sala = h("section", { class: "sala", "aria-labelledby": "sala-h" },
       h("div", { class: "sala-main" }, h("div", { class: "sala-tools" }, h("h2", { id: "sala-h", class: "serif" }, "La sala"), btn("Aggiungi tavolo", newTable, tables.length ? "soft sm" : "primary", "plus"), tables.length ? zoomBar : null), legend,
         h("div", { class: "hall-frame" }, wrap,
+          !R.print ? h("div", { class: "alert info" }, icon("lock"), h("div", null, h("p", null, h("b", null, "Anteprima del tableau"), " · fino a " + R.tables + " tavoli, senza stampa né esportazione. " + (guests.length > R.guests - 10 ? "Il piano Gratis arriva a " + R.guests + " invitati." : "")),
+            canEdit(w) ? h("div", { class: "btn-row" }, unlockBtn(w, "tavoli", "Il tableau completo", TXT_T, "primary sm")) : null)) : null,
           h("p", { class: "hall-note" }, icon("info"), tables.length ? "Trascinate i tavoli per disporre la sala. Toccate un posto per scegliere chi ci siede: i posti di chi è in attesa sono provvisori finché non conferma." : "Disegnate la sala con «Aggiungi tavolo»: tavoli da 6 a 12 posti, imperiali da 40 a 100, oppure il tavolo degli sposi."))),
       waitingPanel);
 
@@ -1645,7 +1734,7 @@
       }))) : empty("Ancora nessun tavolo", "Aggiungete i tavoli dalla sala: qui li vedrete uno per uno, posto per posto.", btn("Aggiungi tavolo", newTable, "primary", "plus"), "table");
 
     var head = pageHead("Invitati e tavoli", g.si + " vengono · " + g.in_attesa + " in attesa · " + g.no + " non vengono" + (w.guests_expected ? " · obiettivo " + w.guests_expected : ""),
-      [guests.length ? btn("Esporta CSV", csv, "ghost") : null, addTable, addGuest()]);
+      [guests.length ? btn("Stampa ed esporta", printMenu, "ghost", R.print ? "printer" : "lock") : null, addTable, addGuest()]);
     return [head, stats, tabs, tab === "elenco" ? elenco : tab === "tavoli" ? cards : sala];
   }
 
@@ -1766,14 +1855,75 @@
         h("table", null, h("thead", null, h("tr", null, ["Ora", "Momento", "Dove", "Chi coordina"].map(function (c) { return h("th", null, c); }))),
           h("tbody", null, list.map(function (x) { return h("tr", null, h("td", null, String(x.start_time).slice(0, 5)), h("td", null, x.title), h("td", null, x.place || "—"), h("td", null, x.owner || "—")); }))));
     }));
+    printSheet(sheet);
+  }
+  // Stampa (o "Salva come PDF") di un foglio preparato apposta: la dashboard sparisce, resta il foglio.
+  function printSheet(sheet) {
+    sheet.classList.add("print-sheet");
     document.body.append(sheet); document.body.classList.add("printing");
     var done = function () { sheet.remove(); document.body.classList.remove("printing"); window.removeEventListener("afterprint", done); };
     window.addEventListener("afterprint", done);
     window.print();
     setTimeout(function () { if (!matchMedia("print").matches) done(); }, 1000);
   }
+  /* ---- stampe dei tavoli: il tableau per gli ospiti e la scheda per catering e location ---- */
+  function tableOrder(tables) {
+    return tables.slice().sort(function (a, b) { return (a.kind === "sposi" ? 0 : 1) - (b.kind === "sposi" ? 0 : 1) || a.name.localeCompare(b.name, "it", { numeric: true }); });
+  }
+  function seatedAt(guests, t) { return guests.filter(function (x) { return x.table_id === t.id && x.rsvp !== "no"; }).sort(function (a, b) { return (a.seat_number || 0) - (b.seat_number || 0); }); }
+  function sheetHead(w, title) { return [h("h1", null, title), h("p", { class: "ps-sub" }, w.title + (w.wedding_date ? " · " + fmtDate(w.wedding_date, true) : "") + (w.city ? " · " + w.city : ""))]; }
+  function printTableau(w, guests, tables) {
+    var list = tableOrder(tables).filter(function (t) { return seatedAt(guests, t).length; });
+    var alpha = guests.filter(function (x) { return x.table_id && x.rsvp !== "no"; }).sort(function (a, b) { return a.name.localeCompare(b.name, "it"); });
+    var byId = {}; tables.forEach(function (t) { byId[t.id] = t; });
+    printSheet(h("div", { class: "ps-tableau" },
+      h("section", null, sheetHead(w, "Tableau"), h("div", { class: "ps-tables" }, list.map(function (t) {
+        return h("article", { class: "ps-table" }, h("h2", null, t.name), h("ul", null, seatedAt(guests, t).map(function (x) { return h("li", null, x.name); })));
+      }))),
+      h("section", null, sheetHead(w, "Cercate il vostro nome"), h("ul", { class: "ps-alpha" }, alpha.map(function (x) { return h("li", null, h("span", null, x.name), h("b", null, byId[x.table_id].name)); })))));
+  }
+  function hallPlan(guests, tables) {
+    var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+    var el = function (tag, attrs, text) { var e = document.createElementNS(NS, tag); Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); }); if (text != null) e.textContent = text; return e; };
+    svg.setAttribute("viewBox", "0 0 " + HALL_W + " " + HALL_H); svg.setAttribute("class", "ps-plan"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Pianta della sala");
+    svg.append(el("rect", { x: 1, y: 1, width: HALL_W - 2, height: HALL_H - 2, fill: "none", stroke: "#999", "stroke-width": 2 }));
+    tables.forEach(function (t) {
+      var g = tableGeometry(t), cx = t.pos_x / 100 * HALL_W, cy = t.pos_y / 100 * HALL_H, n = seatedAt(guests, t).length;
+      svg.append(t.shape === "rotondo" && t.kind !== "sposi" ? el("circle", { cx: cx, cy: cy, r: g.w / 2, fill: "#fff", stroke: "#333", "stroke-width": 3 })
+        : el("rect", { x: cx - g.w / 2, y: cy - g.h / 2, width: g.w, height: g.h, rx: 6, fill: "#fff", stroke: "#333", "stroke-width": 3 }));
+      svg.append(el("text", { x: cx, y: cy - 4, "text-anchor": "middle", "font-size": 22, "font-weight": 700 }, t.name));
+      svg.append(el("text", { x: cx, y: cy + 22, "text-anchor": "middle", "font-size": 18 }, n + "/" + t.seats));
+    });
+    return svg;
+  }
+  function printCatering(w, guests, tables) {
+    var coming = guests.filter(function (x) { return x.rsvp !== "no"; }), ages = { adulto: 0, bambino: 0, under3: 0 }, menus = {}, allergies = {};
+    coming.forEach(function (x) {
+      ages[x.age_band] = (ages[x.age_band] || 0) + 1; menus[x.menu] = (menus[x.menu] || 0) + 1;
+      (x.allergies || []).forEach(function (a) { if (a !== "altro") allergies[a] = (allergies[a] || 0) + 1; });
+    });
+    var unseated = coming.filter(function (x) { return !x.table_id; }), waiting = coming.filter(function (x) { return x.rsvp === "in_attesa"; }).length;
+    var kv = function (rows) { return h("table", { class: "ps-kv" }, h("tbody", null, rows.map(function (r) { return h("tr", null, h("th", null, r[0]), h("td", null, String(r[1]))); }))); };
+    var guestRows = function (list) {
+      return h("table", null, h("thead", null, h("tr", null, ["Posto", "Nome", "Età", "Menù", "Allergie e intolleranze"].map(function (c) { return h("th", null, c); }))),
+        h("tbody", null, list.map(function (x) { return h("tr", null, h("td", null, x.seat_number || "—"), h("td", null, x.name + (x.rsvp === "in_attesa" ? " (in attesa)" : "")), h("td", null, LABEL.age[x.age_band] || ""), h("td", null, LABEL.menu[x.menu] || x.menu || ""), h("td", { class: allergyText(x) ? "ps-al" : null }, allergyText(x) || "—")); })));
+    };
+    printSheet(h("div", { class: "ps-catering" },
+      h("section", null, sheetHead(w, "Scheda per catering e location"),
+        h("p", { class: "ps-sub" }, "Persone attese: " + coming.length + (waiting ? " (di cui " + waiting + " ancora in attesa di risposta)" : "") + ". Aggiornata al " + fmtDate(todayIso(), true) + "."),
+        h("div", { class: "ps-cols" },
+          h("div", null, h("h2", null, "Persone"), kv([["Adulti", ages.adulto], ["Bambini", ages.bambino], ["Bambini sotto i 3 anni", ages.under3], ["Seggiolini (sotto i 3 anni)", ages.under3], ["Tavoli", tables.length]])),
+          h("div", null, h("h2", null, "Menù"), kv(Object.keys(menus).map(function (k) { return [LABEL.menu[k] || k, menus[k]]; }))),
+          h("div", null, h("h2", null, "Allergie e intolleranze"), Object.keys(allergies).length ? kv(Object.keys(allergies).map(function (k) { return [allergyLabel(k), allergies[k]]; })) : h("p", null, "Nessuna segnalata."))),
+        h("h2", null, "Pianta della sala"), hallPlan(guests, tables)),
+      tableOrder(tables).map(function (t) {
+        var list = seatedAt(guests, t);
+        return list.length ? h("section", { class: "ps-keep" }, h("h2", null, t.name + " · " + list.length + " su " + t.seats + " posti"), guestRows(list)) : null;
+      }),
+      unseated.length ? h("section", { class: "ps-keep" }, h("h2", null, "Senza posto assegnato · " + unseated.length), guestRows(unseated)) : null));
+  }
   async function timelineView(w) {
-    if (isGratis(w)) return planLock(w, "Programma del giorno", "Orari, luoghi e responsabili della giornata, da esportare e stampare per fornitori e collaboratori.");
+    if (!rights(w).timeline) return planLock(w, "Programma del giorno", "Orari, luoghi e responsabili della giornata, da esportare e stampare per fornitori e collaboratori.", "programma");
     var items = await api.list("timeline_items", w.id), ro = !canEdit(w), pf = store.get("nio-party") || "";
     var fields = timelineFields(w);
     var add = ro ? null : btn("Aggiungi momento", function () { editDialog("Nuovo momento", fields, { party: "comune" }, "Aggiungi", function (d) { d.wedding_id = w.id; return api.insert("timeline_items", d); }, "Aggiunto."); }, "primary", "plus");
@@ -2030,7 +2180,7 @@
     return [pageHead("Il mio profilo", "Dati personali, promemoria e sicurezza in un solo sguardo.", null, chipInfo(role === "admin" ? "Accesso amministrativo" : role === "planner" ? "Account globale" : ws[0] ? weddingMeta(ws[0]) : "Account", role === "coppia" && ws[0] ? "calendar" : "user")), errBox,
       h("div", { class: "split profile" },
         h("div", { class: "stack" }, panel(role === "coppia" ? "Dati personali" : "I tuoi dati", "Modifica i dati associati al tuo account.", null, f), role === "admin" ? null : roleCard),
-        h("div", { class: "stack" }, role === "admin" ? roleCard : null, role === "planner" ? planPanel() : null,
+        h("div", { class: "stack" }, role === "admin" ? roleCard : null, role === "planner" ? planPanel() : role === "coppia" && ws[0] && ws[0].plan !== "planner" ? panel("Il vostro piano", "Piano " + (PLAN[ws[0].plan] || "—") + ". Nessun abbonamento: si paga una volta sola.", null, linkBtn("#/m/" + ws[0].id + "/piano", ws[0].plan === "completo" ? "Vedi il piano" : "Vedi cosa potete sbloccare", "soft sm"), "compact") : null,
           panel("Promemoria", "Ricevi avvisi prima delle scadenze.", role === "coppia" ? null : more("#/avvisi", "Vedi tutti"), h("div", { class: "stack-sm" }, nf, h("p", { class: "lbl" }, "Notifiche su questo dispositivo"), deviceBox(true)), "compact"),
           panel("Accesso e sicurezza", "Gestisci account e accessi.", btn("Esci", async function () { await attempt(api.signOut); }, "soft sm"), h("div", { class: "stack-sm" }, pw,
             h("p", { class: "small" }, h("b", null, "Account creato"), h("br"), me.created_at ? fmtDate(me.created_at, true) : "—"),
@@ -2093,7 +2243,7 @@
 
   /* ------------------------------------------------------------ amministrazione */
   async function adminView(sub) {
-    var res = await Promise.all([api.listProfiles(), api.listWaitlist(), api.listPlanRequests()]);
+    var res = await Promise.all([api.listProfiles(), api.listWaitlist(), api.listPlanRequests(), api.listUnlockClicks().catch(function () { return []; })]);
     var profiles = res[0], wait = res[1], ws = state.weddings;
     var count2 = function (r) { return profiles.filter(function (p) { return p.role === r; }).length; };
     var tabs = h("nav", { class: "seg pills", "aria-label": "Sezioni di amministrazione" }, [["", "Riepilogo"], ["utenti", "Utenti e ruoli"], ["piani", "Piani"], ["lista", "Lista d'attesa"]].map(function (t) {
@@ -2132,13 +2282,13 @@
           async function (form) { await save(form.elements.plan.value); });
         if (r.value === "ok") { toast("Piano aggiornato."); await loadBase(); render(); }
       };
-      var W_OPTS = [["gratis", "Gratis"], ["completo", "Completo"], ["planner", "Planner (creato da una planner)"]];
+      var W_OPTS = [["gratis", "Gratis"], ["tableau", "Pass Tableau"], ["completo", "Completo"], ["planner", "Planner (creato da una planner)"]];
       var P_OPTS = [["prova", "Prova gratuita (riparte da 7 giorni)"], ["planner", "Planner"], ["team", "Team"], ["studio", "Studio"], ["libero", "Senza limiti"]];
       var editW = function (w) { return pick("Piano del matrimonio", "Matrimonio: " + w.title, W_OPTS, w.plan, function (v) { return api.setWeddingPlan(w.id, v); }); };
       var editP = function (p) { return pick("Piano della planner", "Planner: " + (p.full_name || p.email), P_OPTS, p.plan, function (v) { return api.setProfilePlan(p.id, v, v === "prova" ? 7 : null); }); };
       var grant = async function (x) {
         await attempt(async function () {
-          if (x.plan === "completo") { if (!x.wedding_id) throw new Error("La richiesta non indica un matrimonio."); await api.setWeddingPlan(x.wedding_id, "completo"); }
+          if (x.plan === "completo" || x.plan === "tableau") { if (!x.wedding_id) throw new Error("La richiesta non indica un matrimonio."); await api.setWeddingPlan(x.wedding_id, x.plan); }
           else await api.setProfilePlan(x.user_id, x.plan, null);
           await api.setPlanRequestStatus(x.id, "attivata");
         }, "Piano attivato.");
@@ -2154,6 +2304,15 @@
           return h("tr", null, h("th", { scope: "row" }, u.full_name || "—"), h("td", null, u.email || "—"), h("td", null, badge(PLAN[x.plan] || x.plan, "plain")), h("td", null, w ? w.title : "—"), h("td", null, fmtDate(x.created_at)),
             h("td", null, h("div", { class: "btn-row" }, btn("Attiva", function () { grant(x); }, "primary sm"), btn("Chiudi", function () { close(x); }, "soft sm"))));
         })) : empty("Nessuna richiesta", "Quando qualcuno chiede un piano lo trovi qui.", null, "table")),
+        (function () {
+          // Clic su "Sblocca" durante la fase gratuita: il dato che dice se la linea prezzi C funziona
+          var clicks = res[3], by = {}, wsC = {};
+          clicks.forEach(function (c) { by[c.feature] = (by[c.feature] || 0) + 1; if (c.wedding_id) wsC[c.wedding_id] = 1; });
+          return panel("Clic su «Sblocca»", "Quante volte chi è nella fase gratuita ha provato una funzione a pagamento, e da quanti matrimoni.", badge(plural(clicks.length, "clic", "clic"), ""),
+            clicks.length ? h("ul", { class: "plain-list" }, Object.keys(by).sort(function (a, b) { return by[b] - by[a]; }).map(function (k) { return h("li", null, h("b", null, k), h("span", { class: "muted" }, plural(by[k], "clic", "clic"))); }),
+              h("li", null, h("b", null, "Matrimoni diversi"), h("span", { class: "muted" }, String(Object.keys(wsC).length))))
+              : empty("Ancora nessun clic", "Compariranno qui quando una coppia tocca «Sblocca».", null, "lock"));
+        })(),
         panel("Matrimoni", null, badge(plural(ws.length, "matrimonio", "matrimoni"), ""), ws.length ? table("Matrimoni", ["Matrimonio", "Data", "Piano", "Azione"], ws.map(function (w) {
           return h("tr", null, h("th", { scope: "row" }, w.title), h("td", null, w.wedding_date ? fmtDate(w.wedding_date) : "—"), h("td", null, badge(PLAN[w.plan] || "—", w.plan === "gratis" ? "plain" : "solid-bord")),
             h("td", null, btn("Cambia piano", function () { editW(w); }, "soft sm")));
@@ -2327,11 +2486,11 @@
         else {
           var sec = p[2] || "panoramica";
           if (sec === "tavoli") sec = "invitati";
-          var view = { panoramica: overview, scadenze: tasksView, budget: budgetView, fornitori: vendorsView, invitati: guestsView, scaletta: timelineView, note: notesView, persone: peopleView, impostazioni: settingsView }[sec] || overview;
+          var view = { panoramica: overview, scadenze: tasksView, budget: budgetView, fornitori: vendorsView, invitati: guestsView, scaletta: timelineView, note: notesView, persone: peopleView, impostazioni: settingsView, piano: planView }[sec] || overview;
           if ((sec === "note" || sec === "persone") && !isPlannerHere(w)) view = overview;
           if (!root.querySelector(".shell")) root.replaceChildren(shell(h("p", { class: "loading" }, "Carico…")));
           content = await view(w, p[3]);
-          if (view === overview && isGratis(w) && Array.isArray(content)) content.splice(1, 0, gratisBanner(w));
+          if (view === overview && (w.plan === "gratis" || w.plan === "tableau") && Array.isArray(content)) content.splice(1, 0, gratisBanner(w));
           if (!canEdit(w) && view !== guestsView && view !== overview && Array.isArray(content)) content.splice(1, 0, h("div", { class: "alert info ro-note" }, icon("eye"),
             h("div", null, h("b", null, "Sola lettura"), h("p", null, "Questo matrimonio è seguito da una wedding planner: potete consultare tutto e modificare invitati e tavoli."))));
         }

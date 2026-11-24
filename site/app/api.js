@@ -135,6 +135,11 @@
       if (r.error && /duplicate key/i.test(r.error.message || "")) throw new Error("La richiesta è già stata inviata: ti scriviamo per email.");
       ok(r);
     },
+    // "Sblocca" durante la fase gratuita: dice se la linea prezzi funziona
+    trackUnlock: async function (wid, feature) { ok(await sb.from("unlock_clicks").insert({ wedding_id: wid || null, feature: feature })); },
+    listUnlockClicks: async function () { return ok(await sb.from("unlock_clicks").select("feature, wedding_id, created_at").order("created_at", { ascending: false }).limit(5000)); },
+    myPlanRequests: async function (wid) { return ok(await sb.from("plan_requests").select("plan, stato, created_at").eq("wedding_id", wid).order("created_at", { ascending: false })); },
+    listPurchases: async function (wid) { return ok(await sb.from("purchases").select("product, amount_cents, status, created_at").eq("wedding_id", wid).order("created_at", { ascending: false })); },
     listPlanRequests: async function () { return ok(await sb.from("plan_requests").select("*").order("created_at", { ascending: false })); },
     setPlanRequestStatus: async function (id, stato) { ok(await sb.from("plan_requests").update({ stato: stato }).eq("id", id)); },
     setWeddingPlan: async function (wid, plan) { ok(await sb.rpc("admin_set_wedding_plan", { target: wid, new_plan: plan })); },

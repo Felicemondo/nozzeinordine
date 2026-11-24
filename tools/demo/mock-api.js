@@ -67,6 +67,9 @@
   // dati di esempio, coerenti con quelli del sito
   // Anna e Marco organizzano da soli; Beatrice segue Sara e Paolo (la coppia lì è in sola lettura)
   wedding("w-anna", "Anna e Marco", addDays(232), "Caserta", 26000, 150, [["u-anna", "sposi"], ["u-marco", "sposi"]]);
+  // ?piano=gratis|tableau|completo: il matrimonio della coppia con un altro piano, per provare sblocchi e anteprime
+  var forcedPlan = /[?&]piano=(gratis|tableau|completo)/.exec(location.search);
+  if (forcedPlan) db.weddings[0].plan = forcedPlan[1];
   wedding("w-sara", "Sara e Paolo", addDays(330), "Napoli", 32000, 180, [["u-bea", "planner"], ["u-sara", "sposi"]]);
   wedding("w-giulia", "Giulia e Andrea", addDays(345), "Salerno", 21000, 110, [["u-bea", "planner"]]);
   // per ogni matrimonio: le prime attività già passate sono fatte, le altre restano in ritardo (dati fissi, non casuali)
@@ -254,6 +257,10 @@
     },
 
     requestPlan: async function () {},
+    trackUnlock: async function () {},
+    myPlanRequests: async function () { return []; },
+    listPurchases: async function () { return []; },
+    listUnlockClicks: async function () { return []; },
     listPlanRequests: async function () { return []; },
     setPlanRequestStatus: async function () {},
     setWeddingPlan: async function (wid, plan) { db.weddings.forEach(function (w) { if (w.id === wid) w.plan = plan; }); },
