@@ -13,6 +13,7 @@
   var USERS = {
     coppia: { id: "u-anna", role: "coppia", full_name: "Anna Russo", email: "anna@esempio.it", phone: "", business_name: "", city: "Caserta", notify_days: 3, created_at: new Date(Date.now() - 86400000 * 20).toISOString() },
     planner: { id: "u-bea", role: "planner", plan: "prova", trial_ends_at: new Date(Date.now() + 86400000 * 21).toISOString(), full_name: "Beatrice Esposito", email: "bea@esempio.it", phone: "333 000 0000", business_name: "Esposito Wedding Studio", city: "Napoli", notify_days: 7, weddings_per_year: "1-5", work_mode: "autonomia", created_at: new Date(Date.now() - 86400000 * 40).toISOString() },
+    vuota: { id: "u-prova", role: "coppia", full_name: "Coppia di prova", email: "prova@esempio.it", phone: "", business_name: "", city: "Napoli", notify_days: 3, created_at: new Date().toISOString() },
     admin: { id: "u-admin", role: "admin", full_name: "Amministrazione", email: "info@nozzeinordine.com", phone: "", business_name: "", city: "", notify_days: 3, created_at: new Date(Date.now() - 86400000 * 60).toISOString() }
   };
   var TEMPLATE = [
@@ -29,7 +30,7 @@
   ];
 
   var db = {
-    profiles: [USERS.coppia, USERS.planner, USERS.admin,
+    profiles: [USERS.coppia, USERS.planner, USERS.admin, USERS.vuota,
       { id: "u-marco", role: "coppia", full_name: "Marco De Luca", email: "marco@esempio.it", created_at: null },
       { id: "u-sara", role: "coppia", full_name: "Sara Gallo", email: "sara@esempio.it", created_at: null }],
     weddings: [], wedding_members: [], wedding_invites: [],
@@ -123,6 +124,26 @@
   var GROUPS = [["famiglia_a", "Famiglia Russo", 16, "Russo"], ["famiglia_b", "Famiglia De Luca", 14, "De Luca"], ["amici_a", "Amici di Anna", 12, "Bianchi"], ["amici_b", "Amici di Marco", 12, "Romano"], ["amici_comuni", "Amici comuni", 10, "Conti"]];
   var TABLES = [["Sposi", 2, "rettangolare", 50, 12, "sposi"], ["Capri", 10, "rotondo", 18, 42], ["Ischia", 10, "rotondo", 50, 45], ["Procida", 10, "rotondo", 82, 42], ["Amalfi", 12, "rotondo", 30, 78], ["Positano", 12, "rotondo", 70, 78]];
   sample("w-anna"); sample("w-sara");
+  // coppia appena iscritta: matrimonio vuoto (solo le scadenze automatiche), piano Gratis, per provare limiti, tableau e sblocchi
+  wedding("w-prova", "Giulia e Luca", addDays(300), "Napoli", 0, 0, [["u-prova", "sposi"]]).plan = "gratis";
+  // gli stessi limiti per piano del database (migrazioni pass_tableau e pagamenti_completo)
+  function planOf(wid) { var w = db.weddings.filter(function (x) { return x.id === wid; })[0]; return w ? w.plan : null; }
+  function enforcePlan(table, row, old) {
+    var pl = planOf(row.wedding_id || (old && old.wedding_id)), free = pl === "gratis", cheap = pl === "gratis" || pl === "tableau";
+    var n = function (t) { return db[t].filter(function (x) { return x.wedding_id === row.wedding_id; }).length; };
+    if (old) {
+      if (table === "budget_items" && cheap && ["deposit", "deposit_due", "due_date"].some(function (k) { return k in row && (row[k] || null) !== (old[k] || null) && !(k === "deposit" && !num0(row[k]) && !num0(old[k])); }))
+        throw new Error("Acconti, saldi e date dei pagamenti fanno parte del piano Completo.");
+      return;
+    }
+    if (table === "guests" && free && n("guests") >= 50) throw new Error("Avete più di 50 invitati: sbloccate il tableau completo con il Pass Tableau a 19 €.");
+    if (table === "seating_tables" && free && n("seating_tables") >= 3) throw new Error("Con il piano Gratis provate il tableau fino a 3 tavoli. Con il Pass Tableau (19 €) i tavoli sono illimitati.");
+    if (table === "vendors" && cheap && n("vendors") >= 3) throw new Error("Il vostro piano include fino a 3 fornitori. Con il piano Completo sono illimitati.");
+    if (table === "timeline_items" && cheap) throw new Error("Il programma del giorno fa parte del piano Completo.");
+    if (table === "quotes" && cheap && db.quotes.some(function (q) { return q.vendor_id === row.vendor_id; })) throw new Error("Il vostro piano include un preventivo per fornitore. Con il piano Completo li confrontate fianco a fianco.");
+    if (table === "budget_items" && cheap && (num0(row.deposit) > 0 || row.deposit_due || row.due_date)) throw new Error("Acconti, saldi e date dei pagamenti fanno parte del piano Completo.");
+  }
+  function num0(v) { return Number(v) || 0; }
   db.internal_notes.push({ id: uid(), wedding_id: "w-sara", body: "La sposa preferisce non avere fiori bianchi sui tavoli.", created_by: "u-bea", created_at: new Date().toISOString() });
   db.wedding_invites.push({ id: uid(), wedding_id: "w-giulia", email: "giulia@esempio.it", member_role: "sposi", token: uid(), accepted_at: null, expires_at: addDays(30), created_at: new Date().toISOString() });
 
@@ -224,6 +245,7 @@
       // come il database: si possono inserire più righe insieme
       [].concat(row).forEach(function (row) {
         guardWrite(table, row.wedding_id);
+        enforcePlan(table, row, null);
         var base = { id: uid(), created_at: new Date().toISOString() };
         if (table === "guests") Object.assign(base, { table_id: null, seat_number: null, guest_group: "amici_comuni", age_band: "adulto", allergies: [], allergies_note: "" });
         if (table === "seating_tables") Object.assign(base, { seats: 10, shape: "rotondo", kind: "ospiti", pos_x: 50, pos_y: 50 });
@@ -236,6 +258,7 @@
       await wait();
       var r = db[table].filter(function (x) { return x.id === id; })[0];
       guardWrite(table, r.wedding_id);
+      enforcePlan(table, patch, r);
       // stesse regole del database per tavoli e posti
       if (table === "guests" && patch.table_id) {
         var t = db.seating_tables.filter(function (x) { return x.id === patch.table_id && x.wedding_id === r.wedding_id; })[0];
@@ -256,7 +279,11 @@
       if (table === "seating_tables") db.guests.forEach(function (g) { if (g.table_id === id) { g.table_id = null; g.seat_number = null; } });
     },
 
-    requestPlan: async function () {},
+    // nella demo la richiesta attiva subito il piano, come se il pagamento fosse andato a buon fine
+    requestPlan: async function (plan, wid) {
+      var w = db.weddings.filter(function (x) { return x.id === wid; })[0];
+      if (w && (plan === "tableau" || plan === "completo")) { w.plan = plan; w.plan_since = new Date().toISOString(); }
+    },
     trackUnlock: async function () {},
     myPlanRequests: async function () { return []; },
     listPurchases: async function () { return []; },

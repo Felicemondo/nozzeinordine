@@ -473,7 +473,9 @@
   function rights(w) { return RIGHTS[(w && w.plan) || "completo"] || RIGHTS.completo; }
   function isGratis(w) { return !!w && w.plan === "gratis"; }
   function askPlan(plan, w) {
-    return attempt(function () { return api.requestPlan(plan, w ? w.id : null); }, "Richiesta inviata. Ti scriviamo per email con i prossimi passi.").catch(function () {});
+    var demo = api.mode !== "live";
+    return attempt(function () { return api.requestPlan(plan, w ? w.id : null); }, demo ? "Demo: piano " + (PLAN[plan] || plan) + " attivato subito." : "Richiesta inviata. Ti scriviamo per email con i prossimi passi.")
+      .then(function () { if (demo) return loadBase().then(render); }).catch(function () {});
   }
   // Il piano che sblocca una funzione, partendo dal piano attuale
   function nextPlan(w, feature) { return isGratis(w) && /^(invitati|tavoli|stampa|esporta)$/.test(feature) ? "tableau" : "completo"; }
@@ -732,12 +734,13 @@
     var card = function (title, sub, tag, demo, focus, foot, role, primary) {
       return h("article", { class: "demo-card" + (primary ? " on" : "") }, h("header", null, h("div", null, h("h2", null, title), h("p", null, sub)), badge(tag, primary ? "solid" : "")),
         h("div", { class: "demo-facts" }, h("div", null, h("b", null, "Demo"), h("span", null, demo)), h("div", null, h("b", null, "Focus"), h("span", null, focus))),
-        h("footer", null, h("span", null, foot), h("button", { class: "btn " + (primary ? "primary" : "ghost"), type: "button", onclick: pick(role) }, "Apri demo " + (role === "coppia" ? "coppia" : role === "planner" ? "planner" : "amministrazione"), icon("arrow"))));
+        h("footer", null, h("span", null, foot), h("button", { class: "btn " + (primary ? "primary" : "ghost"), type: "button", onclick: pick(role) }, "Apri demo " + ({ coppia: "coppia", vuota: "vuota", planner: "planner" }[role] || "amministrazione"), icon("arrow"))));
     };
     return h("div", { class: "chooser" }, h("header", { class: "chooser-top" }, brand("ceramica"), badge("Demo · Dati di esempio", "")),
       h("div", { class: "chooser-in" }, h("div", { class: "chooser-text" }, h("h1", null, "Scegli la demo"), h("p", null, "Esplora il prodotto con dati di esempio, dal punto di vista di una coppia o di un wedding planner."), h("a", { href: "index.html" }, "Torna all'accesso")),
         h("div", { class: "chooser-cards" }, h("p", { class: "eyebrow" }, "Seleziona il punto di vista"), h("p", { class: "sub" }, "Scegli l'esperienza che vuoi esplorare."),
           card("Organizziamo il nostro matrimonio", "La vista ideale per chi pianifica la propria cerimonia e il ricevimento.", "Coppia", "Anna e Marco · matrimonio a Caserta", "priorità, budget, invitati e tavoli", "Anna e Marco · Caserta", "coppia", true),
+          card("Coppia appena iscritta", "Matrimonio vuoto sul piano Gratis: aggiungete invitati e tavoli e provate limiti, tableau e sblocchi. Nella demo i piani si attivano subito.", "Vuota", "Giulia e Luca · nessun dato", "piani, tableau e trascinamento", "Giulia e Luca · Napoli", "vuota"),
           card("Organizzo matrimoni per lavoro", "La vista ideale per wedding planner che seguono più eventi.", "Planner", "Beatrice · due matrimoni in corso", "clienti, fornitori, preventivi e coordinamento", "Beatrice · Wedding planner", "planner"),
           card("Amministrazione", "Utenti, ruoli e lista d'attesa, con accesso separato dagli eventi.", "Admin", "Cinque utenti di esempio", "ruoli e iscrizioni", "Accesso amministrativo", "admin"))));
   }
