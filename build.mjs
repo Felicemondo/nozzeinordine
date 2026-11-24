@@ -335,11 +335,11 @@ const planCard = ({ name, who, price, per = "", items, btn, href, featured = fal
           </article>`;
 const PLAN = {
   gratis: { name: "Gratis", who: "Per iniziare a mettere ordine", price: "0 €", per: "senza scadenza", btn: "Apri lo spazio gratuito", href: SIGNUP,
-    items: ["Scadenze sulla data", "Budget e pagamenti", "50 invitati, 3 fornitori", "Anteprima del tableau, fino a 3 tavoli", "Condiviso con il partner"] },
+    items: ["Scadenze sulla data", "Budget per voce di spesa", "50 invitati, 3 fornitori", "Anteprima del tableau, fino a 3 tavoli", "Condiviso con il partner"] },
   tableau: { name: "Pass Tableau", who: "Per i tavoli, IVA inclusa", price: "19 €", per: "una volta sola", btn: "Prova il tableau gratis", href: SIGNUP,
     items: ["Invitati illimitati", "Tavoli e sala in pianta senza limiti", "Stampa del tableau per gli ospiti", "Scheda per catering e location, con menù e allergie"] },
   completo: { name: "Completo", who: "Per un matrimonio, IVA inclusa", price: "49 €", per: "una volta sola", btn: "Inizia gratis", href: SIGNUP, featured: true,
-    items: ["Tutto il Pass Tableau", "Fornitori illimitati", "Preventivi affiancati", "Programma del giorno", "Dal Pass Tableau: 30 €"] },
+    items: ["Tutto il Pass Tableau", "Acconti, saldi e promemoria dei pagamenti", "Fornitori illimitati e preventivi affiancati", "Programma del giorno", "Dal Pass Tableau: 30 €"] },
   planner: { name: "Planner", who: "Per chi lavora in proprio", price: "29 €", per: "al mese + IVA", btn: "Prova Planner 7 giorni", href: SIGNUP,
     items: ["5 matrimoni attivi", "Portale per gli sposi", "Acconti e saldi per evento", "Note riservate"] },
   team: { name: "Team", who: "Per chi lavora con collaboratori", price: "59 €", per: "al mese + IVA", btn: "Prova Team 7 giorni", href: SIGNUP, featured: true,
@@ -899,7 +899,7 @@ guide({ slug: "budget-matrimonio", cat: "Budget", img: "prezzi", published: "202
 
 <h2>6. Un margine per gli imprevisti</h2>
 <p>Qualcosa costerà più del previsto: un invitato in più, una modifica all'abito, un servizio dimenticato. Decidete all'inizio una quota del totale da tenere da parte e non assegnatela a nessuna voce. Se a fine matrimonio è avanzata, meglio.</p>`,
-  tool: { h: "Il budget, già impostato", p: "Nella dashboard gratuita le 12 voci sono pronte: per ognuna previsto, preventivo, acconto e saldo con le date, e quanto resta da pagare. I pagamenti si vedono mese per mese e il budget è condiviso con il partner.", btn: "Crea il budget gratis", href: SIGNUP,
+  tool: { h: "Il budget, già impostato", p: "Nella dashboard gratuita le 12 voci sono pronte: per ognuna previsto, preventivo, già pagato e quanto resta, condiviso con il partner. Con il piano Completo aggiungete acconti e saldi con le date, il grafico dei pagamenti mese per mese e i promemoria.", btn: "Crea il budget gratis", href: SIGNUP,
     after: `<div class="frame frame--photo tool-shot">${shot("budget")}</div>` },
   faq: [
     ["Quanto costa un matrimonio?", "Non c'è una cifra giusta: cambia con la zona, la stagione, il giorno, il numero di invitati e le vostre scelte. Partite da quanto potete spendere voi e dividetelo tra le voci, invece di inseguire una media."],

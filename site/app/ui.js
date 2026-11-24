@@ -465,10 +465,10 @@
      Gli stessi limiti li applica il database (migrazione pass_tableau): qui servono a spiegarli prima dell'errore.
      null = senza limite. Prezzi per le coppie: Pass 19 €, Completo 49 €, dal Pass al Completo 30 €. */
   var RIGHTS = {
-    gratis:   { guests: 50,   tables: 3,    vendors: 3,    quotes: 1,    print: false, timeline: false, invitePlanner: false },
-    tableau:  { guests: null, tables: null, vendors: 3,    quotes: 1,    print: true,  timeline: false, invitePlanner: false },
-    completo: { guests: null, tables: null, vendors: null, quotes: null, print: true,  timeline: true,  invitePlanner: true },
-    planner:  { guests: null, tables: null, vendors: null, quotes: null, print: true,  timeline: true,  invitePlanner: true }
+    gratis:   { guests: 50,   tables: 3,    vendors: 3,    quotes: 1,    print: false, timeline: false, invitePlanner: false, payments: false },
+    tableau:  { guests: null, tables: null, vendors: 3,    quotes: 1,    print: true,  timeline: false, invitePlanner: false, payments: false },
+    completo: { guests: null, tables: null, vendors: null, quotes: null, print: true,  timeline: true,  invitePlanner: true,  payments: true },
+    planner:  { guests: null, tables: null, vendors: null, quotes: null, print: true,  timeline: true,  invitePlanner: true,  payments: true }
   };
   function rights(w) { return RIGHTS[(w && w.plan) || "completo"] || RIGHTS.completo; }
   function isGratis(w) { return !!w && w.plan === "gratis"; }
@@ -491,6 +491,23 @@
       canEdit(w) ? h("button", { class: "btn primary", value: "ok" }, p === "tableau" ? "Chiedi il Pass Tableau" : "Chiedi il piano Completo") : null]);
     if (r.value === "ok") askPlan(p, w);
   }
+  // Anteprima di una funzione del Completo: dati di esempio sfocati e un riquadro con «Sblocca»
+  function lockPreview(w, feature, title, text, sample) {
+    return h("section", { class: "panel lock-prev" }, h("div", { class: "lock-sample", "aria-hidden": "true", inert: "" }, sample),
+      h("div", { class: "lock-card" }, icon("lock"), h("h2", { class: "serif" }, title), h("p", null, text),
+        h("div", { class: "btn-row" }, canEdit(w) ? unlockBtn(w, feature, title, text, "primary sm") : null, linkBtn("#/m/" + w.id + "/piano", "Il vostro piano", "soft sm"))));
+  }
+  var TXT_PAY = "Acconti e saldi per ogni fornitore, il grafico dei pagamenti mese per mese e i promemoria prima di ogni scadenza.";
+  function samplePayChart() {
+    var items = [], d = new Date();
+    [1800, 900, 2600, 600, 3200, 1400].forEach(function (a, i) { var x = new Date(d.getFullYear(), d.getMonth() + i + 1, 10); items.push({ date: isoOf(x), amount: a, label: "Esempio" }); });
+    return payChart(items, { title: "Pagamenti mese per mese" });
+  }
+  function sampleTimeline() {
+    return h("ol", { class: "rows timeline" }, [["11:00", "Rito in chiesa", "Chiesa di San Michele"], ["12:30", "Foto con le famiglie", "Sagrato"], ["13:30", "Aperitivo di benvenuto", "Giardino della villa"], ["15:00", "Pranzo", "Sala principale"], ["18:30", "Taglio della torta", "Terrazza"]].map(function (r) {
+      return h("li", { class: "row tl" }, h("b", { class: "time" }, r[0]), h("div", { class: "row-main" }, h("b", null, r[1])), h("div", { class: "tl-col" }, h("small", null, "Dove"), h("span", null, r[2])));
+    }));
+  }
   function unlockBtn(w, feature, title, text, cls) { return btn(unlockLabel(w, feature), function () { unlock(w, feature, title, text); }, cls || "primary", "lock"); }
   function planLock(w, title, text, feature) {
     var up = w && w.plan === "tableau";
@@ -500,8 +517,8 @@
   function gratisBanner(w) {
     var tab = w.plan === "tableau";
     return h("div", { class: "alert info" }, icon("lock"), h("div", null,
-      tab ? h("p", null, h("b", null, "Pass Tableau"), " · invitati e tavoli senza limiti, stampa ed esportazione del tableau. Fornitori illimitati, preventivi affiancati e programma del giorno sono nel Completo: dal Pass ci passate con 30 €.")
-        : h("p", null, h("b", null, "Piano Gratis"), " · fino a 50 invitati, 3 fornitori e un'anteprima del tableau con 3 tavoli. Con il Pass Tableau (19 €) invitati e tavoli sono illimitati e il tableau si stampa."),
+      tab ? h("p", null, h("b", null, "Pass Tableau"), " · invitati e tavoli senza limiti, stampa ed esportazione del tableau. Acconti e saldi con i promemoria, fornitori illimitati, preventivi affiancati e programma del giorno sono nel Completo: dal Pass ci passate con 30 €.")
+        : h("p", null, h("b", null, "Piano Gratis"), " · fino a 50 invitati, 3 fornitori, budget per voce e un'anteprima del tableau con 3 tavoli. Con il Pass Tableau (19 €) invitati e tavoli sono illimitati e il tableau si stampa; con il Completo (49 €) anche acconti, saldi e promemoria dei pagamenti."),
       h("div", { class: "btn-row" }, canEdit(w) ? unlockBtn(w, tab ? "altro" : "tavoli", tab ? "Passate al Completo" : "Il tableau completo", tab ? "Fornitori illimitati, preventivi affiancati e programma del giorno." : "Invitati illimitati, tavoli e sala senza limiti, stampa ed esportazione del tableau.", "primary sm") : null,
         linkBtn("#/m/" + w.id + "/piano", "Il vostro piano", "soft sm"))));
   }
@@ -509,7 +526,7 @@
   // Offerte per le coppie (linea prezzi C). Mai abbonamenti. Gli sconti solo a tempo: { price: "39 €", until: "2027-01-31", note: "..." }.
   var COUPLE_OFFERS = {
     tableau: { name: "Pass Tableau", price: "19 €", items: ["Invitati illimitati", "Tavoli e sala in pianta senza limiti", "Stampa del tableau per gli ospiti", "Scheda per catering e location"] },
-    completo: { name: "Completo", price: "49 €", upgrade: "30 €", items: ["Tutto il Pass Tableau", "Fornitori illimitati", "Preventivi affiancati", "Programma del giorno", "Invito alla wedding planner"] }
+    completo: { name: "Completo", price: "49 €", upgrade: "30 €", items: ["Tutto il Pass Tableau", "Acconti, saldi e promemoria dei pagamenti", "Fornitori illimitati e preventivi affiancati", "Programma del giorno", "Invito alla wedding planner"] }
   };
   var PROMO = {}; // es. { completo: { price: "39 €", until: "2027-01-31" } }
   function promo(k) { var p = PROMO[k]; return p && p.until >= todayIso() ? p : null; }
@@ -523,6 +540,7 @@
     var current = panel("Piano " + PLAN[cur], cur === "gratis" ? "Senza scadenza. Potete restare sul Gratis quanto volete." : (w.plan_since ? "Attivo dal " + fmtDate(w.plan_since, true) + ". " : "") + "Pagato una volta sola, vale per questo matrimonio.", badge(PLAN[cur], cur === "gratis" ? "plain" : "solid-bord"),
       h("dl", { class: "kv" }, use("Invitati", res[2].length, R.guests), use("Tavoli", res[3].length, R.tables), use("Fornitori", res[4].length, R.vendors),
         h("div", null, h("dt", null, "Stampa ed esportazione del tableau"), h("dd", null, R.print ? "incluse" : "no")),
+        h("div", null, h("dt", null, "Acconti, saldi e promemoria dei pagamenti"), h("dd", null, R.payments ? "inclusi" : "no")),
         h("div", null, h("dt", null, "Programma del giorno"), h("dd", null, R.timeline ? "incluso" : "no"))));
     function offer(k) {
       var o = COUPLE_OFFERS[k], up = k === "completo" && cur === "tableau", pr = promo(k), wait = pending(k);
@@ -1039,7 +1057,7 @@
     var tasksPanel = panel("Cosa devo fare adesso?", "Le attività più importanti da completare subito.", more("#/m/" + w.id + "/scadenze", "Vedi tutte"),
       h("ul", { class: "rows" }, lateSummary(open, tasks, "#/m/" + w.id + "/scadenze"), focus.map(function (x) { return taskRow(x, w, nx && nx.id, { rel: true, noToggle: !canEdit(w) }); }),
         !focus.length ? h("li", { class: "muted" }, open.length ? "Le attività aperte non hanno una data." : "Tutto fatto. Complimenti.") : null));
-    var payPanel = panel("Prossimi pagamenti", null, more("#/m/" + w.id + "/budget", "Vedi tutti"), payList(bud, planner), "compact");
+    var payPanel = rights(w).payments ? panel("Prossimi pagamenti", null, more("#/m/" + w.id + "/budget", "Vedi tutti"), payList(bud, planner), "compact") : null;
     var side = [planner ? panel("Budget e pagamenti", null, more("#/m/" + w.id + "/budget", "Vedi dettagli"), h("div", null, h("p", { class: "kpi-l" }, "Totale previsto"), h("p", { class: "kpi-v" }, eur(t.total)),
       cap ? h("p", { class: "muted" }, "Tetto di spesa " + eur(cap) + " · " + (t.total > cap ? "sopra di " + eur(t.total - cap) : "margine " + eur(cap - t.total))) : null,
       h("dl", { class: "kv" }, h("div", null, h("dt", null, "Già pagato"), h("dd", null, eur(t.paid))), h("div", null, h("dt", null, "Da pagare"), h("dd", null, eur(t.total - t.paid))),
@@ -1057,7 +1075,7 @@
         kpi("Budget totale", eur(t.total), cap ? "Tetto di spesa " + eur(cap) + " · " + (t.total > cap ? "sopra di " + eur(t.total - cap) : "margine " + eur(cap - t.total)) : "Tetto di spesa da impostare"),
         kpi("Pagamenti", eur(t.paid), "Da pagare " + eur(t.total - t.paid)),
         kpi("Invitati", plural(guests.length, "persona", "totali").replace(/^1 persona$/, "1 persona"), g.si + " confermati · " + g.in_attesa + " in attesa · " + g.no + " declinati" + (w.guests_expected ? " · obiettivo " + w.guests_expected : ""))], "four"),
-      (function () { var it = budgetPayItems(bud); return payChart(it, { until: w.wedding_date, undated: it.filter(function (x) { return !x.date; }).length, action: more("#/m/" + w.id + "/budget", "Vedi il budget") }); })(),
+      !rights(w).payments ? lockPreview(w, "pagamenti", "Acconti, saldi e promemoria sono nel Completo", TXT_PAY, samplePayChart()) : (function () { var it = budgetPayItems(bud); return payChart(it, { until: w.wedding_date, undated: it.filter(function (x) { return !x.date; }).length, action: more("#/m/" + w.id + "/budget", "Vedi il budget") }); })(),
       h("div", { class: "split" }, tasksPanel, h("div", { class: "stack" }, side))];
   }
   function firstDay(w, tasks) {
@@ -1121,12 +1139,15 @@
     var used = items.filter(function (x) { return !b || x.id !== b.id; }).map(function (x) { return x.category; });
     var free = CATS.filter(function (c) { return used.indexOf(c) < 0; });
     if (b && free.indexOf(b.category) < 0) free.unshift(b.category);
-    var fields = F.budget_items.map(function (f) { return f.name === "category" ? Object.assign({}, f, { options: free.map(function (c) { return [c, c]; }) }) : f; });
+    var pays = rights(w).payments;
+    var fields = F.budget_items.filter(function (f) { return pays || ["deposit", "deposit_due", "due_date"].indexOf(f.name) < 0; })
+      .map(function (f) { return f.name === "category" ? Object.assign({}, f, { options: free.map(function (c) { return [c, c]; }) }) : f; });
     var vals = Object.assign({}, b || { category: free[0] }, { rental: b && b.rental_amount != null ? "si" : "no" });
     var els = {}, hc = state.hc[w.id] || headcount([]);
     var body = h("div", { class: "dlg-body grid-form" }, fields.map(function (f) { return (els[f.name] = field(f, vals[f.name])); }));
     var calc = h("div", { class: "calc wide", "aria-live": "polite" });
     body.append(calc);
+    if (!pays) body.append(h("p", { class: "muted small wide" }, icon("lock"), " Acconto, saldo e date dei pagamenti, con i promemoria, sono nel piano Completo."));
     var get = function (n) { var el = body.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ""; };
     var amount = function (n) { return num(get(n).replace(",", ".")); };
     var show = function (n, on) { els[n].hidden = !on; els[n].querySelectorAll("input, select").forEach(function (x) { x.disabled = !on; }); };
@@ -1153,7 +1174,7 @@
         d.contracted = 0; d.planned = unitCost(d, hc);
       } else { d.unit_price = 0; d.unit_child = 0; d.rental_amount = null; }
       delete d.rental;
-      checkBudget(Object.assign({ wedding_id: w.id }, d));
+      if (pays) checkBudget(Object.assign({ wedding_id: w.id }, d));
       if (b) await api.update("budget_items", b.id, d);
       else { d.wedding_id = w.id; await api.insert("budget_items", d); }
     });
@@ -1193,19 +1214,19 @@
           render();
         }, "ghost"), "wallet"))];
     }
-    var sorted = items.slice().sort(function (a, b) { return cost(b) - cost(a); });
+    var sorted = items.slice().sort(function (a, b) { return cost(b) - cost(a); }), P = rights(w).payments;
     var table = h("div", { class: "tscroll" }, h("table", { class: "tbl" },
       h("caption", { class: "sr" }, "Voci di spesa"),
-      h("thead", null, h("tr", null, ["Voce", "Costo", "Acconto", "Saldo", "Già pagato", "Da pagare", ro ? null : "Azioni"].filter(Boolean).map(function (x, i) { return h("th", { scope: "col", class: i >= 1 && i <= 5 ? "n" : null }, x); }))),
+      h("thead", null, h("tr", null, ["Voce", "Costo", P ? "Acconto" : null, P ? "Saldo" : null, "Già pagato", "Da pagare", ro ? null : "Azioni"].filter(Boolean).map(function (x, i, a) { return h("th", { scope: "col", class: i >= 1 && i < a.length - (ro ? 0 : 1) ? "n" : null }, x); }))),
       h("tbody", null, sorted.map(function (b) {
         var c = cost(b), pct = t.total ? Math.round(c / t.total * 100) : 0, settled = c > 0 && num(b.paid) >= c, unit = isUnit(b);
         return h("tr", { class: settled ? "settled" : null }, h("th", { scope: "row" }, h("b", null, b.category, settled ? badge("Saldato", "ok") : null), h("small", null, [b.description, unit ? unitNote(b) : num(b.contracted) > 0 ? "contratto" : c ? "stima" : "costo da scrivere", pct ? pct + "% del totale" : null].filter(Boolean).join(" · "))),
-          h("td", { class: "n" }, eur(c)), payCell(b, "acconto"), payCell(b, "saldo"), h("td", { class: "n" }, eur(b.paid)), h("td", { class: "n" }, eur(Math.max(0, c - num(b.paid)))),
+          h("td", { class: "n" }, eur(c)), P ? payCell(b, "acconto") : null, P ? payCell(b, "saldo") : null, h("td", { class: "n" }, eur(b.paid)), h("td", { class: "n" }, eur(Math.max(0, c - num(b.paid)))),
           ro ? null : h("td", null, h("span", { class: "row-actions" },
             mini("Modifica", function () { budgetDialog(w, b, items); }),
             mini("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina la spesa")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger"))));
       })),
-      h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.min(num(b.deposit), cost(b)); }, 0))), h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.max(0, cost(b) - Math.min(num(b.deposit), cost(b))); }, 0))), h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), ro ? null : h("td", null)))));
+      h("tfoot", null, h("tr", null, h("th", { scope: "row" }, "Totale"), h("td", { class: "n" }, eur(t.total)), P ? h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.min(num(b.deposit), cost(b)); }, 0))) : null, P ? h("td", { class: "n" }, eur(items.reduce(function (a, b) { return a + Math.max(0, cost(b) - Math.min(num(b.deposit), cost(b))); }, 0))) : null, h("td", { class: "n" }, eur(t.paid)), h("td", { class: "n" }, eur(left)), ro ? null : h("td", null)))));
     // su telefono: una scheda per voce invece della tabella
     var cards = h("ul", { class: "bud-cards" }, sorted.map(function (b) {
       var c = cost(b), paid = num(b.paid), settled = c > 0 && paid >= c, unit = isUnit(b);
@@ -1220,12 +1241,13 @@
         h("div", { class: "bud-top" }, h("div", null, h("b", null, b.category), h("small", null, [b.description, unit ? unitNote(b) : num(b.contracted) > 0 ? "contratto" : c ? "stima" : "costo da scrivere"].filter(Boolean).join(" · "))),
           h("b", { class: "bud-cost" }, eur(c))),
         c ? h("div", { class: "bud-prog" }, bar([[Math.min(paid, c), "cer"]], c, "Pagato"), h("small", null, settled ? "Saldato" : "Pagato " + eur(paid) + " · da pagare " + eur(Math.max(0, c - paid)))) : null,
-        h("ul", { class: "bud-pays" }, line("acconto"), line("saldo")),
+        P ? h("ul", { class: "bud-pays" }, line("acconto"), line("saldo")) : null,
         ro ? null : h("div", { class: "bud-act" },
           mini("Modifica", function () { budgetDialog(w, b, items); }),
           mini("Elimina", async function () { if (!await confirmBox("Eliminare la voce?", "«" + b.category + "» verrà tolta dal budget.", "Elimina la spesa")) return; await attempt(function () { return api.remove("budget_items", b.id); }, "Eliminata."); render(); }, "danger")));
     }));
-    return [head, k, h("section", { class: "panel" }, h("div", { class: "panel-head" }, h("div", null, addBtn, h("h2", { class: "serif" }, "Tutte le voci"))), table, cards,
+    return [head, k, P ? null : lockPreview(w, "pagamenti", "Acconti, saldi e promemoria sono nel Completo", TXT_PAY, samplePayChart()),
+      h("section", { class: "panel" }, h("div", { class: "panel-head" }, h("div", null, addBtn, h("h2", { class: "serif" }, "Tutte le voci"))), table, cards,
       h("p", { class: "muted small pad-t" }, "Totale previsto " + eur(t.total) + " · Pagato " + eur(t.paid) + " · Da pagare " + eur(left) + (cap ? " · " + (t.total > cap ? "Sopra il budget di " + eur(t.total - cap) : "Margine sul budget " + eur(cap - t.total)) : "") + ". Location, catering, bomboniere e partecipazioni si calcolano dagli invitati; le altre voci usano il contratto quando c'è, altrimenti la stima."))];
   }
 
@@ -1544,6 +1566,65 @@
   }
 
 
+  /* ---- trascinamento degli invitati: mouse, penna e dito (sul telefono si tiene premuto un attimo) ---- */
+  // source: l'elemento da trascinare; label: testo della "etichetta" che segue il puntatore; onDrop(target) riceve l'elemento [data-drop] sotto il puntatore
+  function dragGuest(source, label, onDrop, onTap) {
+    var st = null;
+    function find(x, y) { var el = document.elementFromPoint(x, y); return el && el.closest("[data-drop]"); }
+    function begin(e) {
+      st.on = true; st.ghost = h("div", { class: "drag-ghost" }, label); document.body.append(st.ghost); document.body.classList.add("dragging"); source.classList.add("is-src");
+      move(e);
+    }
+    function move(e) {
+      st.ghost.style.transform = "translate(" + (e.clientX + 12) + "px," + (e.clientY + 12) + "px)";
+      var t = find(e.clientX, e.clientY);
+      if (t !== st.over) { if (st.over) st.over.classList.remove("drop-on"); st.over = t; if (t) t.classList.add("drop-on"); }
+    }
+    function end() {
+      if (st && st.on) { st.ghost.remove(); document.body.classList.remove("dragging"); source.classList.remove("is-src"); if (st.over) st.over.classList.remove("drop-on"); }
+      clearTimeout(st && st.timer); window.removeEventListener("touchmove", block, { passive: false }); st = null;
+    }
+    function block(e) { if (st && st.on) e.preventDefault(); }
+    source.addEventListener("pointerdown", function (e) {
+      if (e.button) return;
+      st = { x: e.clientX, y: e.clientY, on: false, over: null, touch: e.pointerType === "touch" };
+      if (st.touch) {
+        window.addEventListener("touchmove", block, { passive: false });
+        var ev = { clientX: e.clientX, clientY: e.clientY };
+        st.timer = setTimeout(function () { if (st && !st.on) { if (navigator.vibrate) navigator.vibrate(15); begin(ev); } }, 280);
+      }
+      try { source.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    source.addEventListener("pointermove", function (e) {
+      if (!st) return;
+      if (!st.on) {
+        var far = Math.abs(e.clientX - st.x) + Math.abs(e.clientY - st.y) > 6;
+        if (st.touch) { if (far) end(); return; } // sul telefono un movimento prima del tempo è uno scorrimento
+        if (far) begin(e); else return;
+      }
+      move(e);
+    });
+    source.addEventListener("pointerup", function (e) {
+      if (!st) return;
+      var was = st.on, over = st.over; end();
+      if (was) { if (over) onDrop(over); } else if (onTap) onTap();
+    });
+    source.addEventListener("pointercancel", end);
+    source.addEventListener("click", function (e) { e.preventDefault(); }); // il tocco lo gestisce pointerup
+    source.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && onTap) { e.preventDefault(); onTap(); } });
+  }
+  // Nuclei: chi condivide il campo «Nucleo familiare» viaggia insieme (una partecipazione per nucleo)
+  function householdsOf(list) {
+    var out = [], by = {};
+    list.forEach(function (x) {
+      var k = (x.household || "").trim().toLowerCase();
+      if (!k) { out.push({ key: "#" + x.id, name: x.name, people: [x] }); return; }
+      if (!by[k]) { by[k] = { key: k, name: x.household.trim(), people: [] }; out.push(by[k]); }
+      by[k].people.push(x);
+    });
+    return out;
+  }
+
   async function guestsView(w, sub) {
     if (sub === "importa") return importView(w);
     var res = await Promise.all([api.list("guests", w.id), api.list("seating_tables", w.id)]);
@@ -1559,6 +1640,52 @@
     var coming = guests.filter(function (x) { return x.rsvp !== "no"; }), waiting = coming.filter(function (x) { return !x.table_id; }), seated = guests.filter(function (x) { return x.table_id; });
     var seatsTotal = tables.reduce(function (a, t) { return a + t.seats; }, 0);
     var at = function (t, n) { return guests.filter(function (x) { return x.table_id === t.id && x.seat_number === n; })[0]; };
+    var byGid = {}; guests.forEach(function (x) { byGid[x.id] = x; });
+    // Posa uno o più invitati: su un posto (dal posto scelto in avanti) o su un tavolo (primi posti liberi)
+    async function seatPeople(ids, t, startSeat) {
+      var people = ids.map(function (id) { return byGid[id]; }).filter(Boolean);
+      if (!canEdit(w) || !people.length) return;
+      // un solo invitato sopra un posto occupato: scambio (o l'altro torna da sistemare)
+      if (people.length === 1 && startSeat) {
+        var x = people[0], occ = at(t, startSeat);
+        if (occ && occ.id === x.id) return;
+        await attempt(async function () {
+          var from = x.table_id ? { table_id: x.table_id, seat_number: x.seat_number } : null;
+          if (occ) await api.update("guests", occ.id, { table_id: null, seat_number: null });
+          await api.update("guests", x.id, { table_id: t.id, seat_number: startSeat });
+          if (occ && from) await api.update("guests", occ.id, from);
+        }, occ ? (x.table_id ? x.name + " e " + occ.name + " si sono scambiati il posto." : occ.name + " torna tra gli invitati da sistemare.") : x.name + " siede a " + t.name + ".");
+        render(); return;
+      }
+      var free = [];
+      for (var n = 1; n <= t.seats; n++) {
+        var o = at(t, n);
+        if (!o || ids.indexOf(o.id) >= 0) free.push(n);
+      }
+      if (startSeat) free = free.filter(function (n) { return n >= startSeat; }).concat(free.filter(function (n) { return n < startSeat; }));
+      if (free.length < people.length) { toast("A " + t.name + " restano " + plural(free.length, "posto libero", "posti liberi") + ": il nucleo è di " + people.length + " persone.", true); return; }
+      await attempt(async function () {
+        for (var i = 0; i < people.length; i++) if (people[i].table_id) await api.update("guests", people[i].id, { table_id: null, seat_number: null });
+        for (var j = 0; j < people.length; j++) await api.update("guests", people[j].id, { table_id: t.id, seat_number: free[j] });
+      }, people.length > 1 ? plural(people.length, "persona", "persone") + " a " + t.name + "." : people[0].name + " siede a " + t.name + ".");
+      render();
+    }
+    async function unseat(ids) {
+      var people = ids.map(function (id) { return byGid[id]; }).filter(function (x) { return x && x.table_id; });
+      if (!people.length) return;
+      await attempt(async function () { for (var i = 0; i < people.length; i++) await api.update("guests", people[i].id, { table_id: null, seat_number: null }); },
+        people.length > 1 ? "Il nucleo torna tra gli invitati da sistemare." : people[0].name + " torna tra gli invitati da sistemare.");
+      render();
+    }
+    var tById = {}; tables.forEach(function (t) { tById[t.id] = t; });
+    function dropTo(ids) {
+      return function (target) {
+        var d = target.dataset;
+        if (d.drop === "lista") return unseat(ids);
+        var t = tById[d.table]; if (!t) return;
+        seatPeople(ids, t, d.drop === "posto" ? Number(d.seat) : null);
+      };
+    }
     var R = rights(w), TXT_T = "Invitati illimitati, tavoli e sala in pianta senza limiti, stampa ed esportazione del tableau e il PDF per catering e location.";
     var guestsFull = R.guests != null && guests.length >= R.guests, tablesFull = R.tables != null && tables.length >= R.tables;
     var addGuest = function () { return btn("Aggiungi invitato", function () {
@@ -1589,6 +1716,8 @@
       kpi("Ai tavoli", seated.length + " su " + coming.length, "chi viene o non ha ancora risposto", "solid"),
       kpi("Posti liberi", String(seatsTotal - seated.length), "su " + seatsTotal + " totali" + (waiting.length > seatsTotal - seated.length ? " · ne mancano " + (waiting.length - (seatsTotal - seated.length)) : ""))], "six");
     // per il catering: menù e allergie di chi viene o non ha ancora risposto
+    var hcAll = headcount(guests);
+    var invLine = guests.length ? h("p", { class: "small" }, h("b", null, plural(hcAll.nucleiTutti, "partecipazione", "partecipazioni") + " da preparare"), " · una per nucleo familiare, " + plural(guests.length, "persona invitata", "persone invitate") + ". Chi non ha un nucleo conta come partecipazione a sé.") : null;
     var menuLine = Object.keys(menus).length ? h("p", { class: "muted small" }, "Menù di chi viene o è in attesa: " + Object.keys(menus).map(function (k) { return (LABEL.menu[k] || k).toLowerCase() + " " + menus[k]; }).join(" · ") + "." +
       (Object.keys(allergies).length ? " Allergie: " + Object.keys(allergies).map(function (k) { return allergyLabel(k).toLowerCase() + " " + allergies[k]; }).join(" · ") + "." : "")) : null;
     var tabs = subTabs("m/" + w.id + "/invitati", [["", "La sala"], ["elenco", "Elenco invitati · " + guests.length], ["tavoli", "Tavolo per tavolo · " + tables.length]], tab);
@@ -1601,15 +1730,18 @@
     var hall = h("div", { class: "hall", style: "width:" + HALL_W + "px;height:" + HALL_H + "px" });
     tables.forEach(function (t) {
       var geo = tableGeometry(t), filled = guests.filter(function (x) { return x.table_id === t.id; }).length;
-      var el = h("div", { class: "table-el" + (t.kind === "sposi" ? " sposi" : ""), style: "left:" + (t.pos_x / 100 * HALL_W) + "px;top:" + (t.pos_y / 100 * HALL_H) + "px" });
+      var el = h("div", { class: "table-el" + (t.kind === "sposi" ? " sposi" : ""), "data-drop": "tavolo", "data-table": t.id, style: "left:" + (t.pos_x / 100 * HALL_W) + "px;top:" + (t.pos_y / 100 * HALL_H) + "px" });
       var core = h("button", { type: "button", class: "table-core " + (t.shape === "rotondo" ? "round" : "rect") + (t.kind === "sposi" ? " sposi" : "") + (filled >= t.seats ? " full" : ""), style: "width:" + geo.w + "px;height:" + geo.h + "px",
         "aria-label": t.name + ", " + filled + " su " + t.seats + " posti. Trascina per spostare, invio per modificare." },
         t.kind === "sposi" && !/sposi/i.test(t.name) ? h("small", null, "Sposi") : null, h("b", null, t.name), h("span", null, filled + "/" + t.seats));
       el.append(core);
       geo.seats.forEach(function (s, i) {
         var n = i + 1, x = at(t, n);
-        el.append(h("button", { type: "button", class: "seat " + (x ? "gt-" + x.guest_group : "free") + (geo.small ? " sm" : ""), style: "left:" + s.x + "px;top:" + s.y + "px", title: geo.small && x ? x.name : null,
-          "aria-label": "Posto " + n + ": " + (x ? x.name : "libero"), onclick: function () { seatDialog(w, t, n, guests, tables); } }, String(n)));
+        var sb = h("button", { type: "button", class: "seat " + (x ? "gt-" + x.guest_group : "free") + (geo.small ? " sm" : ""), style: "left:" + s.x + "px;top:" + s.y + "px", title: x ? x.name + (canEdit(w) ? " · trascina per spostare" : "") : null,
+          "data-drop": "posto", "data-table": t.id, "data-seat": String(n),
+          "aria-label": "Posto " + n + ": " + (x ? x.name : "libero"), onclick: x && canEdit(w) ? null : function () { seatDialog(w, t, n, guests, tables); } }, String(n));
+        if (x && canEdit(w)) dragGuest(sb, x.name, dropTo([x.id]), function () { seatDialog(w, t, n, guests, tables); });
+        el.append(sb);
         if (x && !geo.small) el.append(h("span", { class: "seat-name a-" + s.align, style: "left:" + (s.x + s.lx) + "px;top:" + (s.y + s.ly) + "px" }, shortName(x)));
       });
       // trascinamento con mouse o dito; un tocco senza movimento apre la modifica del tavolo
@@ -1660,11 +1792,28 @@
     window.onresize = function () { if (!zoom && document.body.contains(wrap)) applyZoom(0); };
     function editTable(t) { tableDialog(t, function (d) { return api.update("seating_tables", t.id, d); }).then(function (d) { if (d) { toast("Tavolo aggiornato."); render(); } }); }
 
-    var waitingPanel = h("aside", { class: "panel waiting", "aria-labelledby": "ds-h" }, h("header", { class: "panel-head" }, h("div", null, h("h2", { id: "ds-h" }, "Da sistemare ", count(waiting.length, "bord")), h("p", { class: "sub" }, "Ospiti confermati o in attesa senza posto assegnato. Toccate un nome per scegliere il posto."))),
+    var chip = function (x) {
+      var b = h("button", { type: "button", class: "guest-chip gt-b-" + x.guest_group }, x.name, x.rsvp === "in_attesa" ? h("span", { class: "q", "aria-label": "in attesa di risposta" }, "?") : null);
+      if (canEdit(w)) dragGuest(b, x.name, dropTo([x.id]), function () { placeGuestDialog(w, x, tables, guests); });
+      return b;
+    };
+    var openHH = state.openHH || (state.openHH = {});
+    var waitingPanel = h("aside", { class: "panel waiting", "data-drop": "lista", "aria-labelledby": "ds-h" }, h("header", { class: "panel-head" }, h("div", null, h("h2", { id: "ds-h" }, "Da sistemare ", count(waiting.length, "bord")),
+        h("p", { class: "sub" }, canEdit(w) ? "Trascinate un nome o un intero nucleo su un tavolo o su un posto. Riportate qui un ospite per togliergli il posto. Toccando un nome scegliete il posto da un elenco." : "Ospiti confermati o in attesa senza posto assegnato."))),
       waiting.length ? GROUPS.map(function (k) {
         var rows = waiting.filter(function (x) { return x.guest_group === k; });
-        return rows.length ? h("div", { class: "wait-group" }, h("p", { class: "lbl" }, h("span", { class: "swatch gt-" + k, "aria-hidden": "true" }), groupLabel(w, k) + " · " + rows.length),
-          h("div", { class: "chips-btn" }, rows.map(function (x) { return h("button", { type: "button", class: "guest-chip", onclick: function () { placeGuestDialog(w, x, tables, guests); } }, x.name, x.rsvp === "in_attesa" ? h("span", { class: "q", "aria-label": "in attesa di risposta" }, "?") : null); }))) : null;
+        if (!rows.length) return null;
+        var hh = householdsOf(rows);
+        return h("div", { class: "wait-group" }, h("p", { class: "lbl" }, h("span", { class: "swatch gt-" + k, "aria-hidden": "true" }), groupLabel(w, k) + " · " + plural(rows.length, "persona", "persone") + " · " + plural(hh.length, "nucleo", "nuclei")),
+          h("div", { class: "chips-btn" }, hh.map(function (f) {
+            if (f.people.length === 1) return chip(f.people[0]);
+            var key = w.id + f.key, det = h("details", { class: "hh", open: !!openHH[key] });
+            det.addEventListener("toggle", function () { openHH[key] = det.open; });
+            var handle = h("span", { class: "hh-drag", role: "button", tabindex: "0", title: canEdit(w) ? "Trascina tutto il nucleo" : null, "aria-label": "Trascina " + f.name + ", " + f.people.length + " persone" }, icon("users"));
+            if (canEdit(w)) dragGuest(handle, f.name + " · " + f.people.length, dropTo(f.people.map(function (x) { return x.id; })), null);
+            det.append(h("summary", null, handle, h("b", null, f.name), h("span", { class: "hh-n" }, String(f.people.length))), h("div", { class: "chips-btn" }, f.people.map(chip)));
+            return det;
+          })));
       }) : h("p", { class: "muted" }, guests.length ? "Tutti hanno un posto." : "Aggiungete gli invitati: chi viene comparirà qui finché non ha un posto."));
 
     var sala = h("section", { class: "sala", "aria-labelledby": "sala-h" },
@@ -1686,12 +1835,21 @@
         oninput: function (e) { store.set("nio-q", e.target.value); resetPage(); clearTimeout(window.__nioQ); window.__nioQ = setTimeout(function () { render().then(function () { var i = document.querySelector(".tools input[type=search]"); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }); }, 300); } })),
       h("label", null, h("span", { class: "sr" }, "Gruppo"), h("select", { onchange: function (e) { store.set("nio-group", e.target.value); resetPage(); render(); } }, h("option", { value: "" }, "Tutti i gruppi"), GROUPS.map(function (k) { return h("option", { value: k, selected: gf === k }, groupLabel(w, k)); }))),
       h("label", null, h("span", { class: "sr" }, "Risposta"), h("select", { onchange: function (e) { store.set("nio-rsvp", e.target.value); resetPage(); render(); } }, h("option", { value: "" }, "Tutte le risposte"), opts(LABEL.rsvp).map(function (o) { return h("option", { value: o[0], selected: rf === o[0] }, o[1]); }))));
-    var rows = [], lastGroup = null, page = shown.slice(pg.from, pg.to);
+    var rows = [], lastGroup = null, lastHH = null, page = shown.slice(pg.from, pg.to), shutHH = state.shutHH || (state.shutHH = {});
+    var hhSize = {}; guests.forEach(function (y) { var k = (y.household || "").trim().toLowerCase(); if (k) hhSize[y.guest_group + "|" + k] = (hhSize[y.guest_group + "|" + k] || 0) + 1; });
     page.forEach(function (x) {
       if (x.guest_group !== lastGroup) {
-        lastGroup = x.guest_group;
+        lastGroup = x.guest_group; lastHH = null;
         rows.push(h("tr", { class: "group-row" }, h("th", { colspan: "6", scope: "rowgroup" }, h("span", { class: "dot gt-" + x.guest_group, "aria-hidden": "true" }), groupLabel(w, x.guest_group), count(guests.filter(function (y) { return y.guest_group === x.guest_group; }).length))));
       }
+      var hk = (x.household || "").trim().toLowerCase(), hkey = w.id + x.guest_group + "|" + hk, size = hk ? hhSize[x.guest_group + "|" + hk] : 0;
+      if (size > 1 && hk !== lastHH) {
+        var shut = !!shutHH[hkey];
+        rows.push(h("tr", { class: "hh-row" }, h("th", { colspan: "6", scope: "rowgroup" }, h("button", { type: "button", class: "hh-toggle", "aria-expanded": String(!shut), onclick: function () { shutHH[hkey] = !shut; render(); } },
+          h("span", { class: "hh-caret", "aria-hidden": "true" }, shut ? "▸" : "▾"), h("b", null, x.household.trim()), h("span", { class: "muted" }, " · " + plural(size, "persona", "persone") + " · 1 partecipazione")))));
+      }
+      lastHH = hk || null;
+      if (size > 1 && shutHH[hkey]) return;
       var t = byId[x.table_id];
       var sub2 = [x.age_band !== "adulto" ? (LABEL.age[x.age_band] || "").toLowerCase() : null, x.notes].filter(Boolean).join(" · "), al = allergyText(x);
       rows.push(h("tr", null, h("th", { scope: "row" }, h("b", null, x.name), sub2 ? h("small", null, sub2) : null), h("td", null, x.household || "—"),
@@ -1706,7 +1864,7 @@
           mini("Modifica", function () { guestDialog(w, x); }),
           mini("Elimina", async function () { if (!await confirmBox("Eliminare l'invitato?", x.name + " verrà tolto dalla lista e dal suo tavolo.", "Elimina")) return; await attempt(function () { return api.remove("guests", x.id); }, "Eliminato."); render(); }, "danger")))));
     });
-    var elenco = h("section", { class: "panel flush", "aria-labelledby": "el-h" }, h("header", { class: "panel-head pad" }, h("div", null, h("h2", { id: "el-h", class: "serif" }, "Elenco invitati"), menuLine)), h("div", { class: "pad-x" }, tools),
+    var elenco = h("section", { class: "panel flush", "aria-labelledby": "el-h" }, h("header", { class: "panel-head pad" }, h("div", null, h("h2", { id: "el-h", class: "serif" }, "Elenco invitati"), invLine, menuLine)), h("div", { class: "pad-x" }, tools),
       guests.length ? (shown.length ? h("div", { class: "tscroll" }, h("table", { class: "tbl guests" }, h("caption", { class: "sr" }, "Invitati"),
         h("thead", null, h("tr", null, ["Nominativo", "Nucleo", "Menù", "Tavolo", "Risposta", "Azioni"].map(function (x) { return h("th", { scope: "col" }, x); }))), h("tbody", null, rows))) : h("p", { class: "muted pad" }, "Nessun invitato con questi filtri."))
         : empty("La lista comincia da voi", "Nessun invitato registrato. Aggiungete una persona o importate un file Excel; il numero previsto resta una stima separata.", h("div", { class: "btn-row" }, addGuest(), linkBtn("#/m/" + w.id + "/invitati/importa", "Importa da Excel", "ghost", "file")), "users"),
@@ -1923,7 +2081,8 @@
       unseated.length ? h("section", { class: "ps-keep" }, h("h2", null, "Senza posto assegnato · " + unseated.length), guestRows(unseated)) : null));
   }
   async function timelineView(w) {
-    if (!rights(w).timeline) return planLock(w, "Programma del giorno", "Orari, luoghi e responsabili della giornata, da esportare e stampare per fornitori e collaboratori.", "programma");
+    if (!rights(w).timeline) return [pageHead("Programma del giorno", "Orari, luoghi e responsabili della giornata."),
+      lockPreview(w, "programma", "Il programma del giorno è nel Completo", "Orari, luoghi e chi coordina ogni momento, con due programmi separati da stampare per fornitori e famiglie.", sampleTimeline())];
     var items = await api.list("timeline_items", w.id), ro = !canEdit(w), pf = store.get("nio-party") || "";
     var fields = timelineFields(w);
     var add = ro ? null : btn("Aggiungi momento", function () { editDialog("Nuovo momento", fields, { party: "comune" }, "Aggiungi", function (d) { d.wedding_id = w.id; return api.insert("timeline_items", d); }, "Aggiunto."); }, "primary", "plus");
@@ -2059,7 +2218,7 @@
       if (n <= (all ? 365 : days)) out.push({ id: "t" + t.id, kind: "scadenza", n: n, due: t.due_date, title: t.title, wedding: mine[t.wedding_id], href: "#/m/" + t.wedding_id + "/scadenze" });
     });
     (state.alertPays || []).forEach(function (b) {
-      if (!b.due_date || !mine[b.wedding_id]) return;
+      if (!b.due_date || !mine[b.wedding_id] || !rights(mine[b.wedding_id]).payments) return;
       var left = cost(b) - num(b.paid), n = daysTo(b.due_date);
       if (left > 0 && n <= (all ? 365 : days) && n >= -30) out.push({ id: "p" + b.id, kind: "pagamento", n: n, due: b.due_date, title: "Pagamento: " + b.category + " (" + eur(left) + ")", wedding: mine[b.wedding_id], href: "#/m/" + b.wedding_id + "/budget" });
     });
