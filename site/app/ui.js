@@ -2083,7 +2083,7 @@
       try {
         var buf = await f.arrayBuffer(), rows;
         if (/\.xlsx$/i.test(f.name)) rows = await readXlsx(buf);
-        else { var text = new TextDecoder("utf-8").decode(buf); if (text.indexOf("�") >= 0) text = new TextDecoder("windows-1252").decode(buf); rows = parseCsv(text); }
+        else { var text = new TextDecoder("utf-8").decode(buf); if (text.indexOf("\uFFFD") >= 0) text = new TextDecoder("windows-1252").decode(buf); rows = parseCsv(text); }
         show(last = readImport(w, rows));
       } catch (err) { out.replaceChildren(bad(err.message || String(err))); }
     } });
