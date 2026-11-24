@@ -924,3 +924,4 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none;
   .tabbar a { min-height: 50px; border-radius: 10px; }
   .shell { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 }
+.tbl .dot.bord { background: var(--bord); }

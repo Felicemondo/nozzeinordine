@@ -130,7 +130,8 @@
   function planOf(wid) { var w = db.weddings.filter(function (x) { return x.id === wid; })[0]; return w ? w.plan : null; }
   function enforcePlan(table, row, old) {
     var pl = planOf(row.wedding_id || (old && old.wedding_id)), free = pl === "gratis", cheap = pl === "gratis" || pl === "tableau";
-    var n = function (t) { return db[t].filter(function (x) { return x.wedding_id === row.wedding_id; }).length; };
+    var n = function (t) { return db[t].filter(function (x) { return x.wedding_id === row.wedding_id && !x.couple_side && x.kind !== "sposi"; }).length; };
+    if (row.couple_side || row.kind === "sposi") return;
     if (old) {
       if (table === "budget_items" && cheap && ["deposit", "deposit_due", "due_date"].some(function (k) { return k in row && (row[k] || null) !== (old[k] || null) && !(k === "deposit" && !num0(row[k]) && !num0(old[k])); }))
         throw new Error("Acconti, saldi e date dei pagamenti fanno parte del piano Completo.");
@@ -144,6 +145,18 @@
     if (table === "budget_items" && cheap && (num0(row.deposit) > 0 || row.deposit_due || row.due_date)) throw new Error("Acconti, saldi e date dei pagamenti fanno parte del piano Completo.");
   }
   function num0(v) { return Number(v) || 0; }
+  // come private.ensure_couple: tavolo degli sposi e i due sposi seduti
+  function ensureCouple(w) {
+    var t = db.seating_tables.filter(function (x) { return x.wedding_id === w.id && x.kind === "sposi"; })[0];
+    if (!t) { t = { id: uid(), wedding_id: w.id, name: "Sposi", seats: 2, shape: "rettangolare", kind: "sposi", pos_x: 50, pos_y: 12, created_at: new Date().toISOString() }; db.seating_tables.push(t); }
+    ["a", "b"].forEach(function (side, i) {
+      if (db.guests.some(function (g) { return g.wedding_id === w.id && g.couple_side === side; })) return;
+      var seat = i + 1; if (db.guests.some(function (g) { return g.table_id === t.id && g.seat_number === seat; })) seat = null;
+      db.guests.push({ id: uid(), wedding_id: w.id, name: (side === "a" ? w.partner_a : w.partner_b) || "Sposo/a " + (i + 1), household: "", guest_group: side === "a" ? "famiglia_a" : "famiglia_b",
+        rsvp: "si", menu: "standard", age_band: "adulto", allergies: [], allergies_note: "", notes: "", couple_side: side, table_id: seat ? t.id : null, seat_number: seat, created_at: new Date().toISOString() });
+    });
+  }
+  db.weddings.forEach(ensureCouple);
   db.internal_notes.push({ id: uid(), wedding_id: "w-sara", body: "La sposa preferisce non avere fiori bianchi sui tavoli.", created_by: "u-bea", created_at: new Date().toISOString() });
   db.wedding_invites.push({ id: uid(), wedding_id: "w-giulia", email: "giulia@esempio.it", member_role: "sposi", token: uid(), accepted_at: null, expires_at: addDays(30), created_at: new Date().toISOString() });
 
@@ -200,6 +213,7 @@
       db.weddings.push(w);
       db.wedding_members.push({ wedding_id: w.id, user_id: me.id, member_role: me.role === "planner" ? "planner" : "sposi", created_at: w.created_at });
       seedTasks(w, true);
+      ensureCouple(w);
       return w.id;
     },
     getWedding: async function (id) { await wait(); return isMember(id) ? clone(db.weddings.filter(function (w) { return w.id === id; })[0] || null) : null; },

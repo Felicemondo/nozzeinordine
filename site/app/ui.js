@@ -51,11 +51,12 @@
     var c = { adulti: 0, bambini: 0, piccoli: 0, nuclei: 0, nucleiTutti: 0 }, coming = {}, all = {};
     guests.forEach(function (g) {
       var key = (g.household || "").trim().toLowerCase() || "#" + g.id;
-      all[key] = 1;
+      if (!g.couple_side) all[key] = 1; // gli sposi non ricevono la partecipazione
       if (g.rsvp === "no") return;
       coming[key] = 1;
       if (g.age_band === "bambino") c.bambini++; else if (g.age_band === "under3") c.piccoli++; else c.adulti++;
     });
+    guests.forEach(function (g) { if (g.couple_side) delete coming[(g.household || "").trim().toLowerCase() || "#" + g.id]; });
     c.nuclei = Object.keys(coming).length; c.nucleiTutti = Object.keys(all).length;
     return c;
   }
@@ -1634,7 +1635,8 @@
     var guests = res[0], tables = res[1], tab = sub === "elenco" || sub === "tavoli" ? sub : "";
     state.hc[w.id] = headcount(guests);
     var byId = {}; tables.forEach(function (t) { byId[t.id] = t; });
-    var g = guestCounts(guests), menus = {}, allergies = {};
+    var invited = guests.filter(function (x) { return !x.couple_side; }); // gli sposi sono in lista ma non sono invitati
+    var g = guestCounts(invited), menus = {}, allergies = {};
     guests.forEach(function (x) {
       if (x.rsvp === "no") return;
       menus[x.menu] = (menus[x.menu] || 0) + 1;
@@ -1690,7 +1692,7 @@
       };
     }
     var R = rights(w), TXT_T = "Invitati illimitati, tavoli e sala in pianta senza limiti, stampa ed esportazione del tableau e il PDF per catering e location.";
-    var guestsFull = R.guests != null && guests.length >= R.guests, tablesFull = R.tables != null && tables.length >= R.tables;
+    var guestsFull = R.guests != null && invited.length >= R.guests, tablesFull = R.tables != null && tables.filter(function (t) { return t.kind !== "sposi"; }).length >= R.tables;
     var addGuest = function () { return btn("Aggiungi invitato", function () {
       if (guestsFull) return unlock(w, "invitati", "Avete più di " + R.guests + " invitati", "Sbloccate il tableau completo a 19 €: " + TXT_T.charAt(0).toLowerCase() + TXT_T.slice(1));
       guestDialog(w, null); }, "primary", "plus"); };
@@ -1712,18 +1714,18 @@
         h("button", { class: "btn primary", value: "tab", disabled: !seated.length }, "Tableau per gli ospiti")]);
       if (r.value === "csv") csv(); else if (r.value === "cat") printCatering(w, guests, tables); else if (r.value === "tab") printTableau(w, guests, tables);
     }
-    var pct = guests.length ? (g.si / guests.length * 100).toFixed(1).replace(".", ",") + "% del totale" : null;
+    var pct = invited.length ? (g.si / invited.length * 100).toFixed(1).replace(".", ",") + "% del totale" : null;
     var stats = kpis([
-      kpi("Totale invitati", String(guests.length), w.guests_expected ? "obiettivo " + w.guests_expected + " · è una stima" : "persone registrate"),
+      kpi("Totale invitati", String(invited.length), (w.guests_expected ? "obiettivo " + w.guests_expected + " · è una stima" : "persone registrate") + (guests.length > invited.length ? " · più gli sposi" : "")),
       kpi("Vengono", String(g.si), pct, "", "olive"), kpi("In attesa", String(g.in_attesa), "risposta pendente"), kpi("Non vengono", String(g.no), "declinato", "", "terra"),
       kpi("Ai tavoli", seated.length + " su " + coming.length, "chi viene o non ha ancora risposto", "solid"),
       kpi("Posti liberi", String(seatsTotal - seated.length), "su " + seatsTotal + " totali" + (waiting.length > seatsTotal - seated.length ? " · ne mancano " + (waiting.length - (seatsTotal - seated.length)) : ""))], "six");
     // per il catering: menù e allergie di chi viene o non ha ancora risposto
     var hcAll = headcount(guests);
-    var invLine = guests.length ? h("p", { class: "small" }, h("b", null, plural(hcAll.nucleiTutti, "partecipazione", "partecipazioni") + " da preparare"), " · una per nucleo familiare, " + plural(guests.length, "persona invitata", "persone invitate") + ". Chi non ha un nucleo conta come partecipazione a sé.") : null;
+    var invLine = guests.length ? h("p", { class: "small" }, h("b", null, plural(hcAll.nucleiTutti, "partecipazione", "partecipazioni") + " da preparare"), " · una per nucleo familiare, " + plural(invited.length, "persona invitata", "persone invitate") + ". Chi non ha un nucleo conta come partecipazione a sé.") : null;
     var menuLine = Object.keys(menus).length ? h("p", { class: "muted small" }, "Menù di chi viene o è in attesa: " + Object.keys(menus).map(function (k) { return (LABEL.menu[k] || k).toLowerCase() + " " + menus[k]; }).join(" · ") + "." +
       (Object.keys(allergies).length ? " Allergie: " + Object.keys(allergies).map(function (k) { return allergyLabel(k).toLowerCase() + " " + allergies[k]; }).join(" · ") + "." : "")) : null;
-    var tabs = subTabs("m/" + w.id + "/invitati", [["", "La sala"], ["elenco", "Elenco invitati · " + guests.length], ["tavoli", "Tavolo per tavolo · " + tables.length]], tab);
+    var tabs = subTabs("m/" + w.id + "/invitati", [["", "La sala"], ["elenco", "Elenco invitati · " + invited.length], ["tavoli", "Tavolo per tavolo · " + tables.length]], tab);
 
     /* ---- la sala: si trascinano i tavoli, si tocca un posto per assegnarlo (struttura invariata) ---- */
     var legend = h("p", { class: "legend-line" }, GROUPS.map(function (k) { return h("span", { class: "leg" }, h("span", { class: "swatch gt-" + k, "aria-hidden": "true" }), groupLabel(w, k)); }),
@@ -1830,7 +1832,7 @@
     /* ---- elenco invitati: ricerca, filtri e pagine, raggruppato per gruppo ---- */
     var q = (store.get("nio-q") || "").toLowerCase(), gf = store.get("nio-group") || "", rf = store.get("nio-rsvp") || "";
     var shown = guests.filter(function (x) { return (!rf || x.rsvp === rf) && (!gf || x.guest_group === gf) && (!q || (x.name + " " + x.household).toLowerCase().indexOf(q) >= 0); })
-      .sort(function (a, b) { return GROUPS.indexOf(a.guest_group) - GROUPS.indexOf(b.guest_group) || (a.household + a.name).localeCompare(b.household + b.name); });
+      .sort(function (a, b) { return (a.couple_side ? 0 : 1) - (b.couple_side ? 0 : 1) || GROUPS.indexOf(a.guest_group) - GROUPS.indexOf(b.guest_group) || (a.household + a.name).localeCompare(b.household + b.name); });
     var pg = pager(shown.length, 15, "nio-gp", "invitati");
     var resetPage = function () { store.set("nio-gp", "1"); };
     var tools = h("div", { class: "tools" },
@@ -1841,9 +1843,12 @@
     var rows = [], lastGroup = null, lastHH = null, page = shown.slice(pg.from, pg.to), shutHH = state.shutHH || (state.shutHH = {});
     var hhSize = {}; guests.forEach(function (y) { var k = (y.household || "").trim().toLowerCase(); if (k) hhSize[y.guest_group + "|" + k] = (hhSize[y.guest_group + "|" + k] || 0) + 1; });
     page.forEach(function (x) {
-      if (x.guest_group !== lastGroup) {
+      if (x.couple_side && lastGroup !== "__sposi") {
+        lastGroup = "__sposi";
+        rows.push(h("tr", { class: "group-row" }, h("th", { colspan: "6", scope: "rowgroup" }, h("span", { class: "dot bord", "aria-hidden": "true" }), "Gli sposi", count(guests.length - invited.length))));
+      } else if (!x.couple_side && x.guest_group !== lastGroup) {
         lastGroup = x.guest_group; lastHH = null;
-        rows.push(h("tr", { class: "group-row" }, h("th", { colspan: "6", scope: "rowgroup" }, h("span", { class: "dot gt-" + x.guest_group, "aria-hidden": "true" }), groupLabel(w, x.guest_group), count(guests.filter(function (y) { return y.guest_group === x.guest_group; }).length))));
+        rows.push(h("tr", { class: "group-row" }, h("th", { colspan: "6", scope: "rowgroup" }, h("span", { class: "dot gt-" + x.guest_group, "aria-hidden": "true" }), groupLabel(w, x.guest_group), count(invited.filter(function (y) { return y.guest_group === x.guest_group; }).length))));
       }
       var hk = (x.household || "").trim().toLowerCase(), hkey = w.id + x.guest_group + "|" + hk, size = hk ? hhSize[x.guest_group + "|" + hk] : 0;
       if (size > 1 && hk !== lastHH) {
@@ -1865,7 +1870,7 @@
         } }, opts(LABEL.rsvp).map(function (o) { return h("option", { value: o[0], selected: x.rsvp === o[0] }, o[1]); })))),
         h("td", null, h("span", { class: "row-actions" },
           mini("Modifica", function () { guestDialog(w, x); }),
-          mini("Elimina", async function () { if (!await confirmBox("Eliminare l'invitato?", x.name + " verrà tolto dalla lista e dal suo tavolo.", "Elimina")) return; await attempt(function () { return api.remove("guests", x.id); }, "Eliminato."); render(); }, "danger")))));
+          x.couple_side ? null : mini("Elimina", async function () { if (!await confirmBox("Eliminare l'invitato?", x.name + " verrà tolto dalla lista e dal suo tavolo.", "Elimina")) return; await attempt(function () { return api.remove("guests", x.id); }, "Eliminato."); render(); }, "danger")))));
     });
     var elenco = h("section", { class: "panel flush", "aria-labelledby": "el-h" }, h("header", { class: "panel-head pad" }, h("div", null, h("h2", { id: "el-h", class: "serif" }, "Elenco invitati"), invLine, menuLine)), h("div", { class: "pad-x" }, tools),
       guests.length ? (shown.length ? h("div", { class: "tscroll" }, h("table", { class: "tbl guests" }, h("caption", { class: "sr" }, "Invitati"),
