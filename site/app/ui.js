@@ -1830,7 +1830,7 @@
       if (f.size > 1048576) return out.replaceChildren(bad("Il file è troppo grande: al massimo 1 MB."));
       var buf = await f.arrayBuffer(), text = new TextDecoder("utf-8").decode(buf);
       // Excel su Windows salva il CSV senza UTF-8: le lettere accentate si recuperano così
-      if (text.indexOf("�") >= 0) text = new TextDecoder("windows-1252").decode(buf);
+      if (text.indexOf("\uFFFD") >= 0) text = new TextDecoder("windows-1252").decode(buf);
       show(last = readImport(parseCsv(text)));
     } });
     return [pageHead("Importa gli invitati", "Dal foglio Excel alla lista in tre passi. Potrete poi correggere ogni persona dall'elenco.", linkBtn("#/m/" + w.id + "/invitati/elenco", "Torna all'elenco", "ghost", "back")),
