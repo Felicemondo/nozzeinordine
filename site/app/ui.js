@@ -1549,7 +1549,7 @@
       while (people.children.length > n - 1) people.lastChild.remove();
       peopleBox.hidden = n < 2;
     }
-    var actions = [adding ? h("button", { class: "btn tert", value: "import", formnovalidate: true }, icon("file"), "Importa da Excel") : null,
+    var actions = [
       h("button", { class: "btn ghost", value: "no", formnovalidate: true }, "Annulla"), h("button", { class: "btn primary", value: "ok" }, adding ? "Aggiungi" : "Salva")];
     var p = dialog(adding ? "Nuovo invitato" : "Modifica invitato", body, actions, async function (form) {
       var d = readForm(form, fields);
@@ -1900,7 +1900,7 @@
       }))) : empty("Ancora nessun tavolo", "Aggiungete i tavoli dalla sala: qui li vedrete uno per uno, posto per posto.", btn("Aggiungi tavolo", newTable, "primary", "plus"), "table");
 
     var head = pageHead("Invitati e tavoli", g.si + " vengono · " + g.in_attesa + " in attesa · " + g.no + " non vengono" + (w.guests_expected ? " · obiettivo " + w.guests_expected : ""),
-      [guests.length ? btn("Stampa ed esporta", printMenu, "ghost", R.print ? "printer" : "lock") : null, addTable, addGuest()]);
+      [guests.length ? btn("Stampa ed esporta", printMenu, "ghost", R.print ? "printer" : "lock") : null, addTable, canEdit(w) ? linkBtn("#/m/" + w.id + "/invitati/importa", "Importa da Excel", "soft", "file") : null, addGuest()]);
     return [head, stats, tabs, tab === "elenco" ? elenco : tab === "tavoli" ? cards : sala];
   }
 
