@@ -1904,12 +1904,18 @@
     return [head, stats, tabs, tab === "elenco" ? elenco : tab === "tavoli" ? cards : sala];
   }
 
-  /* ------------------------------------------------------------ importazione degli invitati */
-  var CSV_HEAD = ["Nome", "Cognome", "Numero bambini", "Bambini sotto i 3 anni", "Menù", "Intolleranze/allergie"];
+  /* ------------------------------------------------------------ importazione degli invitati
+     Il modello Excel lo genera l'app: colonne fisse e menu a tendina, così il file torna indietro sempre leggibile.
+     Si leggono anche i CSV (anche il vecchio modello con «Numero bambini») e un elenco incollato, un nome per riga. */
+  var IMPORT_MARK = "nio-invitati-v1";
+  var IMPORT_COLS = ["Nome e cognome", "Nucleo familiare", "Gruppo", "Età", "Menù", "Allergia 1", "Allergia 2", "Allergia 3", "Altre intolleranze", "Risposta", "Note"];
   var MENU_IN = { standard: "standard", vegano: "vegano", vegana: "vegano", vegetariano: "vegetariano", vegetariana: "vegetariano", "no carne": "no_carne", "senza carne": "no_carne", "no pesce": "no_pesce", "senza pesce": "no_pesce" };
   var ALLERGY_IN = [["glutine", /glutin|celiac/], ["lattosio", /latt/], ["uova", /uov/], ["frutta_guscio", /guscio|noc|mandorl|pistacch|frutta secca/], ["arachidi", /arachid/], ["soia", /soia/],
     ["pesce", /^pesc/], ["crostacei", /crostace|gamber|aragost/], ["molluschi", /mollusch|cozz|vongol|polp|calamar/], ["sedano", /sedano/], ["senape", /senape/], ["sesamo", /sesamo/], ["solfiti", /solfit|solforos/], ["lupini", /lupin/]];
-  var norm = function (v) { return String(v || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+  var AGE_IN = { adulto: "adulto", adulta: "adulto", bambino: "bambino", bambina: "bambino", "bambino sotto i 3 anni": "under3", "sotto i 3 anni": "under3", neonato: "under3", neonata: "under3" };
+  var RSVP_IN = { viene: "si", si: "si", "sì": "si", "in attesa": "in_attesa", "non viene": "no", no: "no" };
+  var norm = function (v) { return String(v == null ? "" : v).trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+  var cleanGroupName = function (s) { return String(s).replace(/[,;"]/g, " ").replace(/\s+/g, " ").trim(); };
   // CSV di Excel: separatore ; o , e celle tra virgolette
   function parseCsv(text) {
     text = text.replace(/^﻿/, "");
@@ -1924,89 +1930,175 @@
       else cell += c;
     }
     if (cell || row.length) { row.push(cell); rows.push(row); }
-    return rows.filter(function (r) { return r.some(function (x) { return x.trim(); }); });
+    return rows.filter(function (r) { return r.some(function (x) { return String(x).trim(); }); });
   }
-  function readImport(rows) {
-    if (!rows.length) return { rows: [], errs: ["Il file è vuoto."] };
-    var head = rows[0].map(norm), out = [], errs = [];
+  var excelLib = null;
+  function loadExcel() {
+    if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
+    return excelLib || (excelLib = new Promise(function (ok, ko) {
+      var s = document.createElement("script"); s.src = "vendor/exceljs.min.js";
+      s.onload = function () { ok(window.ExcelJS); }; s.onerror = function () { excelLib = null; ko(new Error("Non riesco a caricare il lettore Excel. Controllate la connessione e riprovate.")); };
+      document.head.append(s);
+    }));
+  }
+  // Il modello: foglio «Invitati» con menu a tendina, «Come compilarlo» e un foglio nascosto con gli elenchi
+  async function downloadTemplate(w) {
+    var X = await loadExcel(), wb = new X.Workbook();
+    wb.creator = "Nozze in Ordine";
+    var sh = wb.addWorksheet("Invitati", { views: [{ state: "frozen", ySplit: 1 }] }), help = wb.addWorksheet("Come compilarlo"), li = wb.addWorksheet("Elenchi", { state: "veryHidden" });
+    var lists = [GROUPS.map(function (k) { return cleanGroupName(groupLabel(w, k)); }), ["Adulto", "Bambino", "Sotto i 3 anni"], opts(LABEL.menu).map(function (o) { return o[1]; }),
+      ALLERGIES.filter(function (a) { return a[0] !== "altro"; }).map(function (a) { return a[1]; }), ["In attesa", "Viene", "Non viene"]];
+    li.getCell("A1").value = IMPORT_MARK;
+    lists.forEach(function (l, c) { l.forEach(function (v, r) { li.getCell(r + 2, c + 2).value = v; }); });
+    var ref = function (c, n) { var L = String.fromCharCode(66 + c); return "Elenchi!$" + L + "$2:$" + L + "$" + (n + 1); };
+    sh.columns = IMPORT_COLS.map(function (h0, i) { return { header: h0, key: "c" + i, width: [26, 22, 22, 15, 15, 18, 18, 18, 26, 13, 28][i] }; });
+    var head = sh.getRow(1); head.height = 22;
+    head.eachCell(function (c) { c.font = { bold: true, color: { argb: "FFFFFFFF" } }; c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF702F43" } }; c.alignment = { vertical: "middle" }; });
+    var pick = function (formula, title, msg) { return { type: "list", allowBlank: true, formulae: [formula], showErrorMessage: true, errorStyle: "stop", errorTitle: title, error: msg }; };
+    for (var r = 2; r <= 501; r++) {
+      sh.getCell(r, 1).dataValidation = { type: "textLength", operator: "lessThanOrEqual", formulae: [100], allowBlank: true, showErrorMessage: true, errorTitle: "Nome troppo lungo", error: "Al massimo 100 caratteri." };
+      sh.getCell(r, 3).dataValidation = pick(ref(0, lists[0].length), "Gruppo", "Scegliete un gruppo dall'elenco.");
+      sh.getCell(r, 4).dataValidation = pick(ref(1, 3), "Età", "Scegliete Adulto, Bambino o Sotto i 3 anni.");
+      sh.getCell(r, 5).dataValidation = pick(ref(2, lists[2].length), "Menù", "Scegliete un menù dall'elenco.");
+      [6, 7, 8].forEach(function (c) { sh.getCell(r, c).dataValidation = pick(ref(3, lists[3].length), "Allergia", "Scegliete un allergene dall'elenco; le altre intolleranze vanno nella colonna «Altre intolleranze»."); });
+      sh.getCell(r, 10).dataValidation = pick(ref(4, 3), "Risposta", "Scegliete In attesa, Viene o Non viene.");
+    }
+    help.columns = [{ width: 110 }];
+    [["Come compilare il modello degli invitati", true], [""], ["Una riga per ogni persona, bambini compresi. Gli sposi sono già nella lista: non scriveteli."],
+      ["Nome e cognome: obbligatorio. Le righe senza nome vengono saltate."],
+      ["Nucleo familiare: chi vive insieme riceve una sola partecipazione. Scrivete lo stesso nucleo per tutti, per esempio «Famiglia Russo»."],
+      ["Gruppo, Età, Menù, Allergie e Risposta: sceglieteli dal menu a tendina della cella. Se li lasciate vuoti: gruppo scelto al caricamento, Adulto, Standard, nessuna allergia, In attesa."],
+      ["Altre intolleranze: tutto quello che non è nell'elenco degli allergeni, scritto a parole."],
+      ["Non rinominate e non spostate le colonne. Salvate il file così com'è (.xlsx) e caricatelo nella pagina «Importa gli invitati»."]]
+      .forEach(function (l, i) { var c = help.getCell(i + 1, 1); c.value = l[0]; c.alignment = { wrapText: true }; if (l[1]) c.font = { bold: true, size: 14 }; });
+    var buf = await wb.xlsx.writeBuffer();
+    var a = h("a", { href: URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })), download: "invitati-" + w.title.replace(/\W+/g, "-").toLowerCase() + ".xlsx" });
+    document.body.append(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  async function readXlsx(buf) {
+    var X = await loadExcel(), wb = new X.Workbook();
+    try { await wb.xlsx.load(buf); } catch (e) { throw new Error("Il file non si apre come Excel. Scaricate il modello da questa pagina e riprovate."); }
+    var sh = wb.getWorksheet("Invitati") || wb.worksheets.filter(function (s) { return s.state === "visible"; })[0], rows = [];
+    if (!sh) return rows;
+    sh.eachRow({ includeEmpty: false }, function (row) {
+      var r = []; for (var c = 1; c <= Math.max(row.cellCount, IMPORT_COLS.length); c++) { var cell = row.getCell(c); r.push(cell.text != null ? String(cell.text) : ""); }
+      if (r.some(function (x) { return x.trim(); })) rows.push(r);
+    });
+    return rows;
+  }
+  // Righe (prima riga = intestazioni) → invitati pronti da salvare, con avvisi riga per riga
+  function readImport(w, rows) {
+    if (!rows.length) return { people: [], errs: ["Il file è vuoto."] };
+    var head = rows[0].map(norm), people = [], errs = [];
     var col = function (re) { for (var i = 0; i < head.length; i++) if (re.test(head[i])) return i; return -1; };
-    var cN = col(/^nome/), cC = col(/^cognome/), cB = col(/^(numero )?bambini$/), cU = col(/sotto|3 anni/), cM = col(/^menu/), cA = col(/intoller|allerg/);
-    if (cN < 0) return { rows: [], errs: ["Manca la colonna «Nome» nella prima riga: usate il modello scaricato da questa pagina."] };
+    var cols = function (re) { var o = []; head.forEach(function (x, i) { if (re.test(x)) o.push(i); }); return o; };
+    var cN = col(/^nome/), cC = col(/^cognome/), cH = col(/nucleo/), cG = col(/^gruppo/), cE = col(/^eta/), cM = col(/^menu/), cAs = cols(/^allergia|intolleranze\/allergie/),
+      cO = col(/^altre/), cR = col(/^risposta/), cNo = col(/^note/), cB = col(/^(numero )?bambini$/), cU = col(/sotto|3 anni/);
+    if (cN < 0) return { people: [], errs: ["Nella prima riga manca la colonna «Nome e cognome»: usate il modello scaricato da questa pagina."] };
+    var groupIn = {}; GROUPS.forEach(function (k) { groupIn[norm(cleanGroupName(groupLabel(w, k)))] = k; groupIn[norm(groupLabel(w, k))] = k; });
+    var allergyIn = {}; ALLERGIES.forEach(function (a) { allergyIn[norm(a[1])] = a[0]; });
     rows.slice(1, 501).forEach(function (r, i) {
-      var line = i + 2, get = function (c) { return c >= 0 ? String(r[c] || "").trim() : ""; };
+      var line = i + 2, get = function (c) { return c >= 0 ? String(r[c] == null ? "" : r[c]).trim() : ""; };
       var name = (get(cN) + " " + get(cC)).trim().replace(/\s+/g, " ").slice(0, 100);
-      if (!name) { errs.push("Riga " + line + ": manca il nome, la salto."); return; }
-      var kids = Math.max(0, Math.min(15, parseInt(get(cB), 10) || 0)), u = norm(get(cU));
-      var small = /^s[iì]$/.test(u) ? kids : Math.min(kids, Math.max(0, parseInt(u, 10) || 0));
-      var menu = MENU_IN[norm(get(cM))] || "standard";
-      if (get(cM) && !MENU_IN[norm(get(cM))]) errs.push("Riga " + line + ": menù «" + get(cM) + "» non riconosciuto, uso standard.");
-      var al = [], other = [];
-      get(cA).split(/[,;\/+]| e /).forEach(function (a) {
-        a = norm(a); if (!a || /^(no|nessun[ao]?|-)$/.test(a)) return;
-        var hit = ALLERGY_IN.filter(function (x) { return x[1].test(a); })[0];
-        if (hit) { if (al.indexOf(hit[0]) < 0) al.push(hit[0]); } else other.push(a);
+      if (!name) { if (r.some(function (x) { return String(x).trim(); })) errs.push("Riga " + line + ": manca il nome, la salto."); return; }
+      var p = { name: name, household: get(cH).slice(0, 120), guest_group: null, age_band: "adulto", menu: "standard", allergies: [], allergies_note: "", rsvp: "in_attesa", notes: get(cNo).slice(0, 500) };
+      if (get(cG)) { p.guest_group = groupIn[norm(get(cG))] || null; if (!p.guest_group) errs.push("Riga " + line + ": gruppo «" + get(cG) + "» non riconosciuto, uso quello scelto qui sotto."); }
+      if (get(cE)) { p.age_band = AGE_IN[norm(get(cE))] || "adulto"; if (!AGE_IN[norm(get(cE))]) errs.push("Riga " + line + ": età «" + get(cE) + "» non riconosciuta, uso Adulto."); }
+      if (get(cM)) { p.menu = MENU_IN[norm(get(cM))] || "standard"; if (!MENU_IN[norm(get(cM))]) errs.push("Riga " + line + ": menù «" + get(cM) + "» non riconosciuto, uso Standard."); }
+      if (get(cR)) { p.rsvp = RSVP_IN[norm(get(cR))] || "in_attesa"; if (!RSVP_IN[norm(get(cR))]) errs.push("Riga " + line + ": risposta «" + get(cR) + "» non riconosciuta, uso In attesa."); }
+      var other = [];
+      cAs.concat(cO >= 0 ? [cO] : []).forEach(function (c) {
+        get(c).split(/[,;\/+]| e /).forEach(function (a) {
+          a = norm(a); if (!a || /^(no|nessun[ao]?|-)$/.test(a)) return;
+          var hit = allergyIn[a] || (ALLERGY_IN.filter(function (x) { return x[1].test(a); })[0] || [])[0];
+          if (hit) { if (p.allergies.indexOf(hit) < 0) p.allergies.push(hit); } else other.push(a);
+        });
       });
-      if (other.length) al.push("altro");
-      out.push({ name: name, kids: kids, small: small, menu: menu, allergies: al, note: other.join(", ").slice(0, 200) });
+      if (other.length) { p.allergies.push("altro"); p.allergies_note = other.join(", ").slice(0, 200); }
+      people.push(p);
+      // vecchio modello CSV: una riga per adulto con il numero dei bambini
+      if (cB >= 0) {
+        var kids = Math.max(0, Math.min(15, parseInt(get(cB), 10) || 0)), u = norm(get(cU)), small = /^s[iì]$/.test(u) ? kids : Math.min(kids, Math.max(0, parseInt(u, 10) || 0));
+        if (kids && !p.household) p.household = name;
+        for (var k = 1; k <= kids; k++) people.push(Object.assign({}, p, { name: "Bambino " + k + " · " + name, age_band: k <= small ? "under3" : "bambino", notes: "" }));
+      }
     });
-    if (rows.length > 501) errs.push("Il file ha più di 500 righe: importo le prime 500.");
-    return { rows: out, errs: errs };
+    if (rows.length > 501) errs.push("Il file ha più di 500 righe: leggo le prime 500.");
+    return { people: people, errs: errs };
   }
-  // Una riga del foglio diventa l'adulto più i suoi bambini, nello stesso nucleo
-  function importRows(w, rows, group) {
-    var out = [];
-    rows.forEach(function (r) {
-      var base = { wedding_id: w.id, guest_group: group, rsvp: "in_attesa", menu: r.menu, allergies: r.allergies, allergies_note: r.note, household: r.kids ? r.name : "" };
-      out.push(Object.assign({ name: r.name, age_band: "adulto" }, base));
-      for (var i = 1; i <= r.kids; i++) out.push(Object.assign({}, base, { name: "Bambino " + i + " · " + r.name, age_band: i <= r.small ? "under3" : "bambino" }));
+  // Elenco incollato (WhatsApp, note del telefono): un nome per riga, senza numeri, trattini o simboli davanti
+  function readPasted(text) {
+    var people = [], errs = [];
+    String(text).split(/\r?\n/).forEach(function (l, i) {
+      var name = l.replace(/^[^\p{L}]+/u, "").replace(/[^\p{L}.'’)]+$/u, "").replace(/\s+/g, " ").trim().slice(0, 100);
+      if (!name) return;
+      people.push({ name: name, household: "", guest_group: null, age_band: "adulto", menu: "standard", allergies: [], allergies_note: "", rsvp: "in_attesa", notes: "" });
     });
-    return out;
+    if (!people.length) errs.push("Non trovo nomi: scrivete un nome per riga.");
+    return { people: people.slice(0, 500), errs: people.length > 500 ? ["Più di 500 righe: leggo le prime 500."] : errs };
   }
-  function importView(w) {
+  async function importView(w) {
+    var existing = await api.list("guests", w.id), R = rights(w);
+    var have = {}; existing.forEach(function (x) { have[norm(x.name)] = 1; });
+    var room = R.guests == null ? Infinity : Math.max(0, R.guests - existing.filter(function (x) { return !x.couple_side; }).length);
     var group = h("select", { id: "imp-g" }, GROUPS.map(function (k) { return h("option", { value: k }, groupLabel(w, k)); }));
     var out = h("div", { class: "imp-out", "aria-live": "polite" });
     var bad = function (t) { return h("div", { class: "alert bad", role: "alert" }, icon("alert"), h("div", null, h("b", null, t))); };
+    var last = null;
     function show(res) {
-      if (!res.rows.length) return out.replaceChildren(bad(res.errs[0] || "Nessuna riga da importare."));
-      var people = importRows(w, res.rows, group.value), kids = people.filter(function (x) { return x.age_band !== "adulto"; }).length;
-      var small = people.filter(function (x) { return x.age_band === "under3"; }).length;
-      out.replaceChildren(
-        h("p", { class: "imp-sum" }, h("b", null, plural(people.length, "invitato", "invitati")), " da " + plural(res.rows.length, "riga", "righe") + ": " + plural(people.length - kids, "adulto", "adulti") + ", " + plural(kids, "bambino", "bambini") + (small ? " (" + small + " sotto i 3 anni)" : "") + ". Risposta: in attesa."),
-        res.errs.length ? h("ul", { class: "imp-errs" }, res.errs.slice(0, 20).map(function (e) { return h("li", null, e); })) : null,
-        h("div", { class: "tscroll" }, h("table", { class: "tbl" }, h("caption", { class: "sr" }, "Anteprima"),
-          h("thead", null, h("tr", null, ["Nome", "Bambini", "Menù", "Intolleranze e allergie"].map(function (x) { return h("th", { scope: "col" }, x); }))),
-          h("tbody", null, res.rows.slice(0, 50).map(function (r) {
-            return h("tr", null, h("th", { scope: "row" }, r.name), h("td", null, r.kids ? r.kids + (r.small ? " (" + r.small + " sotto i 3 anni)" : "") : "—"), h("td", null, LABEL.menu[r.menu].toLowerCase()), h("td", null, allergyText({ allergies: r.allergies, allergies_note: r.note }) || "—"));
-          })))),
-        res.rows.length > 50 ? h("p", { class: "muted small" }, "Anteprima delle prime 50 righe.") : null,
-        btn("Importa " + plural(people.length, "invitato", "invitati"), async function (e) {
+      if (!res.people.length) return out.replaceChildren(bad(res.errs[0] || "Nessuna riga da importare."));
+      var seen = {}, dup = [], people = [];
+      res.people.forEach(function (p) { var k = norm(p.name); if (have[k] && !/^bambino \d+ · /.test(k)) dup.push(p.name); else if (seen[k] && !/^bambino \d+ · /.test(k)) dup.push(p.name); else { seen[k] = 1; people.push(p); } });
+      var take = people.slice(0, room), over = people.length - take.length;
+      var rowsOf = function (list) { return list.map(function (p) { return Object.assign({}, p, { wedding_id: w.id, guest_group: p.guest_group || group.value }); }); };
+      var kids = take.filter(function (x) { return x.age_band !== "adulto"; }).length, hh = {}; take.forEach(function (p) { hh[norm(p.household) || "#" + p.name] = 1; });
+      out.replaceChildren.apply(out, [
+        h("p", { class: "imp-sum" }, h("b", null, plural(take.length, "invitato", "invitati") + " da importare"), " · " + plural(take.length - kids, "adulto", "adulti") + ", " + plural(kids, "bambino", "bambini") + " · " + plural(Object.keys(hh).length, "partecipazione", "partecipazioni") + "."),
+        dup.length ? h("p", { class: "muted small" }, plural(dup.length, "nome è già in lista e non verrà importato", "nomi sono già in lista e non verranno importati") + ": " + dup.slice(0, 8).join(", ") + (dup.length > 8 ? "…" : "") + ".") : null,
+        over > 0 ? h("div", { class: "alert info" }, icon("lock"), h("div", null, h("p", null, h("b", null, "Il piano Gratis arriva a " + R.guests + " invitati."), " Ne importo " + take.length + "; gli altri " + over + " entrano con il Pass Tableau (19 €)."),
+          canEdit(w) ? h("div", { class: "btn-row" }, unlockBtn(w, "invitati", "Avete più di " + R.guests + " invitati", "Con il Pass Tableau gli invitati sono illimitati, con tavoli, sala e stampa del tableau.", "primary sm")) : null)) : null,
+        res.errs.length ? h("ul", { class: "imp-errs" }, res.errs.slice(0, 20).map(function (e) { return h("li", null, e); }), res.errs.length > 20 ? h("li", null, "…e altri " + (res.errs.length - 20) + " avvisi.") : null) : null,
+        take.length ? h("div", { class: "tscroll" }, h("table", { class: "tbl" }, h("caption", { class: "sr" }, "Anteprima"),
+          h("thead", null, h("tr", null, ["Nome", "Nucleo", "Gruppo", "Età", "Menù", "Allergie", "Risposta"].map(function (x) { return h("th", { scope: "col" }, x); }))),
+          h("tbody", null, take.slice(0, 50).map(function (p) {
+            return h("tr", null, h("th", { scope: "row" }, p.name), h("td", null, p.household || "—"), h("td", null, groupLabel(w, p.guest_group || group.value)), h("td", null, LABEL.age[p.age_band]),
+              h("td", null, LABEL.menu[p.menu]), h("td", null, allergyText(p) || "—"), h("td", null, LABEL.rsvp[p.rsvp]));
+          })))) : null,
+        take.length > 50 ? h("p", { class: "muted small" }, "Anteprima delle prime 50 righe.") : null,
+        take.length ? btn("Importa " + plural(take.length, "invitato", "invitati"), async function (e) {
           var b = e.currentTarget; b.disabled = true;
-          var rows = importRows(w, res.rows, group.value);
+          var rows = rowsOf(take);
           try { await attempt(async function () { for (var i = 0; i < rows.length; i += 200) await api.insert("guests", rows.slice(i, i + 200)); }, plural(rows.length, "invitato importato", "invitati importati") + "."); }
           catch (err) { b.disabled = false; return; }
           go("m/" + w.id + "/invitati/elenco");
-        }, "primary", "check"));
+        }, "primary", "check") : null].filter(Boolean));
     }
-    var last = null;
     group.addEventListener("change", function () { if (last) show(last); });
-    var file = h("input", { type: "file", id: "imp-f", accept: ".csv,text/csv", onchange: async function () {
+    var file = h("input", { type: "file", id: "imp-f", accept: ".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", onchange: async function () {
       var f = file.files[0]; last = null;
       if (!f) return out.replaceChildren();
-      if (/\.xls[xm]?$/i.test(f.name)) return out.replaceChildren(bad("È un file Excel: in Excel scegliete File › Salva con nome › CSV, poi caricate quel file."));
-      if (f.size > 1048576) return out.replaceChildren(bad("Il file è troppo grande: al massimo 1 MB."));
-      var buf = await f.arrayBuffer(), text = new TextDecoder("utf-8").decode(buf);
-      // Excel su Windows salva il CSV senza UTF-8: le lettere accentate si recuperano così
-      if (text.indexOf("\uFFFD") >= 0) text = new TextDecoder("windows-1252").decode(buf);
-      show(last = readImport(parseCsv(text)));
+      if (f.size > 3145728) return out.replaceChildren(bad("Il file è troppo grande: al massimo 3 MB."));
+      if (/\.xls$/i.test(f.name)) return out.replaceChildren(bad("È un vecchio formato Excel (.xls): scaricate il modello da questa pagina e copiateci i nomi."));
+      out.replaceChildren(h("p", { class: "muted" }, "Leggo il file…"));
+      try {
+        var buf = await f.arrayBuffer(), rows;
+        if (/\.xlsx$/i.test(f.name)) rows = await readXlsx(buf);
+        else { var text = new TextDecoder("utf-8").decode(buf); if (text.indexOf("�") >= 0) text = new TextDecoder("windows-1252").decode(buf); rows = parseCsv(text); }
+        show(last = readImport(w, rows));
+      } catch (err) { out.replaceChildren(bad(err.message || String(err))); }
     } });
-    return [pageHead("Importa gli invitati", "Dal foglio Excel alla lista in tre passi. Potrete poi correggere ogni persona dall'elenco.", linkBtn("#/m/" + w.id + "/invitati/elenco", "Torna all'elenco", "ghost", "back")),
+    var paste = h("textarea", { id: "imp-p", rows: 6, placeholder: "Mario Rossi\nLucia Bianchi\nZia Carmela" });
+    return [pageHead("Importa gli invitati", "Dal modello Excel o da un elenco incollato. Gli sposi sono già nella lista; ogni persona si può correggere dopo.", linkBtn("#/m/" + w.id + "/invitati/elenco", "Torna all'elenco", "ghost", "back")),
       h("ol", { class: "imp-steps" },
-        h("li", { class: "panel" }, h("h2", null, "Scaricate il modello"), h("p", null, "Un file CSV con le colonne " + CSV_HEAD.map(function (c) { return "«" + c + "»"; }).join(", ") + ". Una riga per ogni adulto: i suoi bambini si indicano con il numero."),
-          btn("Scarica il modello CSV", function () { download("modello-invitati.csv", [CSV_HEAD]); }, "soft", "file")),
-        h("li", { class: "panel" }, h("h2", null, "Compilatelo con Excel"), h("p", null, "Menù: standard, vegano, vegetariano, no carne o no pesce. Allergie separate da virgole, per esempio «glutine, lattosio»: quelle fuori elenco finiscono in «Altro». Bambini sotto i 3 anni: quanti sono."),
-          h("p", { class: "muted small" }, "Salvate in formato CSV: File › Salva con nome › CSV (delimitato dal separatore di elenco).")),
-        h("li", { class: "panel" }, h("h2", null, "Caricate il file"), h("div", { class: "grid-form" }, h("div", { class: "fld" }, h("label", { for: "imp-f" }, "File CSV compilato"), file),
-          h("div", { class: "fld" }, h("label", { for: "imp-g" }, "Gruppo degli invitati importati"), group)), out))];
+        h("li", { class: "panel" }, h("h2", null, "Scaricate il modello Excel"), h("p", null, "Una riga per persona. Gruppo, età, menù, allergie e risposta si scelgono dal menu a tendina della cella, così il file si importa senza errori. Il foglio «Come compilarlo» spiega ogni colonna."),
+          btn("Scarica il modello Excel", function (e) { var b = e.currentTarget; b.disabled = true; attempt(function () { return downloadTemplate(w); }).catch(function () {}).then(function () { b.disabled = false; }); }, "soft", "file")),
+        h("li", { class: "panel" }, h("h2", null, "Caricate il file compilato"), h("p", { class: "muted small" }, "Excel (.xlsx) o CSV. Funziona anche con Numbers e Fogli Google, esportando in Excel."),
+          h("div", { class: "grid-form" }, h("div", { class: "fld" }, h("label", { for: "imp-f" }, "File compilato"), file),
+            h("div", { class: "fld" }, h("label", { for: "imp-g" }, "Gruppo per chi non ce l'ha"), group))),
+        h("li", { class: "panel" }, h("h2", null, "Oppure incollate un elenco"), h("p", null, "Un nome per riga, copiato da WhatsApp o dalle note del telefono. Numeri, trattini e simboli davanti al nome si tolgono da soli; menù e allergie li aggiungete dopo."),
+          h("div", { class: "fld" }, h("label", { for: "imp-p" }, "Nomi"), paste),
+          btn("Leggi l'elenco", function () { show(last = readPasted(paste.value)); }, "soft", "check"))),
+      out];
   }
 
   /* ------------------------------------------------------------ programma del giorno */
